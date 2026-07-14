@@ -10,7 +10,7 @@
 <body class="bg-black text-white font-sans">
     
     <!-- Navigation -->
-    <nav class="fixed w-full top-0 z-50 bg-black/95 backdrop-blur-md border-b border-red-600/50">
+    <nav class="fixed w-full top-0 z-50 bg-black/95 backdrop-blur-md border-b border-white/10">
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
@@ -23,16 +23,15 @@
                     <a href="#home" class="text-yellow-400 hover:text-red-400 transition duration-300 font-medium">HOME</a>
                     <a href="#menu" class="text-white hover:text-yellow-400 transition duration-300 font-medium">MENU</a>
                     <a href="#about" class="text-white hover:text-yellow-400 transition duration-300 font-medium">ABOUT</a>
-                    <a href="#contact" class="text-white hover:text-yellow-400 transition duration-300 font-medium">CONTACT</a>
                 </div>
 
                 <!-- Right Side Icons & Button -->
                 <div class="flex items-center space-x-4">
-                    <button class="text-white hover:text-yellow-400 transition duration-300">
+                    <a href="/login" class="text-white hover:text-yellow-400 transition duration-300">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
                         </svg>
-                    </button>
+                    </a>
                     <button class="text-white hover:text-yellow-400 transition duration-300">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
@@ -42,6 +41,9 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
                         </svg>
+                    </button>
+                    <button onclick="openModal('login')" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-full font-semibold transition duration-300 transform hover:scale-105">
+                        Login
                     </button>
                     <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition duration-300">
                         Reserve Table
@@ -59,8 +61,19 @@
     </nav>
     <!-- Hero Section -->
     <section id="home" class="min-h-screen flex items-center relative overflow-hidden pt-20">
-        <!-- Background gradient -->
-        <div class="absolute inset-0 bg-gradient-to-br from-black via-red-900/20 to-black"></div>
+        <!-- Background photo -->
+        <div class="absolute inset-0">
+            <img src="{{ asset('images/hero-bg.jpg') }}" 
+                 alt="" 
+                 class="w-full h-full object-cover object-center"
+                 style="opacity: 0.25;">
+        </div>
+        <!-- Dark overlay gradient on top of photo -->
+        <div class="absolute inset-0 bg-gradient-to-br from-black/90 via-red-950/60 to-black/90"></div>
+        <!-- Extra bottom fade to black -->
+        <div class="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent"></div>
+        <!-- Circular vignette effect — subtle/smooth -->
+        <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.25) 65%, rgba(0,0,0,0.55) 85%, rgba(0,0,0,0.75) 100%);"></div>
         
         <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
             <!-- Left Content -->
@@ -155,7 +168,15 @@
     <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
     <!-- Features Section -->
-    <section class="py-20 bg-gray-900">
+    <section class="py-20 bg-gray-900 relative overflow-hidden">
+        <!-- Decorative cutout left -->
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 opacity-20 pointer-events-none select-none rotate-12">
+            <img src="{{ asset('images/deco-burger2.png') }}" class="w-96" alt="">
+        </div>
+        <!-- Decorative cutout right -->
+        <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 opacity-20 pointer-events-none select-none -rotate-12">
+            <img src="{{ asset('images/deco-fries2.png') }}" class="w-80" alt="">
+        </div>
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold mb-4 text-yellow-400" style="font-family: 'Playfair Display', serif;">Why Choose EUT?</h2>
@@ -203,7 +224,15 @@
     <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
     <!-- Menu Preview Section -->
-    <section id="menu" class="py-20 bg-black">
+    <section id="menu" class="py-20 bg-black relative overflow-hidden">
+        <!-- Decorative cutout left -->
+        <div class="absolute left-0 bottom-10 -translate-x-10 opacity-20 pointer-events-none select-none -rotate-6">
+            <img src="{{ asset('images/deco-fries2.png') }}" class="w-80" alt="">
+        </div>
+        <!-- Decorative cutout right -->
+        <div class="absolute right-0 top-10 translate-x-10 opacity-20 pointer-events-none select-none rotate-6">
+            <img src="{{ asset('images/deco-burger2.png') }}" class="w-96" alt="">
+        </div>
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold mb-4 text-yellow-400" style="font-family: 'Playfair Display', serif;">Featured Menu</h2>
@@ -268,29 +297,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Login to view full menu teaser -->
-            <div class="text-center mt-12">
-                <div class="border border-red-600/40 rounded-2xl p-8 max-w-lg mx-auto"
-                     style="background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(0,0,0,0.6));">
-                    <div class="mb-4">
-                        <svg class="w-12 h-12 text-yellow-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        <h3 class="text-xl font-semibold text-yellow-400 mb-2">Want to see the full menu?</h3>
-                        <p class="text-gray-300 text-sm">Login or create an account to browse our complete selection of burgers, sides, beverages, and combo meals.</p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6">
-                        <a href="/login" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-semibold transition duration-300 transform hover:scale-105">
-                            Login to View Menu
-                        </a>
-                        <a href="/register" class="border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-8 py-3 rounded-full font-semibold transition duration-300">
-                            Create Account
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -298,7 +304,15 @@
     <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
     <!-- About Section -->
-    <section id="about" class="py-20 bg-gray-900">
+    <section id="about" class="py-20 bg-gray-900 relative overflow-hidden">
+        <!-- Decorative cutout left -->
+        <div class="absolute left-0 top-10 -translate-x-10 opacity-20 pointer-events-none select-none rotate-6">
+            <img src="{{ asset('images/deco-pepper.png') }}" class="w-72" alt="">
+        </div>
+        <!-- Decorative cutout right -->
+        <div class="absolute right-0 bottom-10 translate-x-10 opacity-20 pointer-events-none select-none -rotate-6">
+            <img src="{{ asset('images/fries-cutout.png') }}" class="w-80" alt="">
+        </div>
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <!-- Left Content -->
@@ -346,86 +360,6 @@
         </div>
     </section>
 
-    <!-- Divider -->
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-black">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4 text-yellow-400" style="font-family: 'Playfair Display', serif;">Visit Us Today</h2>
-                <p class="text-gray-300 text-lg">Experience the EUT difference</p>
-            </div>
-            
-            <div class="grid lg:grid-cols-2 gap-12">
-                <!-- Contact Info -->
-                <div class="space-y-8">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-red-600 w-12 h-12 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-yellow-400">Location</h3>
-                            <p class="text-gray-300">123 Food Street, Culinary District, City</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-yellow-500 w-12 h-12 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-red-400">Phone</h3>
-                            <p class="text-gray-300">+63 912 345 6789</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-gray-700 w-12 h-12 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-300">Hours</h3>
-                            <p class="text-gray-300">Mon-Sun: 10:00 AM - 10:00 PM</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Reservation Form -->
-                <div class="bg-gray-900 border border-red-600/30 rounded-2xl p-8">
-                    <h3 class="text-2xl font-semibold mb-6 text-yellow-400">Make a Reservation</h3>
-                    <form class="space-y-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="text" placeholder="First Name" class="bg-black border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition duration-300">
-                            <input type="text" placeholder="Last Name" class="bg-black border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition duration-300">
-                        </div>
-                        <input type="email" placeholder="Email Address" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 transition duration-300">
-                        <input type="tel" placeholder="Phone Number" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition duration-300">
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="date" class="bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition duration-300">
-                            <input type="time" class="bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition duration-300">
-                        </div>
-                        <select class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition duration-300">
-                            <option>Number of Guests</option>
-                            <option>1-2 Guests</option>
-                            <option>3-4 Guests</option>
-                            <option>5-8 Guests</option>
-                            <option>8+ Guests</option>
-                        </select>
-                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-yellow-500 hover:from-red-700 hover:to-yellow-600 text-white py-3 rounded-lg font-semibold transition duration-300 transform hover:scale-105">
-                            Reserve Table
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Divider -->
     <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
@@ -594,6 +528,196 @@
                     button.style.backgroundColor = '';
                 }, 1000);
             }
+        });
+    </script>
+
+    <!-- ===================== AUTH MODAL ===================== -->
+    <div id="authModal" class="fixed inset-0 z-[9999] flex items-center justify-center hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeModal()"></div>
+
+        <!-- Modal Box -->
+        <div class="relative w-full max-w-md mx-4 rounded-2xl overflow-hidden shadow-2xl"
+             style="background: #0a0a0a;">
+
+            <!-- Close button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition z-10">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <!-- Tab Switcher -->
+            <div class="flex border-b border-white/10">
+                <button id="loginTab" onclick="switchTab('login')"
+                    class="flex-1 py-4 text-sm font-semibold tracking-widest uppercase transition duration-300 text-yellow-400 border-b-2 border-yellow-400">
+                    Login
+                </button>
+                <button id="signupTab" onclick="switchTab('signup')"
+                    class="flex-1 py-4 text-sm font-semibold tracking-widest uppercase transition duration-300 text-gray-500 border-b-2 border-transparent hover:text-gray-300">
+                    Sign Up
+                </button>
+            </div>
+
+            <div class="p-8">
+
+                <!-- ---- LOGIN PANEL ---- -->
+                <div id="loginPanel">
+                    <h2 class="text-2xl font-bold text-yellow-400 mb-1" style="font-family:'Playfair Display',serif;">Welcome Back</h2>
+                    <p class="text-gray-400 text-sm mb-6">Sign in to your EUT account</p>
+
+                    <!-- Google Login -->
+                    <button class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-gray-600 text-xs">or continue with email</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
+
+                    <!-- Email / Password -->
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Email</label>
+                            <input type="email" placeholder="you@example.com"
+                                class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Password</label>
+                            <input type="password" placeholder="••••••••"
+                                class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-gray-300 transition">
+                                <input type="checkbox" class="accent-yellow-400"> Remember me
+                            </label>
+                            <a href="#" class="hover:text-yellow-400 transition">Forgot password?</a>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105">
+                            Login
+                        </button>
+                    </form>
+                    <p class="text-center text-gray-500 text-sm mt-6">
+                        Don't have an account?
+                        <button onclick="switchTab('signup')" class="text-yellow-400 hover:text-yellow-300 font-semibold transition">Sign up</button>
+                    </p>
+                </div>
+
+                <!-- ---- SIGN UP PANEL ---- -->
+                <div id="signupPanel" class="hidden">
+                    <h2 class="text-2xl font-bold text-yellow-400 mb-1" style="font-family:'Playfair Display',serif;">Create Account</h2>
+                    <p class="text-gray-400 text-sm mb-6">Join EUT Restaurant today</p>
+
+                    <!-- Google Signup -->
+                    <button class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Sign up with Google
+                    </button>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flex-1 h-px bg-white/10"></div>
+                        <span class="text-gray-600 text-xs">or sign up with email</span>
+                        <div class="flex-1 h-px bg-white/10"></div>
+                    </div>
+
+                    <form class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">First Name</label>
+                                <input type="text" placeholder="Juan"
+                                    class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Last Name</label>
+                                <input type="text" placeholder="Dela Cruz"
+                                    class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Email</label>
+                            <input type="email" placeholder="you@example.com"
+                                class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Password</label>
+                            <input type="password" placeholder="••••••••"
+                                class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Confirm Password</label>
+                            <input type="password" placeholder="••••••••"
+                                class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105">
+                            Create Account
+                        </button>
+                    </form>
+                    <p class="text-center text-gray-500 text-sm mt-6">
+                        Already have an account?
+                        <button onclick="switchTab('login')" class="text-yellow-400 hover:text-yellow-300 font-semibold transition">Login</button>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ===================== END MODAL ===================== -->
+
+    <script>
+        function openModal(tab) {
+            document.getElementById('authModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            switchTab(tab || 'login');
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function switchTab(tab) {
+            const loginPanel  = document.getElementById('loginPanel');
+            const signupPanel = document.getElementById('signupPanel');
+            const loginTab    = document.getElementById('loginTab');
+            const signupTab   = document.getElementById('signupTab');
+
+            if (tab === 'login') {
+                loginPanel.classList.remove('hidden');
+                signupPanel.classList.add('hidden');
+                loginTab.classList.add('text-yellow-400', 'border-yellow-400');
+                loginTab.classList.remove('text-gray-500', 'border-transparent');
+                signupTab.classList.add('text-gray-500', 'border-transparent');
+                signupTab.classList.remove('text-yellow-400', 'border-yellow-400');
+            } else {
+                signupPanel.classList.remove('hidden');
+                loginPanel.classList.add('hidden');
+                signupTab.classList.add('text-yellow-400', 'border-yellow-400');
+                signupTab.classList.remove('text-gray-500', 'border-transparent');
+                loginTab.classList.add('text-gray-500', 'border-transparent');
+                loginTab.classList.remove('text-yellow-400', 'border-yellow-400');
+            }
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
         });
     </script>
 
