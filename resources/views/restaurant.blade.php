@@ -69,7 +69,7 @@
                     <h1 class="text-5xl lg:text-7xl font-bold mb-4" style="font-family: 'Playfair Display', serif;">
                         <span class="text-yellow-400">EUT</span> <span class="text-red-500">Restaurant</span>
                     </h1>
-                    <h2 class="text-2xl lg:text-3xl text-blue-400 mb-6 font-light">
+                    <h2 class="text-2xl lg:text-3xl text-gray-300 mb-6 font-light">
                         Eat • Unwind • Tea
                     </h2>
                 </div>
@@ -92,7 +92,7 @@
                 <div class="flex space-x-2 pt-8">
                     <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                     <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
                 </div>
             </div>
             
@@ -101,7 +101,7 @@
                 <!-- Burger Image -->
                 <div class="relative z-10 mb-6">
                     <div class="bg-gradient-to-br from-red-600 to-red-800 rounded-2xl p-4 shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500">
-                        <div class="bg-white rounded-xl p-3 shadow-lg">
+                        <div class="bg-black rounded-xl p-3 shadow-lg">
                             <img src="{{ asset('images/single-burger.png') }}" 
                                  alt="Delicious Burger" 
                                  class="w-full h-48 object-cover rounded-lg shadow-md">
@@ -112,7 +112,7 @@
                 <!-- Fries Image -->
                 <div class="relative z-10">
                     <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-4 shadow-2xl transform -rotate-2 hover:rotate-0 transition duration-500">
-                        <div class="bg-white rounded-xl p-3 shadow-lg">
+                        <div class="bg-black rounded-xl p-3 shadow-lg">
                             <img src="{{ asset('images/single-fries.png') }}" 
                                  alt="Crispy French Fries" 
                                  class="w-full h-48 object-cover rounded-lg shadow-md">
@@ -123,7 +123,7 @@
                 <!-- Floating elements -->
                 <div class="absolute top-10 -right-5 w-20 h-20 bg-red-500 rounded-full opacity-20 animate-pulse"></div>
                 <div class="absolute bottom-10 -left-5 w-16 h-16 bg-yellow-400 rounded-full opacity-30 animate-bounce"></div>
-                <div class="absolute top-1/2 right-10 w-12 h-12 bg-blue-500 rounded-full opacity-25 animate-ping"></div>
+                <div class="absolute top-1/2 right-10 w-12 h-12 bg-gray-600 rounded-full opacity-25 animate-ping"></div>
             </div>
         </div>
         
@@ -163,18 +163,18 @@
                             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4 text-red-400">Expert Chefs</h3>
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Expert Chefs</h3>
                     <p class="text-gray-300">Our experienced chefs craft each dish with passion and culinary expertise.</p>
                 </div>
                 
                 <!-- Feature 3 -->
                 <div class="text-center group">
-                    <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition duration-300">
+                    <div class="bg-gray-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition duration-300">
                         <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4 text-blue-400">Cozy Atmosphere</h3>
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Cozy Atmosphere</h3>
                     <p class="text-gray-300">Relax and unwind in our warm, inviting atmosphere perfect for any occasion.</p>
                 </div>
             </div>
@@ -229,18 +229,18 @@
                 </div>
                 
                 <!-- Classic French Fries -->
-                <div class="bg-gray-900 border border-blue-600/30 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300 shadow-lg hover:border-blue-500">
+                <div class="bg-gray-900 border border-yellow-500/30 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300 shadow-lg hover:border-yellow-400">
                     <div class="h-48 overflow-hidden">
                         <img src="{{ asset('images/french-fries.jpg') }}" 
                              alt="Classic French Fries" 
                              class="w-full h-full object-cover hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-blue-400">Classic French Fries</h3>
+                        <h3 class="text-xl font-semibold mb-2 text-yellow-400">Classic French Fries</h3>
                         <p class="text-gray-300 mb-4">Golden crispy fries with sea salt - perfect side for any meal</p>
                         <div class="flex justify-between items-center">
-                            <span class="text-blue-400 text-xl font-bold">₱120</span>
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition duration-300">
+                            <span class="text-yellow-400 text-xl font-bold">₱120</span>
+                            <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-full text-sm font-semibold transition duration-300">
                                 Order Now
                             </button>
                         </div>
@@ -265,11 +265,11 @@
     </section>
 
     <!-- Comprehensive Menu Section -->
-    <section class="py-20 bg-slate-800">
+    <section class="py-20 bg-gray-900">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4" style="font-family: 'Playfair Display', serif;">Complete Menu</h2>
-                <p class="text-slate-300 text-lg">Explore our full collection of delicious offerings</p>
+                <h2 class="text-4xl font-bold mb-4 text-yellow-400" style="font-family: 'Playfair Display', serif;">Complete Menu</h2>
+                <p class="text-gray-300 text-lg">Explore our full collection of delicious offerings</p>
             </div>
 
             <!-- Menu Categories -->
@@ -283,7 +283,7 @@
                 <button class="menu-category-btn text-red-400 border border-red-400 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-red-400 hover:text-white" data-category="sides">
                     Sides
                 </button>
-                <button class="menu-category-btn text-blue-400 border border-blue-400 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-blue-400 hover:text-white" data-category="beverages">
+                <button class="menu-category-btn text-gray-300 border border-gray-400 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-gray-400 hover:text-black" data-category="beverages">
                     Beverages
                 </button>
                 <button class="menu-category-btn text-yellow-400 border border-yellow-400 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-yellow-400 hover:text-black" data-category="combos">
@@ -371,15 +371,15 @@
                     </div>
 
                     <!-- Veggie Delight Burger -->
-                    <div class="menu-item bg-black border border-blue-600/30 rounded-lg p-6 hover:border-blue-500 transition duration-300" data-category="burgers">
+                    <div class="menu-item bg-black border border-gray-600/30 rounded-lg p-6 hover:border-gray-400 transition duration-300" data-category="burgers">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/gourmet-burger.jpg') }}" alt="Veggie Delight Burger" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2 text-blue-400">Veggie Delight Burger</h4>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-300">Veggie Delight Burger</h4>
                                 <p class="text-gray-300 text-sm mb-3">House-made veggie patty with avocado, sprouts, herbed mayo</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-blue-400 text-lg font-bold">₱320</span>
-                                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-gray-400 text-lg font-bold">₱320</span>
+                                    <button class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
@@ -389,78 +389,78 @@
 
             <!-- Sides Section -->
             <div class="menu-section" id="sides-section">
-                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Delicious Sides</h3>
+                <h3 class="text-3xl font-bold mb-8 text-red-400" style="font-family: 'Playfair Display', serif;">Delicious Sides</h3>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     <!-- Classic French Fries -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-6 hover:border-yellow-400 transition duration-300" data-category="sides">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/french-fries.jpg') }}" alt="Classic French Fries" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Classic French Fries</h4>
-                                <p class="text-slate-300 text-sm mb-3">Golden crispy fries with sea salt</p>
+                                <h4 class="text-xl font-semibold mb-2 text-yellow-400">Classic French Fries</h4>
+                                <p class="text-gray-300 text-sm mb-3">Golden crispy fries with sea salt</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱120</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-yellow-400 text-lg font-bold">₱120</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Sweet Potato Fries -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                    <div class="menu-item bg-black border border-red-600/30 rounded-lg p-6 hover:border-red-500 transition duration-300" data-category="sides">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/french-fries.jpg') }}" alt="Sweet Potato Fries" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Sweet Potato Fries</h4>
-                                <p class="text-slate-300 text-sm mb-3">Crispy sweet potato fries with honey mustard dip</p>
+                                <h4 class="text-xl font-semibold mb-2 text-red-400">Sweet Potato Fries</h4>
+                                <p class="text-gray-300 text-sm mb-3">Crispy sweet potato fries with honey mustard dip</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱150</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-red-400 text-lg font-bold">₱150</span>
+                                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Loaded Cheese Fries -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-6 hover:border-yellow-400 transition duration-300" data-category="sides">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/french-fries.jpg') }}" alt="Loaded Cheese Fries" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Loaded Cheese Fries</h4>
-                                <p class="text-slate-300 text-sm mb-3">Fries topped with melted cheese, bacon bits, green onions</p>
+                                <h4 class="text-xl font-semibold mb-2 text-yellow-400">Loaded Cheese Fries</h4>
+                                <p class="text-gray-300 text-sm mb-3">Fries topped with melted cheese, bacon bits, green onions</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱180</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-yellow-400 text-lg font-bold">₱180</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Onion Rings -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                    <div class="menu-item bg-black border border-red-600/30 rounded-lg p-6 hover:border-red-500 transition duration-300" data-category="sides">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/combo-meal.jpg') }}" alt="Onion Rings" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Onion Rings</h4>
-                                <p class="text-slate-300 text-sm mb-3">Beer-battered onion rings with ranch dipping sauce</p>
+                                <h4 class="text-xl font-semibold mb-2 text-red-400">Onion Rings</h4>
+                                <p class="text-gray-300 text-sm mb-3">Beer-battered onion rings with ranch dipping sauce</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱140</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-red-400 text-lg font-bold">₱140</span>
+                                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Mozzarella Sticks -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-6 hover:border-yellow-400 transition duration-300" data-category="sides">
                         <div class="flex items-start gap-4">
                             <img src="{{ asset('images/combo-meal.jpg') }}" alt="Mozzarella Sticks" class="w-20 h-20 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Mozzarella Sticks</h4>
-                                <p class="text-slate-300 text-sm mb-3">Golden fried mozzarella with marinara sauce</p>
+                                <h4 class="text-xl font-semibold mb-2 text-yellow-400">Mozzarella Sticks</h4>
+                                <p class="text-gray-300 text-sm mb-3">Golden fried mozzarella with marinara sauce</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱160</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-yellow-400 text-lg font-bold">₱160</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
@@ -470,71 +470,71 @@
 
             <!-- Beverages Section -->
             <div class="menu-section" id="beverages-section">
-                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Beverages</h3>
+                <h3 class="text-3xl font-bold mb-8 text-yellow-400" style="font-family: 'Playfair Display', serif;">Beverages</h3>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     <!-- Premium Tea Collection -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-6 hover:border-yellow-400 transition duration-300" data-category="beverages">
                         <div class="flex items-start gap-4">
-                            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg flex items-center justify-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-600 to-green-800 rounded-lg flex items-center justify-center">
                                 <span class="text-3xl">🍵</span>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Premium Tea Collection</h4>
-                                <p class="text-slate-300 text-sm mb-3">Earl Grey, Jasmine, Oolong, or Chamomile</p>
+                                <h4 class="text-xl font-semibold mb-2 text-yellow-400">Premium Tea Collection</h4>
+                                <p class="text-gray-300 text-sm mb-3">Earl Grey, Jasmine, Oolong, or Chamomile</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱180</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-yellow-400 text-lg font-bold">₱180</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Freshly Brewed Coffee -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                    <div class="menu-item bg-black border border-red-600/30 rounded-lg p-6 hover:border-red-500 transition duration-300" data-category="beverages">
                         <div class="flex items-start gap-4">
-                            <div class="w-20 h-20 bg-gradient-to-br from-amber-600 to-orange-700 rounded-lg flex items-center justify-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-red-800 to-red-900 rounded-lg flex items-center justify-center">
                                 <span class="text-3xl">☕</span>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Freshly Brewed Coffee</h4>
-                                <p class="text-slate-300 text-sm mb-3">Single origin coffee, expertly brewed</p>
+                                <h4 class="text-xl font-semibold mb-2 text-red-400">Freshly Brewed Coffee</h4>
+                                <p class="text-gray-300 text-sm mb-3">Single origin coffee, expertly brewed</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱120</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-red-400 text-lg font-bold">₱120</span>
+                                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Fresh Fruit Smoothies -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-6 hover:border-yellow-400 transition duration-300" data-category="beverages">
                         <div class="flex items-start gap-4">
-                            <div class="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg flex items-center justify-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-lg flex items-center justify-center">
                                 <span class="text-3xl">🥤</span>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Fresh Fruit Smoothies</h4>
-                                <p class="text-slate-300 text-sm mb-3">Mango, Strawberry, or Mixed Berry</p>
+                                <h4 class="text-xl font-semibold mb-2 text-yellow-400">Fresh Fruit Smoothies</h4>
+                                <p class="text-gray-300 text-sm mb-3">Mango, Strawberry, or Mixed Berry</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱200</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-yellow-400 text-lg font-bold">₱200</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Craft Sodas -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                    <div class="menu-item bg-black border border-gray-600/30 rounded-lg p-6 hover:border-gray-400 transition duration-300" data-category="beverages">
                         <div class="flex items-start gap-4">
-                            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center">
+                            <div class="w-20 h-20 bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg flex items-center justify-center">
                                 <span class="text-3xl">🥤</span>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-xl font-semibold mb-2">Craft Sodas</h4>
-                                <p class="text-slate-300 text-sm mb-3">House-made sodas in various flavors</p>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-300">Craft Sodas</h4>
+                                <p class="text-gray-300 text-sm mb-3">House-made sodas in various flavors</p>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-lg font-bold">₱100</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                    <span class="text-gray-400 text-lg font-bold">₱100</span>
+                                    <button class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
@@ -544,57 +544,57 @@
 
             <!-- Combo Meals Section -->
             <div class="menu-section" id="combos-section">
-                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Value Combo Meals</h3>
+                <h3 class="text-3xl font-bold mb-8 text-yellow-400" style="font-family: 'Playfair Display', serif;">Value Combo Meals</h3>
                 <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- EUT Classic Combo -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                    <div class="menu-item bg-black border border-red-600/30 rounded-lg p-8 hover:border-red-500 transition duration-300" data-category="combos">
                         <div class="flex items-start gap-6">
                             <img src="{{ asset('images/delicious-burger-fries.jpg') }}" alt="EUT Classic Combo" class="w-32 h-32 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-2xl font-semibold mb-3">EUT Classic Combo</h4>
-                                <p class="text-slate-300 mb-4">EUT Classic Burger + French Fries + Drink</p>
-                                <div class="text-sm text-slate-400 mb-4">
+                                <h4 class="text-2xl font-semibold mb-3 text-yellow-400">EUT Classic Combo</h4>
+                                <p class="text-gray-300 mb-4">EUT Classic Burger + French Fries + Drink</p>
+                                <div class="text-sm text-gray-400 mb-4">
                                     <p>Includes: EUT Classic Burger, Regular Fries, Soft Drink</p>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-2xl font-bold">₱550</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                    <span class="text-red-400 text-2xl font-bold">₱550</span>
+                                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Gourmet Combo -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                    <div class="menu-item bg-black border border-yellow-500/30 rounded-lg p-8 hover:border-yellow-400 transition duration-300" data-category="combos">
                         <div class="flex items-start gap-6">
                             <img src="{{ asset('images/combo-meal.jpg') }}" alt="Gourmet Combo" class="w-32 h-32 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-2xl font-semibold mb-3">Gourmet Combo</h4>
-                                <p class="text-slate-300 mb-4">Gourmet Cheeseburger + Sweet Potato Fries + Premium Tea</p>
-                                <div class="text-sm text-slate-400 mb-4">
+                                <h4 class="text-2xl font-semibold mb-3 text-red-400">Gourmet Combo</h4>
+                                <p class="text-gray-300 mb-4">Gourmet Cheeseburger + Sweet Potato Fries + Premium Tea</p>
+                                <div class="text-sm text-gray-400 mb-4">
                                     <p>Includes: Gourmet Cheeseburger, Sweet Potato Fries, Premium Tea</p>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-2xl font-bold">₱650</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                    <span class="text-yellow-400 text-2xl font-bold">₱650</span>
+                                    <button class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Spicy Combo -->
-                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                    <div class="menu-item bg-black border border-red-600/30 rounded-lg p-8 hover:border-red-500 transition duration-300" data-category="combos">
                         <div class="flex items-start gap-6">
                             <img src="{{ asset('images/delicious-burger-fries.jpg') }}" alt="Spicy Combo" class="w-32 h-32 object-cover rounded-lg">
                             <div class="flex-1">
-                                <h4 class="text-2xl font-semibold mb-3">Spicy Combo</h4>
-                                <p class="text-slate-300 mb-4">Spicy Jalapeño Burger + Loaded Cheese Fries + Smoothie</p>
-                                <div class="text-sm text-slate-400 mb-4">
+                                <h4 class="text-2xl font-semibold mb-3 text-yellow-400">Spicy Combo</h4>
+                                <p class="text-gray-300 mb-4">Spicy Jalapeño Burger + Loaded Cheese Fries + Smoothie</p>
+                                <div class="text-sm text-gray-400 mb-4">
                                     <p>Includes: Spicy Jalapeño Burger, Loaded Cheese Fries, Fresh Smoothie</p>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-amber-400 text-2xl font-bold">₱620</span>
-                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                    <span class="text-red-400 text-2xl font-bold">₱620</span>
+                                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
                                 </div>
                             </div>
                         </div>
@@ -629,7 +629,7 @@
                             <div class="text-gray-300">Menu Items</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-blue-400 mb-2">1000+</div>
+                            <div class="text-3xl font-bold text-gray-300 mb-2">1000+</div>
                             <div class="text-gray-300">Happy Customers</div>
                         </div>
                     </div>
@@ -687,13 +687,13 @@
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center">
+                        <div class="bg-gray-700 w-12 h-12 rounded-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold text-blue-400">Hours</h3>
+                            <h3 class="text-xl font-semibold text-gray-300">Hours</h3>
                             <p class="text-gray-300">Mon-Sun: 10:00 AM - 10:00 PM</p>
                         </div>
                     </div>
@@ -750,7 +750,7 @@
                                 <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
                             </svg>
                         </a>
-                        <a href="#" class="bg-blue-600 hover:bg-yellow-500 text-white hover:text-black w-10 h-10 rounded-full flex items-center justify-center transition duration-300">
+                        <a href="#" class="bg-gray-700 hover:bg-yellow-500 text-white hover:text-black w-10 h-10 rounded-full flex items-center justify-center transition duration-300">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.404-5.940 1.404-5.940s-.358-.72-.358-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.098.119.112.223.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.751-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z.017 0z"/>
                             </svg>
@@ -777,7 +777,7 @@
                 
                 <!-- Contact Info -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-4 text-blue-400">Contact Info</h4>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-300">Contact Info</h4>
                     <div class="space-y-2 text-gray-300">
                         <p>123 Food Street</p>
                         <p>Culinary District, City</p>
