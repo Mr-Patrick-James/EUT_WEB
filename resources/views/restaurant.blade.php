@@ -99,16 +99,12 @@
             <!-- Right Content - Food Image -->
             <div class="relative">
                 <div class="relative z-10">
-                    <!-- Placeholder for food image - you can replace with actual image -->
-                    <div class="bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl p-8 shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500">
-                        <div class="bg-white rounded-xl p-6 shadow-lg">
-                            <div class="w-full h-64 bg-gradient-to-br from-orange-300 to-red-500 rounded-lg flex items-center justify-center">
-                                <!-- Burger and fries illustration -->
-                                <div class="text-center">
-                                    <div class="text-6xl mb-4">🍔</div>
-                                    <div class="text-4xl">🍟</div>
-                                </div>
-                            </div>
+                    <!-- Hero food image -->
+                    <div class="bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl p-4 shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500">
+                        <div class="bg-white rounded-xl p-3 shadow-lg">
+                            <img src="{{ asset('images/delicious-burger-fries.jpg') }}" 
+                                 alt="Delicious Burger and Fries" 
+                                 class="w-full h-64 object-cover rounded-lg shadow-md">
                         </div>
                     </div>
                 </div>
@@ -182,14 +178,16 @@
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Menu Item 1 -->
-                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300">
-                    <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
-                        <span class="text-6xl">🥘</span>
+                <!-- EUT Classic Burger -->
+                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300 shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="{{ asset('images/hero-burger.jpg') }}" 
+                             alt="EUT Classic Burger" 
+                             class="w-full h-full object-cover hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Signature Curry</h3>
-                        <p class="text-slate-300 mb-4">Rich and aromatic curry with premium spices</p>
+                        <h3 class="text-xl font-semibold mb-2">EUT Classic Burger</h3>
+                        <p class="text-slate-300 mb-4">Juicy beef patty, lettuce, tomato, pickles, special sauce on brioche bun</p>
                         <div class="flex justify-between items-center">
                             <span class="text-amber-400 text-xl font-bold">₱350</span>
                             <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-full text-sm font-semibold transition duration-300">
@@ -199,16 +197,18 @@
                     </div>
                 </div>
                 
-                <!-- Menu Item 2 -->
-                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300">
-                    <div class="h-48 bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center">
-                        <span class="text-6xl">🍵</span>
+                <!-- Gourmet Cheeseburger -->
+                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300 shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="{{ asset('images/gourmet-burger.jpg') }}" 
+                             alt="Gourmet Cheeseburger" 
+                             class="w-full h-full object-cover hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Premium Tea Collection</h3>
-                        <p class="text-slate-300 mb-4">Finest selection of traditional and modern teas</p>
+                        <h3 class="text-xl font-semibold mb-2">Gourmet Cheeseburger</h3>
+                        <p class="text-slate-300 mb-4">Premium beef with aged cheddar, caramelized onions, bacon</p>
                         <div class="flex justify-between items-center">
-                            <span class="text-amber-400 text-xl font-bold">₱180</span>
+                            <span class="text-amber-400 text-xl font-bold">₱420</span>
                             <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-full text-sm font-semibold transition duration-300">
                                 Order Now
                             </button>
@@ -216,16 +216,18 @@
                     </div>
                 </div>
                 
-                <!-- Menu Item 3 -->
-                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300">
-                    <div class="h-48 bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
-                        <span class="text-6xl">🥗</span>
+                <!-- Classic French Fries -->
+                <div class="bg-slate-800 rounded-xl overflow-hidden hover:transform hover:scale-105 transition duration-300 shadow-lg">
+                    <div class="h-48 overflow-hidden">
+                        <img src="{{ asset('images/french-fries.jpg') }}" 
+                             alt="Classic French Fries" 
+                             class="w-full h-full object-cover hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Garden Fresh Salad</h3>
-                        <p class="text-slate-300 mb-4">Crispy greens with house-made dressing</p>
+                        <h3 class="text-xl font-semibold mb-2">Classic French Fries</h3>
+                        <p class="text-slate-300 mb-4">Golden crispy fries with sea salt - perfect side for any meal</p>
                         <div class="flex justify-between items-center">
-                            <span class="text-amber-400 text-xl font-bold">₱280</span>
+                            <span class="text-amber-400 text-xl font-bold">₱120</span>
                             <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-full text-sm font-semibold transition duration-300">
                                 Order Now
                             </button>
@@ -235,12 +237,359 @@
             </div>
             
             <div class="text-center mt-12">
-                <button class="border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-slate-900 px-8 py-3 rounded-full font-semibold transition duration-300">
-                    View Full Menu
-                </button>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button class="border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-slate-900 px-8 py-3 rounded-full font-semibold transition duration-300">
+                        View Full Menu
+                    </button>
+                    <a href="/menu-pdf" target="_blank" class="bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-full font-semibold transition duration-300 inline-flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        Download Menu PDF
+                    </a>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- Comprehensive Menu Section -->
+    <section class="py-20 bg-slate-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4" style="font-family: 'Playfair Display', serif;">Complete Menu</h2>
+                <p class="text-slate-300 text-lg">Explore our full collection of delicious offerings</p>
+            </div>
+
+            <!-- Menu Categories -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="menu-category-btn active bg-amber-500 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300" data-category="all">
+                    All Items
+                </button>
+                <button class="menu-category-btn text-amber-500 border border-amber-500 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-amber-500 hover:text-slate-900" data-category="burgers">
+                    Burgers
+                </button>
+                <button class="menu-category-btn text-amber-500 border border-amber-500 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-amber-500 hover:text-slate-900" data-category="sides">
+                    Sides
+                </button>
+                <button class="menu-category-btn text-amber-500 border border-amber-500 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-amber-500 hover:text-slate-900" data-category="beverages">
+                    Beverages
+                </button>
+                <button class="menu-category-btn text-amber-500 border border-amber-500 px-6 py-3 rounded-full font-semibold transition duration-300 hover:bg-amber-500 hover:text-slate-900" data-category="combos">
+                    Combos
+                </button>
+            </div>
+
+            <!-- Burgers Section -->
+            <div class="menu-section" id="burgers-section">
+                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Premium Burgers</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- EUT Classic Burger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/hero-burger.jpg') }}" alt="EUT Classic Burger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">EUT Classic Burger</h4>
+                                <p class="text-slate-300 text-sm mb-3">Juicy beef patty, lettuce, tomato, pickles, special sauce on brioche bun</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱350</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gourmet Cheeseburger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/gourmet-burger.jpg') }}" alt="Gourmet Cheeseburger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Gourmet Cheeseburger</h4>
+                                <p class="text-slate-300 text-sm mb-3">Premium beef with aged cheddar, caramelized onions, bacon</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱420</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spicy Jalapeño Burger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/delicious-burger-fries.jpg') }}" alt="Spicy Jalapeño Burger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Spicy Jalapeño Burger</h4>
+                                <p class="text-slate-300 text-sm mb-3">Flame-grilled patty with jalapeños, pepper jack cheese, chipotle mayo</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱380</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mushroom Swiss Burger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/combo-meal.jpg') }}" alt="Mushroom Swiss Burger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Mushroom Swiss Burger</h4>
+                                <p class="text-slate-300 text-sm mb-3">Sautéed mushrooms, Swiss cheese, garlic aioli on artisan bread</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱395</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BBQ Bacon Burger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/hero-burger.jpg') }}" alt="BBQ Bacon Burger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">BBQ Bacon Burger</h4>
+                                <p class="text-slate-300 text-sm mb-3">Smoky BBQ sauce, crispy bacon, onion rings, cheddar cheese</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱410</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Veggie Delight Burger -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="burgers">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/gourmet-burger.jpg') }}" alt="Veggie Delight Burger" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Veggie Delight Burger</h4>
+                                <p class="text-slate-300 text-sm mb-3">House-made veggie patty with avocado, sprouts, herbed mayo</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱320</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sides Section -->
+            <div class="menu-section" id="sides-section">
+                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Delicious Sides</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- Classic French Fries -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/french-fries.jpg') }}" alt="Classic French Fries" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Classic French Fries</h4>
+                                <p class="text-slate-300 text-sm mb-3">Golden crispy fries with sea salt</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱120</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sweet Potato Fries -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/french-fries.jpg') }}" alt="Sweet Potato Fries" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Sweet Potato Fries</h4>
+                                <p class="text-slate-300 text-sm mb-3">Crispy sweet potato fries with honey mustard dip</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱150</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loaded Cheese Fries -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/french-fries.jpg') }}" alt="Loaded Cheese Fries" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Loaded Cheese Fries</h4>
+                                <p class="text-slate-300 text-sm mb-3">Fries topped with melted cheese, bacon bits, green onions</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱180</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onion Rings -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/combo-meal.jpg') }}" alt="Onion Rings" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Onion Rings</h4>
+                                <p class="text-slate-300 text-sm mb-3">Beer-battered onion rings with ranch dipping sauce</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱140</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mozzarella Sticks -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="sides">
+                        <div class="flex items-start gap-4">
+                            <img src="{{ asset('images/combo-meal.jpg') }}" alt="Mozzarella Sticks" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Mozzarella Sticks</h4>
+                                <p class="text-slate-300 text-sm mb-3">Golden fried mozzarella with marinara sauce</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱160</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beverages Section -->
+            <div class="menu-section" id="beverages-section">
+                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Beverages</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- Premium Tea Collection -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg flex items-center justify-center">
+                                <span class="text-3xl">🍵</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Premium Tea Collection</h4>
+                                <p class="text-slate-300 text-sm mb-3">Earl Grey, Jasmine, Oolong, or Chamomile</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱180</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Freshly Brewed Coffee -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-amber-600 to-orange-700 rounded-lg flex items-center justify-center">
+                                <span class="text-3xl">☕</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Freshly Brewed Coffee</h4>
+                                <p class="text-slate-300 text-sm mb-3">Single origin coffee, expertly brewed</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱120</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fresh Fruit Smoothies -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg flex items-center justify-center">
+                                <span class="text-3xl">🥤</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Fresh Fruit Smoothies</h4>
+                                <p class="text-slate-300 text-sm mb-3">Mango, Strawberry, or Mixed Berry</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱200</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Craft Sodas -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-6 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="beverages">
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center">
+                                <span class="text-3xl">🥤</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-xl font-semibold mb-2">Craft Sodas</h4>
+                                <p class="text-slate-300 text-sm mb-3">House-made sodas in various flavors</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-lg font-bold">₱100</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1 rounded-full text-xs font-semibold transition duration-300">Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combo Meals Section -->
+            <div class="menu-section" id="combos-section">
+                <h3 class="text-3xl font-bold mb-8 text-amber-400" style="font-family: 'Playfair Display', serif;">Value Combo Meals</h3>
+                <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- EUT Classic Combo -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                        <div class="flex items-start gap-6">
+                            <img src="{{ asset('images/delicious-burger-fries.jpg') }}" alt="EUT Classic Combo" class="w-32 h-32 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-2xl font-semibold mb-3">EUT Classic Combo</h4>
+                                <p class="text-slate-300 mb-4">EUT Classic Burger + French Fries + Drink</p>
+                                <div class="text-sm text-slate-400 mb-4">
+                                    <p>Includes: EUT Classic Burger, Regular Fries, Soft Drink</p>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-2xl font-bold">₱550</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gourmet Combo -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                        <div class="flex items-start gap-6">
+                            <img src="{{ asset('images/combo-meal.jpg') }}" alt="Gourmet Combo" class="w-32 h-32 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-2xl font-semibold mb-3">Gourmet Combo</h4>
+                                <p class="text-slate-300 mb-4">Gourmet Cheeseburger + Sweet Potato Fries + Premium Tea</p>
+                                <div class="text-sm text-slate-400 mb-4">
+                                    <p>Includes: Gourmet Cheeseburger, Sweet Potato Fries, Premium Tea</p>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-2xl font-bold">₱650</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spicy Combo -->
+                    <div class="menu-item bg-slate-900 rounded-lg p-8 border border-slate-700 hover:border-amber-500 transition duration-300" data-category="combos">
+                        <div class="flex items-start gap-6">
+                            <img src="{{ asset('images/delicious-burger-fries.jpg') }}" alt="Spicy Combo" class="w-32 h-32 object-cover rounded-lg">
+                            <div class="flex-1">
+                                <h4 class="text-2xl font-semibold mb-3">Spicy Combo</h4>
+                                <p class="text-slate-300 mb-4">Spicy Jalapeño Burger + Loaded Cheese Fries + Smoothie</p>
+                                <div class="text-sm text-slate-400 mb-4">
+                                    <p>Includes: Spicy Jalapeño Burger, Loaded Cheese Fries, Fresh Smoothie</p>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-amber-400 text-2xl font-bold">₱620</span>
+                                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-full font-semibold transition duration-300">Order Combo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- About Section -->
     <section id="about" class="py-20 bg-slate-800">
@@ -276,11 +625,15 @@
                 
                 <!-- Right Image -->
                 <div class="relative">
-                    <div class="bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl p-6">
-                        <div class="bg-slate-800 rounded-xl p-8 text-center">
-                            <div class="text-8xl mb-4">🏪</div>
-                            <h3 class="text-2xl font-semibold text-white">Visit Our Restaurant</h3>
-                        </div>
+                    <div class="bg-gradient-to-br from-amber-400 to-orange-600 rounded-2xl p-3 shadow-xl">
+                        <img src="{{ asset('images/restaurant-interior.jpg') }}" 
+                             alt="EUT Restaurant Interior" 
+                             class="w-full h-80 object-cover rounded-xl shadow-lg">
+                    </div>
+                    <!-- Overlay text -->
+                    <div class="absolute bottom-6 left-6 right-6 bg-slate-900/80 rounded-lg p-4">
+                        <h3 class="text-xl font-semibold text-white mb-2">Visit Our Restaurant</h3>
+                        <p class="text-slate-300 text-sm">Experience the perfect dining atmosphere</p>
                     </div>
                 </div>
             </div>
@@ -430,6 +783,7 @@
 
     <!-- Smooth scrolling script -->
     <script>
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -437,6 +791,79 @@
                     behavior: 'smooth'
                 });
             });
+        });
+
+        // Menu filtering functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.menu-category-btn');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const menuSections = document.querySelectorAll('.menu-section');
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active button
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-amber-500', 'text-slate-900');
+                        btn.classList.add('text-amber-500', 'border', 'border-amber-500');
+                    });
+                    
+                    this.classList.add('active', 'bg-amber-500', 'text-slate-900');
+                    this.classList.remove('text-amber-500', 'border', 'border-amber-500');
+                    
+                    // Show/hide items based on category
+                    if (category === 'all') {
+                        // Show all sections
+                        menuSections.forEach(section => {
+                            section.style.display = 'block';
+                        });
+                        menuItems.forEach(item => {
+                            item.style.display = 'block';
+                        });
+                    } else {
+                        // Hide all sections first
+                        menuSections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // Show only the selected category section
+                        const targetSection = document.getElementById(category + '-section');
+                        if (targetSection) {
+                            targetSection.style.display = 'block';
+                        }
+                        
+                        // Filter items
+                        menuItems.forEach(item => {
+                            const itemCategory = item.getAttribute('data-category');
+                            if (itemCategory === category) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        // Add to cart functionality (you can extend this)
+        document.addEventListener('click', function(e) {
+            if (e.target.textContent === 'Add to Cart' || e.target.textContent === 'Order Now' || e.target.textContent === 'Order Combo') {
+                e.preventDefault();
+                
+                // Simple notification (you can replace with a proper cart system)
+                const button = e.target;
+                const originalText = button.textContent;
+                
+                button.textContent = 'Added!';
+                button.style.backgroundColor = '#22c55e';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 1000);
+            }
         });
     </script>
 

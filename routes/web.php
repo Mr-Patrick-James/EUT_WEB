@@ -13,3 +13,7 @@ Route::get('/welcome', function () {
 Route::get('/example', function () {
     return view('example');
 });
+
+Route::get('/menu-pdf', function () {
+    return view('menu-pdf');
+});
