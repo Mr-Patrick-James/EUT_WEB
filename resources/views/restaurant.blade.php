@@ -27,11 +27,6 @@
 
                 <!-- Right Side Icons & Button -->
                 <div class="flex items-center space-x-4">
-                    <a href="/login" class="text-white hover:text-yellow-400 transition duration-300">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-                        </svg>
-                    </a>
                     <button class="text-white hover:text-yellow-400 transition duration-300">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
@@ -42,12 +37,36 @@
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
                         </svg>
                     </button>
-                    <button onclick="openModal('login')" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-full font-semibold transition duration-300 transform hover:scale-105">
-                        Login
-                    </button>
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition duration-300">
-                        Reserve Table
-                    </button>
+
+                    @auth
+                        <!-- Logged in: show avatar + name + logout -->
+                        <div class="flex items-center gap-3">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ auth()->user()->avatar }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-8 h-8 rounded-full border-2 border-yellow-400 object-cover">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-black font-bold text-sm">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <span class="text-gray-300 text-sm font-medium hidden md:block">{{ auth()->user()->name }}</span>
+                        </div>
+                        <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-semibold text-sm transition duration-300">
+                                Logout
+                            </button>
+                        </form>
+                    @else
+                        <!-- Guest: show Login + Reserve -->
+                        <button onclick="openModal('login')" class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-full font-semibold transition duration-300 transform hover:scale-105">
+                            Login
+                        </button>
+                        <button onclick="openModal('signup')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition duration-300">
+                            Sign Up
+                        </button>
+                    @endauth
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -537,8 +556,7 @@
         <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeModal()"></div>
 
         <!-- Modal Box -->
-        <div class="relative w-full max-w-md mx-4 rounded-2xl overflow-hidden shadow-2xl"
-             style="background: #0a0a0a;">
+        <div class="relative w-full max-w-md mx-4 rounded-2xl overflow-hidden shadow-2xl" style="background: #0a0a0a;">
 
             <!-- Close button -->
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition z-10">
@@ -559,7 +577,10 @@
                 </button>
             </div>
 
-            <div class="p-8">
+            <!-- Error/Success alert -->
+            <div id="authAlert" class="hidden mx-8 mt-6 px-4 py-3 rounded-xl text-sm font-medium"></div>
+
+            <div class="p-8 pt-4">
 
                 <!-- ---- LOGIN PANEL ---- -->
                 <div id="loginPanel">
@@ -567,7 +588,8 @@
                     <p class="text-gray-400 text-sm mb-6">Sign in to your EUT account</p>
 
                     <!-- Google Login -->
-                    <button class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
+                    <a href="{{ route('auth.google') }}"
+                       class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
                         <svg class="w-5 h-5" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -575,7 +597,7 @@
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
                         Continue with Google
-                    </button>
+                    </a>
 
                     <!-- Divider -->
                     <div class="flex items-center gap-3 mb-4">
@@ -584,25 +606,26 @@
                         <div class="flex-1 h-px bg-white/10"></div>
                     </div>
 
-                    <!-- Email / Password -->
-                    <form class="space-y-4">
+                    <!-- Login Form -->
+                    <form id="loginForm" class="space-y-4">
+                        @csrf
                         <div>
                             <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Email</label>
-                            <input type="email" placeholder="you@example.com"
+                            <input id="loginEmail" type="email" name="email" placeholder="you@example.com"
                                 class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Password</label>
-                            <input type="password" placeholder="••••••••"
+                            <input id="loginPassword" type="password" name="password" placeholder="••••••••"
                                 class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                         </div>
                         <div class="flex justify-between items-center text-xs text-gray-500">
                             <label class="flex items-center gap-2 cursor-pointer hover:text-gray-300 transition">
-                                <input type="checkbox" class="accent-yellow-400"> Remember me
+                                <input id="loginRemember" type="checkbox" class="accent-yellow-400"> Remember me
                             </label>
                             <a href="#" class="hover:text-yellow-400 transition">Forgot password?</a>
                         </div>
-                        <button type="submit"
+                        <button type="submit" id="loginBtn"
                             class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105">
                             Login
                         </button>
@@ -619,7 +642,8 @@
                     <p class="text-gray-400 text-sm mb-6">Join EUT Restaurant today</p>
 
                     <!-- Google Signup -->
-                    <button class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
+                    <a href="{{ route('auth.google') }}"
+                       class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-3 rounded-xl mb-4 transition duration-300">
                         <svg class="w-5 h-5" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -627,7 +651,7 @@
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
                         Sign up with Google
-                    </button>
+                    </a>
 
                     <!-- Divider -->
                     <div class="flex items-center gap-3 mb-4">
@@ -636,35 +660,37 @@
                         <div class="flex-1 h-px bg-white/10"></div>
                     </div>
 
-                    <form class="space-y-4">
+                    <!-- Signup Form -->
+                    <form id="signupForm" class="space-y-4">
+                        @csrf
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">First Name</label>
-                                <input type="text" placeholder="Juan"
+                                <input id="signupFirstName" type="text" name="first_name" placeholder="Juan"
                                     class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                             </div>
                             <div>
                                 <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Last Name</label>
-                                <input type="text" placeholder="Dela Cruz"
+                                <input id="signupLastName" type="text" name="last_name" placeholder="Dela Cruz"
                                     class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                             </div>
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Email</label>
-                            <input type="email" placeholder="you@example.com"
+                            <input id="signupEmail" type="email" name="email" placeholder="you@example.com"
                                 class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Password</label>
-                            <input type="password" placeholder="••••••••"
+                            <input id="signupPassword" type="password" name="password" placeholder="••••••••"
                                 class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs mb-1 uppercase tracking-wider">Confirm Password</label>
-                            <input type="password" placeholder="••••••••"
+                            <input id="signupPasswordConfirm" type="password" name="password_confirmation" placeholder="••••••••"
                                 class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-400 transition"/>
                         </div>
-                        <button type="submit"
+                        <button type="submit" id="signupBtn"
                             class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105">
                             Create Account
                         </button>
@@ -680,23 +706,42 @@
     </div>
     <!-- ===================== END MODAL ===================== -->
 
+    @if(session('success'))
+    <div id="flashSuccess" class="fixed top-6 right-6 z-[99999] bg-green-600 text-white px-6 py-4 rounded-xl shadow-lg font-semibold text-sm">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div id="flashError" class="fixed top-6 right-6 z-[99999] bg-red-600 text-white px-6 py-4 rounded-xl shadow-lg font-semibold text-sm">
+        {{ session('error') }}
+    </div>
+    @endif
+
     <script>
+        const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+
+        // ── Modal open/close ──────────────────────────────────────────
         function openModal(tab) {
             document.getElementById('authModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            hideAlert();
             switchTab(tab || 'login');
         }
 
         function closeModal() {
             document.getElementById('authModal').classList.add('hidden');
             document.body.style.overflow = '';
+            hideAlert();
         }
 
+        // ── Tab switch ────────────────────────────────────────────────
         function switchTab(tab) {
             const loginPanel  = document.getElementById('loginPanel');
             const signupPanel = document.getElementById('signupPanel');
             const loginTab    = document.getElementById('loginTab');
             const signupTab   = document.getElementById('signupTab');
+            hideAlert();
 
             if (tab === 'login') {
                 loginPanel.classList.remove('hidden');
@@ -715,11 +760,127 @@
             }
         }
 
-        // Close on ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeModal();
+        // ── Alert helpers ─────────────────────────────────────────────
+        function showAlert(msg, type = 'error') {
+            const el = document.getElementById('authAlert');
+            el.textContent = msg;
+            el.className = 'mx-8 mt-4 px-4 py-3 rounded-xl text-sm font-medium ' +
+                (type === 'success'
+                    ? 'bg-green-600/20 border border-green-500/40 text-green-300'
+                    : 'bg-red-600/20 border border-red-500/40 text-red-300');
+        }
+
+        function hideAlert() {
+            const el = document.getElementById('authAlert');
+            el.className = 'hidden';
+            el.textContent = '';
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            btn.disabled = loading;
+            btn.textContent = loading ? 'Please wait…' : (btnId === 'loginBtn' ? 'Login' : 'Create Account');
+        }
+
+        // ── LOGIN form submit ─────────────────────────────────────────
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideAlert();
+            setLoading('loginBtn', true);
+
+            try {
+                const res = await fetch('{{ route("auth.login") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email:    document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value,
+                        remember: document.getElementById('loginRemember').checked,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('Login successful! Redirecting…', 'success');
+                    setTimeout(() => { window.location.href = data.redirect; }, 800);
+                } else {
+                    const msg = data.errors
+                        ? Object.values(data.errors).flat().join(' ')
+                        : (data.message || 'Invalid credentials.');
+                    showAlert(msg);
+                    setLoading('loginBtn', false);
+                }
+            } catch (err) {
+                showAlert('Something went wrong. Please try again.');
+                setLoading('loginBtn', false);
+            }
         });
+
+        // ── SIGNUP form submit ────────────────────────────────────────
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideAlert();
+            setLoading('signupBtn', true);
+
+            const password = document.getElementById('signupPassword').value;
+            const confirm  = document.getElementById('signupPasswordConfirm').value;
+
+            if (password !== confirm) {
+                showAlert('Passwords do not match.');
+                setLoading('signupBtn', false);
+                return;
+            }
+
+            try {
+                const res = await fetch('{{ route("auth.signup") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        first_name:            document.getElementById('signupFirstName').value,
+                        last_name:             document.getElementById('signupLastName').value,
+                        email:                 document.getElementById('signupEmail').value,
+                        password:              password,
+                        password_confirmation: confirm,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('Account created! Redirecting…', 'success');
+                    setTimeout(() => { window.location.href = data.redirect; }, 800);
+                } else {
+                    const msg = data.errors
+                        ? Object.values(data.errors).flat().join(' ')
+                        : (data.message || 'Signup failed.');
+                    showAlert(msg);
+                    setLoading('signupBtn', false);
+                }
+            } catch (err) {
+                showAlert('Something went wrong. Please try again.');
+                setLoading('signupBtn', false);
+            }
+        });
+
+        // ── Auto-dismiss flash messages ───────────────────────────────
+        ['flashSuccess','flashError'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) setTimeout(() => el.remove(), 4000);
+        });
+
+        // ── Close on ESC ──────────────────────────────────────────────
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
     </script>
 
 </body>
+</html>
 </html>
