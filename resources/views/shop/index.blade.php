@@ -377,34 +377,20 @@
         <button class="cat-pill active" data-category="all" style="flex-shrink:0;">
             <span style="font-size:17px; line-height:1;">🍽️</span> All
         </button>
-        <button class="cat-pill" data-category="burgers" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🍔</span> Burgers
+        @php
+            $iconMap = [
+                'beef'    => '🍔',
+                'flame'   => '🍟',
+                'coffee'  => '🥤',
+                'package' => '🍱',
+                'tag'     => '🏷️',
+            ];
+        @endphp
+        @foreach($categories as $cat)
+        <button class="cat-pill" data-category="{{ $cat->slug }}" style="flex-shrink:0;">
+            <span style="font-size:17px; line-height:1;">{{ $iconMap[$cat->icon] ?? '🍽️' }}</span> {{ $cat->name }}
         </button>
-        <button class="cat-pill" data-category="sides" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🍟</span> Sides
-        </button>
-        <button class="cat-pill" data-category="beverages" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🥤</span> Beverages
-        </button>
-        <button class="cat-pill" data-category="combos" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🍱</span> Combos
-        </button>
-        <button class="cat-pill" data-category="snacks" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🧆</span> Snacks
-        </button>
-        <button class="cat-pill" data-category="desserts" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🍰</span> Desserts
-        </button>
-        <button class="cat-pill" data-category="salads" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🥗</span> Salads
-        </button>
-        <button class="cat-pill" data-category="specials" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">⭐</span> Specials
-        </button>
-        <button class="cat-pill" data-category="breakfast" style="flex-shrink:0;">
-            <span style="font-size:17px; line-height:1;">🍳</span> Breakfast
-        </button>
-        <!-- right padding spacer -->
+        @endforeach
         <span style="flex-shrink:0; width:20px; display:inline-block;"></span>
     </div>
 </div>
@@ -416,13 +402,13 @@
 </div>
 
 <div class="products-grid" id="productsGrid">
-    @foreach(\App\Models\MenuItem::getAllMenuItems() as $index => $item)
-    <div class="p-card" data-category="{{ $item['category']['slug'] ?? '' }}" data-name="{{ strtolower($item['name']) }}" style="animation-delay: {{ $index * 0.04 }}s;">
-        <a href="{{ route('shop.product', $item['id']) }}" style="text-decoration:none; display:block;">
+    @foreach($menuItems as $index => $item)
+    <div class="p-card" data-category="{{ $item->category->slug ?? '' }}" data-name="{{ strtolower($item->name) }}" style="animation-delay: {{ $index * 0.04 }}s;">
+        <a href="{{ route('shop.product', $item->id) }}" style="text-decoration:none; display:block;">
             <div class="p-card-img-wrap">
-                <img src="{{ asset($item['image'] ?? '') }}" alt="{{ $item['name'] }}" class="p-card-img" loading="lazy">
+                <img src="{{ asset($item->image ?? '') }}" alt="{{ $item->name }}" class="p-card-img" loading="lazy">
                 <div class="p-card-img-overlay"></div>
-                @if(!empty($item['featured']))
+                @if($item->featured)
                     <span class="badge-hot">🔥 Hot</span>
                 @endif
                 <span class="badge-rating">
@@ -431,21 +417,21 @@
                 </span>
             </div>
             <div class="p-card-body">
-                <p class="p-card-name">{{ $item['name'] }}</p>
-                <p class="p-card-desc">{{ $item['description'] }}</p>
+                <p class="p-card-name">{{ $item->name }}</p>
+                <p class="p-card-desc">{{ $item->description }}</p>
                 <div class="p-card-price-row">
-                    <span class="p-card-price">₱{{ number_format($item['price'], 0) }}</span>
+                    <span class="p-card-price">₱{{ number_format($item->price, 0) }}</span>
                     <span class="p-card-sold">{{ rand(200,4800) }}+ sold</span>
                 </div>
             </div>
         </a>
         <div class="p-card-footer">
             <button class="add-btn"
-                data-id="{{ $item['id'] }}"
-                data-name="{{ $item['name'] }}"
-                data-price="{{ $item['price'] }}"
-                data-image="{{ $item['image'] }}"
-                data-category="{{ $item['category']['slug'] ?? '' }}">
+                data-id="{{ $item->id }}"
+                data-name="{{ $item->name }}"
+                data-price="{{ $item->price }}"
+                data-image="{{ $item->image }}"
+                data-category="{{ $item->category->slug ?? '' }}">
                 + Add to Cart
             </button>
         </div>
