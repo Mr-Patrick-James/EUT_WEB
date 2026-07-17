@@ -1,5 +1,4 @@
 @extends('admin.layout')
-@extends('admin.layout')
 @section('title', 'Menu Items')
 
 @section('content')
