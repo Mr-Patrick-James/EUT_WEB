@@ -88,9 +88,8 @@
             background: linear-gradient(135deg, #1a0506 0%, #1a0d00 50%, #0e0f1a 100%);
             border: 1px solid rgba(250,204,21,0.12);
             border-radius: 24px; overflow: hidden;
-            display: flex; align-items: center;
-            padding: 28px 28px 0; gap: 24px;
-            position: relative; min-height: 180px;
+            position: relative; min-height: 220px;
+            padding: 28px 28px 28px;
         }
         .hero-card::before {
             content: '';
@@ -106,7 +105,7 @@
             background: radial-gradient(circle, rgba(250,204,21,0.08) 0%, transparent 70%);
             pointer-events: none;
         }
-        .hero-text { flex: 1; position: relative; z-index: 1; }
+        .hero-text { position: relative; z-index: 1; max-width: 55%; }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 5px;
             background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
@@ -126,9 +125,13 @@
             font-size: 11px; color: #9ca3af; font-weight: 500;
         }
         .hero-img {
-            width: 200px; flex-shrink: 0; align-self: flex-end;
-            position: relative; z-index: 1;
-            filter: drop-shadow(0 -8px 24px rgba(220,38,38,0.4));
+            position: absolute;
+            right: -30px; bottom: 0;
+            height: 100%; max-height: 220px;
+            width: auto;
+            object-fit: contain; object-position: right bottom;
+            z-index: 1;
+            filter: drop-shadow(-8px 0 20px rgba(0,0,0,0.5));
         }
 
         /* ── CATEGORIES ── */
@@ -364,7 +367,7 @@
                 <span class="hero-pill">📍 Metro Manila</span>
             </div>
         </div>
-        <img src="{{ asset('images/hero-burger.jpg') }}" alt="EUT Burger" class="hero-img" style="border-radius:16px 16px 0 0; max-height:200px; object-fit:cover; object-position:center;">
+        <img src="{{ asset('images/DeliveryPanda.png') }}" alt="Delivery Panda" class="hero-img">
     </div>
 </div>
 
@@ -414,10 +417,10 @@
 
 <div class="products-grid" id="productsGrid">
     @foreach(\App\Models\MenuItem::getAllMenuItems() as $index => $item)
-    <div class="p-card" data-category="{{ $item['category'] }}" data-name="{{ strtolower($item['name']) }}" style="animation-delay: {{ $index * 0.04 }}s;">
+    <div class="p-card" data-category="{{ $item['category']['slug'] ?? '' }}" data-name="{{ strtolower($item['name']) }}" style="animation-delay: {{ $index * 0.04 }}s;">
         <a href="{{ route('shop.product', $item['id']) }}" style="text-decoration:none; display:block;">
             <div class="p-card-img-wrap">
-                <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" class="p-card-img" loading="lazy">
+                <img src="{{ asset($item['image'] ?? '') }}" alt="{{ $item['name'] }}" class="p-card-img" loading="lazy">
                 <div class="p-card-img-overlay"></div>
                 @if(!empty($item['featured']))
                     <span class="badge-hot">🔥 Hot</span>
@@ -442,7 +445,7 @@
                 data-name="{{ $item['name'] }}"
                 data-price="{{ $item['price'] }}"
                 data-image="{{ $item['image'] }}"
-                data-category="{{ $item['category'] }}">
+                data-category="{{ $item['category']['slug'] ?? '' }}">
                 + Add to Cart
             </button>
         </div>

@@ -13,12 +13,14 @@ class ShopController extends Controller
 
     public function product($id)
     {
-        $menuItems = \App\Models\MenuItem::getAllMenuItems();
-        $item = collect($menuItems)->firstWhere('id', $id);
+        $item = \App\Models\MenuItem::with('category')->active()->find((int) $id);
 
         if (!$item) {
             abort(404);
         }
+
+        // Convert to array so product.blade.php can use $item['key'] syntax
+        $item = $item->toArray();
 
         return view('shop.product', compact('item'));
     }
