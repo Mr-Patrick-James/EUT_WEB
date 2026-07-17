@@ -34,10 +34,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            $redirect = Auth::user()->isAdmin() ? route('admin.dashboard') : route('home');
+
             return response()->json([
                 'success'  => true,
                 'message'  => 'Login successful.',
-                'redirect' => route('home'),
+                'redirect' => $redirect,
                 'user'     => [
                     'name'   => Auth::user()->name,
                     'email'  => Auth::user()->email,
@@ -126,21 +128,32 @@ class AuthController extends Controller
             return redirect()->route('home')->with('error', 'Google login failed. Please try again.');
         }
 
-        // Find or create user
-        $user = User::updateOrCreate(
-            ['google_id' => $googleUser->getId()],
-            [
+        // Find or create user — never overwrite an existing role
+        $user = User::where('google_id', $googleUser->getId())->first();
+
+        if ($user) {
+            $user->update([
+                'name'              => $googleUser->getName(),
+                'email'             => $googleUser->getEmail(),
+                'avatar'            => $googleUser->getAvatar(),
+                'email_verified_at' => now(),
+            ]);
+        } else {
+            $user = User::create([
+                'google_id'         => $googleUser->getId(),
                 'name'              => $googleUser->getName(),
                 'email'             => $googleUser->getEmail(),
                 'avatar'            => $googleUser->getAvatar(),
                 'provider'          => 'google',
                 'role'              => 'user',
                 'email_verified_at' => now(),
-            ]
-        );
+            ]);
+        }
 
         Auth::login($user, true);
 
-        return redirect()->route('home')->with('success', 'Welcome, ' . $user->name . '!');
+        $redirect = $user->isAdmin() ? route('admin.dashboard') : route('home');
+
+        return redirect($redirect)->with('success', 'Welcome, ' . $user->name . '!');
     }
 }
