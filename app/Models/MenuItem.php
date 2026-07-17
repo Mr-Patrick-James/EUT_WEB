@@ -2,233 +2,110 @@
 
 namespace App\Models;
 
-class MenuItem
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+
+class MenuItem extends Model
 {
-    public static function getBurgers()
+    protected $fillable = [
+        'category_id',
+        'name',
+        'description',
+        'price',
+        'image',
+        'featured',
+        'is_archived',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'price'       => 'decimal:2',
+        'featured'    => 'boolean',
+        'is_archived' => 'boolean',
+        'sort_order'  => 'integer',
+    ];
+
+    // ── Relationships ────────────────────────────────────────
+    public function category()
     {
-        return [
-            [
-                'id' => 1,
-                'name' => 'EUT Classic Burger',
-                'description' => 'Juicy beef patty, lettuce, tomato, pickles, special sauce on brioche bun',
-                'price' => 350,
-                'image' => '/images/hero-burger.jpg',
-                'category' => 'burgers',
-                'featured' => true,
-                'ingredients' => ['Beef patty', 'Lettuce', 'Tomato', 'Pickles', 'Special sauce', 'Brioche bun']
-            ],
-            [
-                'id' => 2,
-                'name' => 'Gourmet Cheeseburger',
-                'description' => 'Premium beef with aged cheddar, caramelized onions, bacon',
-                'price' => 420,
-                'image' => '/images/gourmet-burger.jpg',
-                'category' => 'burgers',
-                'featured' => true,
-                'ingredients' => ['Premium beef', 'Aged cheddar', 'Caramelized onions', 'Bacon', 'Arugula']
-            ],
-            [
-                'id' => 3,
-                'name' => 'Spicy Jalapeño Burger',
-                'description' => 'Flame-grilled patty with jalapeños, pepper jack cheese, chipotle mayo',
-                'price' => 380,
-                'image' => '/images/delicious-burger-fries.jpg',
-                'category' => 'burgers',
-                'featured' => false,
-                'ingredients' => ['Beef patty', 'Jalapeños', 'Pepper jack cheese', 'Chipotle mayo', 'Lettuce']
-            ],
-            [
-                'id' => 4,
-                'name' => 'Mushroom Swiss Burger',
-                'description' => 'Sautéed mushrooms, Swiss cheese, garlic aioli on artisan bread',
-                'price' => 395,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'burgers',
-                'featured' => false,
-                'ingredients' => ['Beef patty', 'Sautéed mushrooms', 'Swiss cheese', 'Garlic aioli', 'Arugula']
-            ],
-            [
-                'id' => 5,
-                'name' => 'BBQ Bacon Burger',
-                'description' => 'Smoky BBQ sauce, crispy bacon, onion rings, cheddar cheese',
-                'price' => 410,
-                'image' => '/images/hero-burger.jpg',
-                'category' => 'burgers',
-                'featured' => false,
-                'ingredients' => ['Beef patty', 'BBQ sauce', 'Crispy bacon', 'Onion rings', 'Cheddar cheese']
-            ],
-            [
-                'id' => 6,
-                'name' => 'Veggie Delight Burger',
-                'description' => 'House-made veggie patty with avocado, sprouts, herbed mayo',
-                'price' => 320,
-                'image' => '/images/gourmet-burger.jpg',
-                'category' => 'burgers',
-                'featured' => false,
-                'ingredients' => ['Veggie patty', 'Avocado', 'Sprouts', 'Herbed mayo', 'Whole grain bun']
-            ]
-        ];
+        return $this->belongsTo(Category::class);
     }
 
-    public static function getSides()
+    public function modifierGroups()
     {
-        return [
-            [
-                'id' => 7,
-                'name' => 'Classic French Fries',
-                'description' => 'Golden crispy fries with sea salt',
-                'price' => 120,
-                'image' => '/images/french-fries.jpg',
-                'category' => 'sides',
-                'featured' => true,
-                'size_options' => ['Regular', 'Large']
-            ],
-            [
-                'id' => 8,
-                'name' => 'Sweet Potato Fries',
-                'description' => 'Crispy sweet potato fries with honey mustard dip',
-                'price' => 150,
-                'image' => '/images/french-fries.jpg',
-                'category' => 'sides',
-                'featured' => true,
-                'size_options' => ['Regular', 'Large']
-            ],
-            [
-                'id' => 9,
-                'name' => 'Loaded Cheese Fries',
-                'description' => 'Fries topped with melted cheese, bacon bits, green onions',
-                'price' => 180,
-                'image' => '/images/french-fries.jpg',
-                'category' => 'sides',
-                'featured' => false,
-                'size_options' => ['Regular', 'Large']
-            ],
-            [
-                'id' => 10,
-                'name' => 'Onion Rings',
-                'description' => 'Beer-battered onion rings with ranch dipping sauce',
-                'price' => 140,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'sides',
-                'featured' => false,
-                'size_options' => ['Regular', 'Large']
-            ],
-            [
-                'id' => 11,
-                'name' => 'Mozzarella Sticks',
-                'description' => 'Golden fried mozzarella with marinara sauce',
-                'price' => 160,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'sides',
-                'featured' => false,
-                'size_options' => ['6 pieces', '12 pieces']
-            ]
-        ];
+        return $this->hasMany(ModifierGroup::class)->orderBy('sort_order');
     }
 
-    public static function getBeverages()
+    public function flavors()
     {
-        return [
-            [
-                'id' => 12,
-                'name' => 'Premium Tea Collection',
-                'description' => 'Earl Grey, Jasmine, Oolong, or Chamomile',
-                'price' => 180,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'beverages',
-                'featured' => true,
-                'options' => ['Hot', 'Iced']
-            ],
-            [
-                'id' => 13,
-                'name' => 'Freshly Brewed Coffee',
-                'description' => 'Single origin coffee, expertly brewed',
-                'price' => 120,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'beverages',
-                'featured' => false,
-                'options' => ['Black', 'Latte', 'Cappuccino']
-            ],
-            [
-                'id' => 14,
-                'name' => 'Fresh Fruit Smoothies',
-                'description' => 'Mango, Strawberry, or Mixed Berry',
-                'price' => 200,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'beverages',
-                'featured' => true,
-                'options' => ['Mango', 'Strawberry', 'Mixed Berry']
-            ],
-            [
-                'id' => 15,
-                'name' => 'Craft Sodas',
-                'description' => 'House-made sodas in various flavors',
-                'price' => 100,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'beverages',
-                'featured' => false,
-                'options' => ['Cola', 'Lemon-Lime', 'Orange', 'Root Beer']
-            ]
-        ];
+        return $this->hasMany(ModifierGroup::class)->where('type', 'flavor')->orderBy('sort_order');
     }
 
-    public static function getComboMeals()
+    public function modifiers()
     {
-        return [
-            [
-                'id' => 16,
-                'name' => 'EUT Classic Combo',
-                'description' => 'EUT Classic Burger + French Fries + Drink',
-                'price' => 550,
-                'image' => '/images/delicious-burger-fries.jpg',
-                'category' => 'combos',
-                'featured' => true,
-                'includes' => ['EUT Classic Burger', 'Regular Fries', 'Soft Drink']
-            ],
-            [
-                'id' => 17,
-                'name' => 'Gourmet Combo',
-                'description' => 'Gourmet Cheeseburger + Sweet Potato Fries + Premium Tea',
-                'price' => 650,
-                'image' => '/images/combo-meal.jpg',
-                'category' => 'combos',
-                'featured' => true,
-                'includes' => ['Gourmet Cheeseburger', 'Sweet Potato Fries', 'Premium Tea']
-            ],
-            [
-                'id' => 18,
-                'name' => 'Spicy Combo',
-                'description' => 'Spicy Jalapeño Burger + Loaded Cheese Fries + Smoothie',
-                'price' => 620,
-                'image' => '/images/delicious-burger-fries.jpg',
-                'category' => 'combos',
-                'featured' => false,
-                'includes' => ['Spicy Jalapeño Burger', 'Loaded Cheese Fries', 'Fresh Smoothie']
-            ]
-        ];
+        return $this->hasMany(ModifierGroup::class)->where('type', 'modifier')->orderBy('sort_order');
     }
 
-    public static function getAllMenuItems()
+    // ── Scopes ───────────────────────────────────────────────
+    public function scopeActive(Builder $query): Builder
     {
-        return array_merge(
-            self::getBurgers(),
-            self::getSides(),
-            self::getBeverages(),
-            self::getComboMeals()
-        );
+        return $query->where('is_archived', false);
     }
 
-    public static function getFeaturedItems()
+    public function scopeArchived(Builder $query): Builder
     {
-        return array_filter(self::getAllMenuItems(), function($item) {
-            return isset($item['featured']) && $item['featured'] === true;
-        });
+        return $query->where('is_archived', true);
     }
 
-    public static function getItemsByCategory($category)
+    public function scopeFeatured(Builder $query): Builder
     {
-        return array_filter(self::getAllMenuItems(), function($item) use ($category) {
-            return $item['category'] === $category;
-        });
+        return $query->where('featured', true)->where('is_archived', false);
+    }
+
+    public function scopeByCategory(Builder $query, string $slug): Builder
+    {
+        return $query->whereHas('category', fn($q) => $q->where('slug', $slug));
+    }
+
+    // ── Helpers ──────────────────────────────────────────────
+    public function isArchived(): bool
+    {
+        return (bool) $this->is_archived;
+    }
+
+    // ── Legacy static helpers (keep dashboard working) ───────
+    public static function getAllMenuItems(): array
+    {
+        return self::with('category')->active()->orderBy('category_id')->orderBy('sort_order')->get()->toArray();
+    }
+
+    public static function getFeaturedItems(): array
+    {
+        return self::with('category')->featured()->get()->toArray();
+    }
+
+    public static function getBurgers(): array
+    {
+        return self::active()->byCategory('burgers')->get()->toArray();
+    }
+
+    public static function getSides(): array
+    {
+        return self::active()->byCategory('sides')->get()->toArray();
+    }
+
+    public static function getBeverages(): array
+    {
+        return self::active()->byCategory('beverages')->get()->toArray();
+    }
+
+    public static function getComboMeals(): array
+    {
+        return self::active()->byCategory('combos')->get()->toArray();
+    }
+
+    public static function getItemsByCategory(string $slug): array
+    {
+        return self::with('category')->active()->byCategory($slug)->orderBy('sort_order')->get()->toArray();
     }
 }
