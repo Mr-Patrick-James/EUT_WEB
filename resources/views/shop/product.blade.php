@@ -391,7 +391,7 @@
 
     <!-- Info section -->
     <div class="info-section">
-        <p class="info-category">{{ ucfirst($item['category'] ?? 'Food') }}</p>
+        <p class="info-category">{{ ucfirst($item['category']['name'] ?? 'Food') }}</p>
         <h1 class="info-name">{{ $item['name'] }}</h1>
         <div class="info-meta">
             <span class="info-rating">
@@ -597,7 +597,7 @@ const BASE_PRICE = {{ $item['price'] }};
 const ITEM_ID    = {{ $item['id'] }};
 const ITEM_NAME  = @json($item['name']);
 const ITEM_IMAGE = @json($item['image']);
-const ITEM_CAT   = @json($item['category'] ?? 'food');
+const ITEM_CAT   = @json($item['category']['slug'] ?? 'food');
 
 let sheetMode     = 'cart'; // 'cart' or 'buy'
 let selectedFlavor = null;
