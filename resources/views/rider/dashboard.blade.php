@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -366,6 +366,7 @@
         <button class="tab active" id="tab-active" onclick="switchTab('active')">Active Orders</button>
         <button class="tab" id="tab-history" onclick="switchTab('history')">History</button>
         <button class="tab" id="tab-earnings" onclick="switchTab('earnings')">Earnings</button>
+        <button class="tab" id="tab-profile" onclick="switchTab('profile')">Profile</button>
     </div>
 
     <!-- -->
@@ -426,11 +427,11 @@
                     </div>
                 </div>
             </div>
-            <div class="oc-items">EUT Classic Burger Ã— 1 &middot; Crispy Fries Ã— 2 &middot; Iced Tea Ã— 1</div>
+            <div class="oc-items">EUT Classic Burger &times; 1 &middot; Crispy Fries &times; 2 &middot; Iced Tea &times; 1</div>
             <div class="oc-footer">
                 <div>
                     <p class="oc-total-label">Order Total</p>
-                    <p class="oc-total">‚±520</p>
+                    <p class="oc-total">&#8369;520</p>
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <button class="btn-call" onclick="window.location='tel:09181234567'" title="Call Customer">
@@ -480,11 +481,11 @@
                     </div>
                 </div>
             </div>
-            <div class="oc-items">Gourmet Cheeseburger Ã— 1 &middot; Onion Rings Ã— 1</div>
+            <div class="oc-items">Gourmet Cheeseburger &times; 1 &middot; Onion Rings &times; 1</div>
             <div class="oc-footer">
                 <div>
                     <p class="oc-total-label">Order Total</p>
-                    <p class="oc-total">‚±490</p>
+                    <p class="oc-total">&#8369;490</p>
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <button class="btn-call" onclick="window.location='tel:09271234567'" title="Call Customer">
@@ -505,10 +506,10 @@
         <p class="section-label">Completed Today</p>
         @php
         $historyOrders = [
-            ['id'=>'EUT-00498','customer'=>'Celia Reyes',  'items'=>'EUT Classic Burger Ã— 1',           'total'=>'‚±400','time'=>'5:10 PM','rating'=>5],
-            ['id'=>'EUT-00481','customer'=>'Danny Torres', 'items'=>'Crispy Fries Ã— 2 &middot; Iced Tea Ã— 2',  'total'=>'‚±340','time'=>'3:45 PM','rating'=>5],
-            ['id'=>'EUT-00465','customer'=>'Eva Lim',      'items'=>'Gourmet Burger Ã— 1 &middot; Rings Ã— 1',   'total'=>'‚±490','time'=>'1:20 PM','rating'=>4],
-            ['id'=>'EUT-00452','customer'=>'Felix Cruz',   'items'=>'Combo Meal Ã— 1',                    'total'=>'‚±380','time'=>'12:05 PM','rating'=>5],
+            ['id'=>'EUT-00498','customer'=>'Celia Reyes',  'items'=>'EUT Classic Burger &times; 1',           'total'=>400,'time'=>'5:10 PM','rating'=>5],
+            ['id'=>'EUT-00481','customer'=>'Danny Torres', 'items'=>'Crispy Fries &times; 2 &middot; Iced Tea &times; 2',  'total'=>340,'time'=>'3:45 PM','rating'=>5],
+            ['id'=>'EUT-00465','customer'=>'Eva Lim',      'items'=>'Gourmet Burger &times; 1 &middot; Rings &times; 1',   'total'=>490,'time'=>'1:20 PM','rating'=>4],
+            ['id'=>'EUT-00452','customer'=>'Felix Cruz',   'items'=>'Combo Meal &times; 1',                    'total'=>380,'time'=>'12:05 PM','rating'=>5],
         ];
         @endphp
         @foreach($historyOrders as $h)
@@ -519,11 +520,11 @@
                     <span style="font-size:11px;color:#4b5563;">{{ $h['time'] }}</span>
                 </div>
                 <p style="font-size:12px;font-weight:600;color:#d1d5db;margin:0 0 2px;">{{ $h['customer'] }}</p>
-                <p style="font-size:11px;color:#4b5563;margin:0;">{{ $h['items'] }}</p>
+                <p style="font-size:11px;color:#4b5563;margin:0;">{!! $h['items'] !!}</p>
             </div>
             <div style="text-align:right;flex-shrink:0;">
-                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">{{ $h['total'] }}</p>
-                <p style="font-size:12px;color:#facc15;">{{ str_repeat('&#11088;', $h['rating']) }}</p>
+                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">&#8369;{{ $h['total'] }}</p>
+                <p style="font-size:12px;color:#facc15;">@for($s=0;$s<$h['rating'];$s++)<span>&#11088;</span>@endfor</p>
             </div>
         </div>
         @endforeach
@@ -533,15 +534,15 @@
     <div id="view-earnings" style="display:none;">
         <div class="earn-card" style="margin-bottom:14px;">
             <p style="font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Today's Earnings</p>
-            <p style="font-size:2.5rem;font-weight:900;color:#10b981;line-height:1;margin-bottom:4px;">‚±840</p>
-            <p style="font-size:12px;color:#6b7280;">7 deliveries &middot; Avg. ‚±120/order</p>
+            <p style="font-size:2.5rem;font-weight:900;color:#10b981;line-height:1;margin-bottom:4px;">&#8369;840</p>
+            <p style="font-size:12px;color:#6b7280;">7 deliveries &middot; Avg. &#8369;120/order</p>
             <div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);">
                 <div style="flex:1;text-align:center;">
-                    <p style="font-size:18px;font-weight:800;color:#10b981;">‚±4,200</p>
+                    <p style="font-size:18px;font-weight:800;color:#10b981;">&#8369;4,200</p>
                     <p style="font-size:10px;color:#4b5563;">This Week</p>
                 </div>
                 <div style="flex:1;text-align:center;">
-                    <p style="font-size:18px;font-weight:800;color:#facc15;">‚±16,800</p>
+                    <p style="font-size:18px;font-weight:800;color:#facc15;">&#8369;16,800</p>
                     <p style="font-size:10px;color:#4b5563;">This Month</p>
                 </div>
                 <div style="flex:1;text-align:center;">
@@ -553,11 +554,11 @@
         <p class="section-label">Daily Breakdown</p>
         @php
         $earningDays = [
-            ['day'=>'Fri Jul 18','deliveries'=>7,'earn'=>'‚±840'],
-            ['day'=>'Thu Jul 17','deliveries'=>9,'earn'=>'‚±1,080'],
-            ['day'=>'Wed Jul 16','deliveries'=>6,'earn'=>'‚±720'],
-            ['day'=>'Tue Jul 15','deliveries'=>8,'earn'=>'‚±960'],
-            ['day'=>'Mon Jul 14','deliveries'=>5,'earn'=>'‚±600'],
+            ['day'=>'Fri Jul 18','deliveries'=>7,'earn'=>840],
+            ['day'=>'Thu Jul 17','deliveries'=>9,'earn'=>1080],
+            ['day'=>'Wed Jul 16','deliveries'=>6,'earn'=>720],
+            ['day'=>'Tue Jul 15','deliveries'=>8,'earn'=>960],
+            ['day'=>'Mon Jul 14','deliveries'=>5,'earn'=>600],
         ];
         @endphp
         @foreach($earningDays as $e)
@@ -566,12 +567,104 @@
                 <p style="font-size:13px;font-weight:600;color:#e5e7eb;margin:0 0 2px;">{{ $e['day'] }}</p>
                 <p style="font-size:11px;color:#4b5563;margin:0;">{{ $e['deliveries'] }} deliveries</p>
             </div>
-            <p style="font-size:18px;font-weight:900;color:#10b981;">{{ $e['earn'] }}</p>
+            <p style="font-size:18px;font-weight:900;color:#10b981;">&#8369;{{ number_format($e['earn']) }}</p>
         </div>
         @endforeach
     </div>
 
 </div><!-- /page-body -->
+
+</div><!-- /page-body -->
+
+<!-- PROFILE TAB (inside its own page-body so it scrolls correctly) -->
+<div id="view-profile" style="display:none;max-width:540px;margin:0 auto;padding:82px 16px 110px;">
+
+    <!-- Profile Card -->
+    <div style="background:linear-gradient(135deg,#1a0e00,#100f1a);border:1px solid rgba(245,158,11,.2);border-radius:20px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(245,158,11,.08) 0%,transparent 70%);pointer-events:none;"></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem;color:#f59e0b;border:3px solid rgba(245,158,11,.3);flex-shrink:0;">{{ $rider->initials }}</div>
+            <div>
+                <p style="font-size:19px;font-weight:800;color:#fff;margin:0 0 4px;">{{ $rider->user->name }}</p>
+                <p style="font-size:12px;color:#6b7280;margin:0;">{{ $rider->user->email }}</p>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
+                <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Vehicle</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">&#x1F3CD; {{ ucfirst($rider->vehicle_type) }}</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
+                <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Plate / ID</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">{{ $rider->plate_number ?? 'RIDER-' . str_pad($rider->id, 3, '0', STR_PAD_LEFT) }}</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
+                <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Phone</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">{{ $rider->phone ?? '—' }}</p>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
+                <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Rating</p>
+                <p style="font-size:14px;font-weight:700;color:#facc15;margin:0;">&#11088; {{ number_format($rider->rating, 1) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Career Stats -->
+    <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px 18px;margin-bottom:14px;">
+        <p style="font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin:0 0 12px;">Career Stats</p>
+        <div style="display:flex;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);">
+            <div style="flex:1;text-align:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,.07);">
+                <p style="font-size:22px;font-weight:900;color:#facc15;margin:0 0 3px;">{{ $rider->total_deliveries }}</p>
+                <p style="font-size:10px;color:#4b5563;margin:0;">Deliveries</p>
+            </div>
+            <div style="flex:1;text-align:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,.07);">
+                <p style="font-size:22px;font-weight:900;color:#10b981;margin:0 0 3px;">&#8369;{{ number_format($rider->total_deliveries * 120) }}</p>
+                <p style="font-size:10px;color:#4b5563;margin:0;">Total Earned</p>
+            </div>
+            <div style="flex:1;text-align:center;padding:14px 8px;">
+                <p style="font-size:22px;font-weight:900;color:#f59e0b;margin:0 0 3px;">&#11088; {{ number_format($rider->rating,1) }}</p>
+                <p style="font-size:10px;color:#4b5563;margin:0;">Rating</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Availability -->
+    <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px 18px;margin-bottom:14px;">
+        <p style="font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin:0 0 12px;">Availability</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0 0 3px;" id="profileStatusLabel">
+                    {{ $rider->is_available ? 'Online — Ready for orders' : 'Offline — Not accepting orders' }}
+                </p>
+                <p style="font-size:11px;color:#6b7280;margin:0;">Toggle to start or stop receiving deliveries</p>
+            </div>
+            <button class="toggle-pill {{ $rider->is_available ? 'is-online' : '' }}" id="profileOnlineToggle" onclick="toggleOnlineSync()" style="flex-shrink:0;">
+                <span class="toggle-pill-thumb"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Account Actions -->
+    <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:18px;overflow:hidden;margin-bottom:24px;">
+        <a href="{{ route('shop.home') }}" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);text-decoration:none;" onmouseenter="this.style.background='rgba(255,255,255,.04)'" onmouseleave="this.style.background='transparent'">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;">
+                <svg width="16" height="16" fill="none" stroke="#818cf8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            </div>
+            <span style="font-size:14px;font-weight:600;color:#e5e7eb;">Browse Menu</span>
+            <svg width="16" height="16" fill="none" stroke="#4b5563" viewBox="0 0 24 24" style="margin-left:auto;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+        <form method="POST" action="{{ route('auth.logout') }}">
+            @csrf
+            <button type="submit" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 18px;background:transparent;border:none;cursor:pointer;text-align:left;" onmouseenter="this.style.background='rgba(239,68,68,.06)'" onmouseleave="this.style.background='transparent'">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;">
+                    <svg width="16" height="16" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                </div>
+                <span style="font-size:14px;font-weight:600;color:#f87171;">Log Out</span>
+            </button>
+        </form>
+    </div>
+
+</div><!-- /view-profile -->
 
 <!-- -->
 <nav class="bottom-nav">
@@ -588,9 +681,9 @@
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Earnings
         </a>
-        <a href="{{ route('admin.dashboard') }}" class="bnav-item">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Admin
+        <a href="#" class="bnav-item" onclick="switchTab('profile');return false;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Profile
         </a>
     </div>
 </nav>
@@ -962,6 +1055,14 @@ if (navigator.geolocation) {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
 
 
