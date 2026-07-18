@@ -209,7 +209,7 @@ img { display: block; }
 }
 .hero-panda-wrap { position: relative; }
 .hero-panda {
-    width: 460px; height: auto; object-fit: contain;
+    width: 380px; height: auto; object-fit: contain;
     filter: drop-shadow(0 0 60px rgba(220,38,38,0.3)) drop-shadow(0 20px 40px rgba(220,38,38,0.2));
     animation: panda-float 5s ease-in-out infinite;
 }
@@ -766,8 +766,8 @@ img { display: block; }
     .hero { padding: 60px 24px; min-height: auto; }
     .hero-inner { flex-direction: column; gap: 40px; text-align: center; }
     .hero-right { order: -1; width: 100%; display: flex; justify-content: center; }
-    .hero-panda-wrap { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 0 16px; }
-    .hero-panda { width: 260px; }
+    .hero-panda-wrap { width: 100%; display: flex; justify-content: center; align-items: center; gap: 0px; padding: 0 16px; }
+    .hero-panda { width: 260px; margin-right: -16px; }
     .hero-sales-card { position: relative; left: 0; bottom: 0; margin-top: 0; min-width: 130px; flex-shrink: 0; width: 140px; padding: 12px 14px; border-radius: 14px; }
     .hero-sales-amount { font-size: 20px; }
     .hero-sales-label { font-size: 9px; margin-bottom: 6px; }
@@ -803,7 +803,7 @@ img { display: block; }
 @media (max-width: 600px) {
     .hero { padding: 48px 16px; }
     .hero-title { font-size: 30px; }
-    .hero-panda { width: 240px; }
+    .hero-panda { width: 240px; margin-right: -12px; }
     .hero-sales-card { width: 130px; min-width: 120px; padding: 10px 12px; border-radius: 12px; }
     .hero-sales-amount { font-size: 18px; }
     .hero-sales-label { font-size: 8px; }
