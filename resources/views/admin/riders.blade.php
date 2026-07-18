@@ -438,13 +438,13 @@ function confirmRemoveRider(name) {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const RESTAURANT_ADMIN = [13.3211, 121.4583];
+const RESTAURANT_ADMIN = [13.3213129, 121.3027265];
 const ADMIN_RIDERS = [
-    { name:'Juan dela Cruz',  pos:[13.3240,121.4615], dest:[13.3295,121.4670], status:'on_delivery', order:'#EUT-00512', color:'#8b5cf6' },
-    { name:'Pedro Reyes',     pos:[13.3178,121.4552], dest:[13.3310,121.4640], status:'on_delivery', order:'#EUT-00509', color:'#8b5cf6' },
-    { name:'Rosa Dela Torre', pos:[13.3265,121.4700], dest:[13.3180,121.4520], status:'on_delivery', order:'#EUT-00514', color:'#8b5cf6' },
-    { name:'Maria Santos',    pos:[13.3195,121.4630], dest:null,               status:'online',      order:null,         color:'#10b981' },
-    { name:'Ana Gomez',       pos:[13.3222,121.4598], dest:null,               status:'online',      order:null,         color:'#10b981' },
+    { name:'Juan dela Cruz',  pos:[13.3235,121.3050], dest:[13.3265,121.3085], status:'on_delivery', order:'#EUT-00512', color:'#8b5cf6' },
+    { name:'Pedro Reyes',     pos:[13.3195,121.2990], dest:[13.3280,121.3100], status:'on_delivery', order:'#EUT-00509', color:'#8b5cf6' },
+    { name:'Rosa Dela Torre', pos:[13.3245,121.3060], dest:[13.3190,121.2960], status:'on_delivery', order:'#EUT-00514', color:'#8b5cf6' },
+    { name:'Maria Santos',    pos:[13.3220,121.3035], dest:null,               status:'online',      order:null,         color:'#10b981' },
+    { name:'Ana Gomez',       pos:[13.3225,121.3042], dest:null,               status:'online',      order:null,         color:'#10b981' },
 ];
 
 async function fetchOSRMAdmin(from, to) {

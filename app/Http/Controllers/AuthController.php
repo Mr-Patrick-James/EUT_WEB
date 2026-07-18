@@ -34,7 +34,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            $redirect = Auth::user()->isAdmin() ? route('admin.dashboard') : route('home');
+            $redirect = Auth::user()->isAdmin()
+                ? route('admin.dashboard')
+                : (Auth::user()->isRider() ? route('rider.dashboard') : route('shop.home'));
 
             return response()->json([
                 'success'  => true,
@@ -152,7 +154,9 @@ class AuthController extends Controller
 
         Auth::login($user, true);
 
-        $redirect = $user->isAdmin() ? route('admin.dashboard') : route('home');
+        $redirect = $user->isAdmin()
+            ? route('admin.dashboard')
+            : ($user->isRider() ? route('rider.dashboard') : route('shop.home'));
 
         return redirect($redirect)->with('success', 'Welcome, ' . $user->name . '!');
     }

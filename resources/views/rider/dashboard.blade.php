@@ -330,8 +330,10 @@
                 <span class="brand-tag">Rider</span>
             </div>
             <div class="online-toggle-wrap">
-                <span class="online-label" id="onlineLabel" style="color:#4b5563;">Offline</span>
-                <button class="toggle-pill" id="onlineToggle" onclick="toggleOnline()">
+                <span class="online-label" id="onlineLabel" style="color:{{ $rider->is_available ? '#10b981' : '#4b5563' }};">
+                    {{ $rider->is_available ? 'Online' : 'Offline' }}
+                </span>
+                <button class="toggle-pill {{ $rider->is_available ? 'is-online' : '' }}" id="onlineToggle" onclick="toggleOnline()">
                     <span class="toggle-pill-thumb"></span>
                 </button>
             </div>
@@ -345,17 +347,17 @@
     <!-- -->
     <div class="profile-card">
         <div class="profile-row">
-            <div class="profile-avatar">JD</div>
+            <div class="profile-avatar">{{ $rider->initials }}</div>
             <div>
-                <p class="profile-name">Juan dela Cruz</p>
-                <p class="profile-sub">&#x1F3CD;&#xFE0F; Motorcycle &middot; ID: RIDER-001</p>
+                <p class="profile-name">{{ $rider->user->name }}</p>
+                <p class="profile-sub">&#x1F3CD;&#xFE0F; {{ ucfirst($rider->vehicle_type) }} &middot; ID: RIDER-{{ str_pad($rider->id, 3, '0', STR_PAD_LEFT) }}</p>
             </div>
         </div>
         <div class="profile-stats">
-            <div class="pstat"><p class="pstat-val">7</p><p class="pstat-label">Today</p></div>
-            <div class="pstat"><p class="pstat-val" style="color:#10b981;">142</p><p class="pstat-label">All Time</p></div>
-            <div class="pstat"><p class="pstat-val">&#11088; 4.9</p><p class="pstat-label">Rating</p></div>
-            <div class="pstat"><p class="pstat-val" style="color:#10b981;">&#8369;840</p><p class="pstat-label">Today's Pay</p></div>
+            <div class="pstat"><p class="pstat-val">{{ $todayDeliveries }}</p><p class="pstat-label">Today</p></div>
+            <div class="pstat"><p class="pstat-val" style="color:#10b981;">{{ $rider->total_deliveries }}</p><p class="pstat-label">All Time</p></div>
+            <div class="pstat"><p class="pstat-val">&#11088; {{ number_format($rider->rating, 1) }}</p><p class="pstat-label">Rating</p></div>
+            <div class="pstat"><p class="pstat-val" style="color:#10b981;">&#8369;{{ number_format($todayEarnings) }}</p><p class="pstat-label">Today's Pay</p></div>
         </div>
     </div>
 
@@ -825,9 +827,9 @@ function dismissSuccess() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const RESTAURANT_R = [13.3211, 121.4583];
-const CUSTOMER_R   = [13.3295, 121.4670];
-let myPos          = [13.3240, 121.4615];
+const RESTAURANT_R = [13.3213129, 121.3027265];
+const CUSTOMER_R   = [13.3265, 121.3085];
+let myPos          = [13.3235, 121.3050];
 let myMarker       = null;
 let riderRouteL    = null;
 let riderMapL      = null;
@@ -942,9 +944,25 @@ function updateRiderDist() {
 }
 
 document.addEventListener('DOMContentLoaded', initRiderMap);
+
+/* -- GPS Location Ping every 10 seconds -- */
+function pingLocation(lat, lng) {
+    fetch('{{ route("rider.location") }}', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ lat, lng }),
+    }).catch(() => {});
+}
+
+if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(pos => {
+        pingLocation(pos.coords.latitude, pos.coords.longitude);
+    }, null, { enableHighAccuracy: true, maximumAge: 10000 });
+}
 </script>
 </body>
 </html>
+
 
 
 

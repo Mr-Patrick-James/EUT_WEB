@@ -39,8 +39,18 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isRider(): bool
+    {
+        return $this->role === 'rider';
+    }
+
     public function isGoogleUser(): bool
     {
         return $this->provider === 'google';
+    }
+
+    public function rider()
+    {
+        return $this->hasOne(\App\Models\Rider::class);
     }
 }

@@ -647,9 +647,95 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrderItems();
     buildPastOrders();
     buildCancelledOrders();
-    // animate progress bar
     setTimeout(() => { document.getElementById('progressBar').style.width = '40%'; }, 300);
+
+    // ── Poll real order status if we have an active order ID ──
+    const activeOrderId = localStorage.getItem('eutActiveOrderId');
+    if (activeOrderId) {
+        pollOrderStatus(activeOrderId);
+        setInterval(() => pollOrderStatus(activeOrderId), 5000);
+    }
 });
+
+async function pollOrderStatus(orderId) {
+    try {
+        const res  = await fetch(`/orders/${orderId}`, {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update status badge
+        const badge = document.querySelector('.badge-live');
+        if (badge) badge.innerHTML = `<span class="badge-pulse"></span> ${data.status_label}`;
+
+        // Update progress bar
+        const progressMap = {
+            'pending': 10, 'accepted': 20, 'preparing': 40,
+            'rider_assigned': 60, 'out_for_delivery': 80, 'delivered': 100,
+        };
+        const pct = progressMap[data.status] || 10;
+        const bar = document.getElementById('progressBar');
+        if (bar) bar.style.width = pct + '%';
+
+        // Update progress step labels
+        const steps = document.querySelectorAll('.progress-step-label');
+        const stepMap = {
+            'pending':          0, 'accepted':          0, 'preparing':       1,
+            'rider_assigned':   2, 'out_for_delivery':  2, 'delivered':       3,
+        };
+        const activeStep = stepMap[data.status] ?? 0;
+        steps.forEach((s, i) => {
+            s.classList.remove('done', 'active');
+            if (i < activeStep) s.classList.add('done');
+            else if (i === activeStep) s.classList.add('active');
+        });
+
+        // Update timeline
+        updateTimeline(data);
+
+        // Update rider info & map
+        if (data.rider) {
+            const riderEl = document.querySelector('.info-text-val');
+            if (riderEl && riderEl.closest('.info-row')?.querySelector('[stroke="#a78bfa"]')) {
+                riderEl.textContent = data.rider.name;
+            }
+            // Update rider marker on map if positions available
+            if (data.rider.lat && data.rider.lng && riderMarker) {
+                riderMarker.setLatLng([data.rider.lat, data.rider.lng]);
+            }
+        }
+
+        // If delivered, stop polling
+        if (data.status === 'delivered') {
+            localStorage.removeItem('eutActiveOrderId');
+        }
+    } catch (e) { /* silently fail — will retry */ }
+}
+
+function updateTimeline(data) {
+    const steps = [
+        { key: 'placed',     label: 'Order Placed',        time: data.placed_at,    desc: 'Received & confirmed' },
+        { key: 'preparing',  label: '&#x1F373; Preparing', time: data.accepted_at,  desc: 'Our chefs are crafting your order' },
+        { key: 'rider',      label: 'Out for Delivery',    time: data.picked_up_at, desc: data.rider ? data.rider.name + ' · On the way' : 'Rider heading to you' },
+        { key: 'delivered',  label: 'Delivered &#x1F389;', time: data.delivered_at, desc: 'Enjoy your meal!' },
+    ];
+
+    const statusOrder = ['pending','accepted','preparing','rider_assigned','out_for_delivery','delivered'];
+    const currentIdx  = statusOrder.indexOf(data.status);
+
+    const stepEls = document.querySelectorAll('.t-step');
+    stepEls.forEach((el, i) => {
+        const dot  = el.querySelector('.t-dot');
+        const line = el.querySelector('.t-line');
+        const lbl  = el.querySelector('[class^="t-label"]');
+
+        if (!dot) return;
+        dot.className  = 't-dot ' + (i < currentIdx ? 't-dot-done' : i === currentIdx ? 't-dot-active' : 't-dot-pending');
+        if (line) line.className = 't-line ' + (i < currentIdx ? 't-line-done' : i === currentIdx ? 't-line-active' : 't-line-pending');
+        if (lbl)  lbl.className  = i < currentIdx ? 't-label-done' : i === currentIdx ? 't-label-active' : 't-label-pending';
+    });
+}
 
 /* ── Tabs ── */
 function switchTab(tab) {
@@ -816,9 +902,9 @@ function buildCancelledOrders() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const RESTAURANT = [13.3211, 121.4583];
-const CUSTOMER   = [13.3295, 121.4670];
-let riderPos     = [13.3240, 121.4615];
+const RESTAURANT = [13.3213129, 121.3027265];
+const CUSTOMER   = [13.3265, 121.3085];
+let riderPos     = [13.3235, 121.3050];
 let trackingMap  = null;
 let riderMarker  = null;
 let routeLine    = null;
