@@ -788,7 +788,7 @@ img { display: block; }
 @media (max-width: 600px) {
     .hero-title { font-size: 34px; }
     .section-title { font-size: 30px; }
-    .menu-grid { grid-template-columns: 1fr; }
+    .menu-grid { grid-template-columns: repeat(2,1fr); }
     .features-grid { grid-template-columns: 1fr; }
     .steps-row { grid-template-columns: 1fr; }
     .stats-bar, .footer { padding-left: 20px; padding-right: 20px; }
