@@ -62,7 +62,7 @@ $riderStats = [
         </div>
         <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.7rem;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);padding:.25rem .6rem;border-radius:99px;">
             <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>
-            3 riders active
+            {{ $onlineRiders + $onDeliveryRiders }} riders active
         </span>
     </div>
     <div id="adminRidersMap" style="width:100%;height:320px;position:relative;z-index:0;"></div>
@@ -492,13 +492,40 @@ function confirmRemoveRider(name) {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const RESTAURANT_ADMIN = [13.3213129, 121.3027265];
-const ADMIN_RIDERS = [
-    { name:'Juan dela Cruz',  pos:[13.3235,121.3050], dest:[13.3265,121.3085], status:'on_delivery', order:'#EUT-00512', color:'#8b5cf6' },
-    { name:'Pedro Reyes',     pos:[13.3195,121.2990], dest:[13.3280,121.3100], status:'on_delivery', order:'#EUT-00509', color:'#8b5cf6' },
-    { name:'Rosa Dela Torre', pos:[13.3245,121.3060], dest:[13.3190,121.2960], status:'on_delivery', order:'#EUT-00514', color:'#8b5cf6' },
-    { name:'Maria Santos',    pos:[13.3220,121.3035], dest:null,               status:'online',      order:null,         color:'#10b981' },
-    { name:'Ana Gomez',       pos:[13.3225,121.3042], dest:null,               status:'online',      order:null,         color:'#10b981' },
-];
+@php
+$adminRidersJson = $riders->map(function($rider) {
+    $activeOrder = $rider->activeOrder();
+    if ($activeOrder && in_array($activeOrder->status, ['rider_assigned', 'out_for_delivery'])) {
+        $currentStatus = 'on_delivery';
+    } else if ($rider->is_available) {
+        $currentStatus = 'online';
+    } else {
+        $currentStatus = 'offline';
+    }
+    // Get rider's current position (default to restaurant if not available)
+    $pos = [
+        $rider->current_lat ?? 13.3213129,
+        $rider->current_lng ?? 121.3027265
+    ];
+    // Get customer destination if on delivery
+    $dest = null;
+    if ($currentStatus === 'on_delivery' && $activeOrder->delivery_lat && $activeOrder->delivery_lng) {
+        $dest = [$activeOrder->delivery_lat, $activeOrder->delivery_lng];
+    }
+    // Get color based on status
+    $color = $currentStatus === 'on_delivery' ? '#8b5cf6' : ($currentStatus === 'online' ? '#10b981' : '#6b7280');
+    return [
+        'id' => $rider->id,
+        'name' => $rider->user->name,
+        'pos' => $pos,
+        'dest' => $dest,
+        'status' => $currentStatus,
+        'order' => $activeOrder ? '#' . $activeOrder->order_number : null,
+        'color' => $color
+    ];
+})->values();
+@endphp
+const ADMIN_RIDERS = {!! $adminRidersJson !!};
 
 async function fetchOSRMAdmin(from, to) {
     const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
