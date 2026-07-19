@@ -13,14 +13,16 @@ class ModifierGroup extends Model
         'name',
         'description',
         'required',
+        'max_selections',
         'is_active',
         'sort_order',
     ];
 
     protected $casts = [
-        'required'   => 'boolean',
-        'is_active'  => 'boolean',
-        'sort_order' => 'integer',
+        'required'        => 'boolean',
+        'is_active'       => 'boolean',
+        'sort_order'      => 'integer',
+        'max_selections'  => 'integer',
     ];
 
     // ── Relationships ────────────────────────────────────────

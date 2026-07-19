@@ -88,39 +88,73 @@ $statusConfig = [
         </thead>
         <tbody>
             @forelse($orders as $order)
-            @php $sc = $statusConfig[$order['status']]; @endphp
+            @php
+                $statusKey = $order->status;
+                $sc = $statusConfig[$statusKey] ?? $statusConfig['pending'];
+                $customerName = $order->user?->name ?? 'Guest';
+                $initials = strtoupper(substr($customerName, 0, 1));
+            @endphp
             <tr>
+                {{-- Order # --}}
                 <td>
-                    <span style="font-family:monospace;font-weight:700;color:var(--accent);font-size:.875rem;">#{{ $order['id'] }}</span>
+                    <span style="font-family:monospace;font-weight:700;color:var(--accent);font-size:.875rem;">{{ $order->order_number }}</span>
                 </td>
+
+                {{-- Customer --}}
                 <td>
                     <div style="display:flex;align-items:center;gap:.5rem;">
-                        <div style="width:1.875rem;height:1.875rem;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;">
-                            {{ strtoupper(substr($order['customer'],0,1)) }}
+                        <div style="width:1.875rem;height:1.875rem;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:.7rem;flex-shrink:0;">
+                            {{ $initials }}
                         </div>
-                        <span style="font-weight:500;color:var(--text-strong);font-size:.875rem;">{{ $order['customer'] }}</span>
+                        <div>
+                            <p style="font-weight:600;color:var(--text-strong);font-size:.8rem;margin:0;">{{ $customerName }}</p>
+                            <p style="font-size:.68rem;color:var(--text-muted);margin:0;">{{ $order->delivery_address }}</p>
+                        </div>
                     </div>
                 </td>
-                <td style="color:var(--text-muted);font-size:.75rem;max-width:200px;">{{ $order['items'] }}</td>
-                <td style="font-weight:700;color:var(--accent);">₱{{ number_format($order['total']) }}</td>
+
+                {{-- Items (formatted) --}}
+                <td style="max-width:200px;">
+                    @php $allItems = $order->items; @endphp
+                    @foreach($allItems->take(2) as $item)
+                        <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+                            <span style="font-size:.72rem;font-weight:700;color:var(--accent);background:rgba(250,204,21,.1);border-radius:4px;padding:1px 5px;flex-shrink:0;">×{{ $item->quantity }}</span>
+                            <span style="font-size:.75rem;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;" title="{{ $item->item_name }}">{{ $item->item_name }}</span>
+                        </div>
+                    @endforeach
+                    @if($allItems->count() > 2)
+                        <span style="font-size:.68rem;color:var(--text-muted);">+{{ $allItems->count() - 2 }} more item(s)</span>
+                    @endif
+                </td>
+
+                {{-- Total --}}
+                <td style="font-weight:700;color:var(--accent);">₱{{ number_format($order->total) }}</td>
+
+                {{-- Status --}}
                 <td>
-                    <span class="badge badge-{{ $order['status'] }}" style="display:inline-flex;align-items:center;gap:.3rem;">
+                    <span class="badge badge-{{ $statusKey }}" style="display:inline-flex;align-items:center;gap:.3rem;">
                         <i data-lucide="{{ $sc['icon'] }}" style="width:.65rem;height:.65rem;stroke-width:2.5;"></i>
                         {{ $sc['label'] }}
                     </span>
                 </td>
-                <td style="color:var(--text-muted);font-size:.75rem;">{{ $order['date'] }}</td>
+
+                {{-- Date --}}
+                <td style="color:var(--text-muted);font-size:.75rem;">{{ $order->created_at->format('M d, Y g:i A') }}</td>
+
+                {{-- Actions --}}
                 <td>
-                    <div style="display:flex;gap:.5rem;">
+                    <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
                         <button class="btn-ghost" style="font-size:.75rem;display:inline-flex;align-items:center;gap:.3rem;"
-                                onclick="alert('Order detail view coming soon!')">
+                                onclick="showOrderDetail({{ $order->id }})">
                             <i data-lucide="eye" style="width:.8rem;height:.8rem;stroke-width:2;"></i> View
                         </button>
-                        @if($order['status']==='pending')
-                            <button class="btn-success" style="font-size:.75rem;"
-                                    onclick="alert('Connect to DB to activate.')">
-                                <i data-lucide="check" style="width:.8rem;height:.8rem;stroke-width:2.5;"></i> Accept
-                            </button>
+                        @if($order->status === 'pending')
+                            <form method="POST" action="{{ route('admin.orders.accept', $order) }}" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn-success" style="font-size:.75rem;display:inline-flex;align-items:center;gap:.3rem;">
+                                    <i data-lucide="check" style="width:.8rem;height:.8rem;stroke-width:2.5;"></i> Accept
+                                </button>
+                            </form>
                         @endif
                     </div>
                 </td>
