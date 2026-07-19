@@ -24,6 +24,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors(),
             ], 422);
         }
@@ -62,22 +63,27 @@ class AuthController extends Controller
     public function signup(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'first_name'            => 'required|string|max:100',
-            'last_name'             => 'required|string|max:100',
+            'name'                  => 'required|string|max:200',
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required',
+        ], [
+            'name.required'     => 'Please enter your full name.',
+            'email.unique'      => 'An account with this email already exists.',
+            'password.min'      => 'Password must be at least 6 characters.',
+            'password.confirmed'=> 'Passwords do not match.',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => $validator->errors()->first(),
                 'errors'  => $validator->errors(),
             ], 422);
         }
 
         $user = User::create([
-            'name'     => trim($request->first_name . ' ' . $request->last_name),
+            'name'     => trim($request->name),
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'provider' => 'email',
@@ -90,7 +96,7 @@ class AuthController extends Controller
         return response()->json([
             'success'  => true,
             'message'  => 'Account created successfully.',
-            'redirect' => route('home'),
+            'redirect' => route('shop.home'),
             'user'     => [
                 'name'   => $user->name,
                 'email'  => $user->email,
@@ -130,26 +136,40 @@ class AuthController extends Controller
             return redirect()->route('home')->with('error', 'Google login failed. Please try again.');
         }
 
-        // Find or create user — never overwrite an existing role
+        // First try to find by google_id
         $user = User::where('google_id', $googleUser->getId())->first();
 
         if ($user) {
+            // Existing Google user — refresh their info
             $user->update([
                 'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
                 'avatar'            => $googleUser->getAvatar(),
                 'email_verified_at' => now(),
             ]);
         } else {
-            $user = User::create([
-                'google_id'         => $googleUser->getId(),
-                'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
-                'avatar'            => $googleUser->getAvatar(),
-                'provider'          => 'google',
-                'role'              => 'user',
-                'email_verified_at' => now(),
-            ]);
+            // Check if the email is already registered via email/password
+            $existing = User::where('email', $googleUser->getEmail())->first();
+
+            if ($existing) {
+                // Link the Google ID to the existing account
+                $existing->update([
+                    'google_id'         => $googleUser->getId(),
+                    'avatar'            => $existing->avatar ?? $googleUser->getAvatar(),
+                    'email_verified_at' => now(),
+                ]);
+                $user = $existing;
+            } else {
+                // Brand-new user via Google
+                $user = User::create([
+                    'google_id'         => $googleUser->getId(),
+                    'name'              => $googleUser->getName(),
+                    'email'             => $googleUser->getEmail(),
+                    'avatar'            => $googleUser->getAvatar(),
+                    'provider'          => 'google',
+                    'role'              => 'user',
+                    'email_verified_at' => now(),
+                ]);
+            }
         }
 
         Auth::login($user, true);

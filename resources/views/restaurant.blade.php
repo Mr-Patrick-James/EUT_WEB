@@ -1691,7 +1691,7 @@ document.getElementById('lightbox').addEventListener('click', function(e) {
                     <label class="auth-label">Password</label>
                     <input type="password" class="auth-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
                 </div>
-                <button class="btn-login" onclick="doLogin()">Sign In →</button>
+                <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In →</button>
             </div>
 
             <!-- SIGNUP PANEL -->
@@ -1713,9 +1713,9 @@ document.getElementById('lightbox').addEventListener('click', function(e) {
                 </div>
                 <div class="auth-field">
                     <label class="auth-label">Password</label>
-                    <input type="password" class="auth-input" id="signupPassword" placeholder="Min. 8 characters" autocomplete="new-password">
+                    <input type="password" class="auth-input" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
                 </div>
-                <button class="btn-signup" onclick="doSignup()">Create Account →</button>
+                <button class="btn-signup" id="signupBtn" onclick="doSignup()">Create Account →</button>
             </div>
         </div>
     </div>
@@ -1892,12 +1892,18 @@ function clearAlert() {
    LOGIN FETCH
 ══════════════════════════════════════════════════════ */
 async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
+    const email    = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
+    const btn      = document.getElementById('loginBtn');
+
     if (!email || !password) { showAlert('Please enter your email and password.'); return; }
     clearAlert();
+
+    btn.disabled    = true;
+    btn.textContent = 'Signing in…';
+
     try {
-        const res = await fetch('{{ route("auth.login") }}', {
+        const res  = await fetch('{{ route("auth.login") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1909,26 +1915,35 @@ async function doLogin() {
         const data = await res.json();
         if (res.ok && data.redirect) {
             window.location.href = data.redirect;
-        } else {
-            showAlert(data.message || 'Invalid credentials. Please try again.');
+            return; // keep button disabled while redirecting
         }
+        showAlert(data.message || 'Invalid credentials. Please try again.');
     } catch (err) {
         showAlert('Something went wrong. Please try again.');
     }
+
+    btn.disabled    = false;
+    btn.textContent = 'Sign In →';
 }
 
 /* ══════════════════════════════════════════════════════
    SIGNUP FETCH
 ══════════════════════════════════════════════════════ */
 async function doSignup() {
-    const name = document.getElementById('signupName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
+    const name     = document.getElementById('signupName').value.trim();
+    const email    = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
+    const btn      = document.getElementById('signupBtn');
+
     if (!name || !email || !password) { showAlert('Please fill in all fields.'); return; }
-    if (password.length < 8) { showAlert('Password must be at least 8 characters.'); return; }
+    if (password.length < 6) { showAlert('Password must be at least 6 characters.'); return; }
     clearAlert();
+
+    btn.disabled    = true;
+    btn.textContent = 'Creating account…';
+
     try {
-        const res = await fetch('{{ route("auth.signup") }}', {
+        const res  = await fetch('{{ route("auth.signup") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1940,12 +1955,15 @@ async function doSignup() {
         const data = await res.json();
         if (res.ok && data.redirect) {
             window.location.href = data.redirect;
-        } else {
-            showAlert(data.message || 'Could not create account. Please try again.');
+            return; // keep button disabled while redirecting
         }
+        showAlert(data.message || 'Could not create account. Please try again.');
     } catch (err) {
         showAlert('Something went wrong. Please try again.');
     }
+
+    btn.disabled    = false;
+    btn.textContent = 'Create Account →';
 }
 
 /* ══════════════════════════════════════════════════════
