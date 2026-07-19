@@ -255,11 +255,6 @@
             cursor: pointer; transition: all 0.2s;
             box-shadow: 0 2px 8px rgba(250,204,21,0.2);
         }
-        .add-btn:hover { box-shadow: 0 4px 14px rgba(250,204,21,0.4); transform: translateY(-1px); }
-        .add-btn.added {
-            background: linear-gradient(135deg, #16a34a, #22c55e);
-            box-shadow: 0 2px 8px rgba(34,197,94,0.3);
-        }
 
         /* ── EMPTY STATE ── */
         .empty-state {
@@ -416,16 +411,6 @@
                 </div>
             </div>
         </a>
-        <div class="p-card-footer">
-            <button class="add-btn"
-                data-id="{{ $item->id }}"
-                data-name="{{ $item->name }}"
-                data-price="{{ $item->price }}"
-                data-image="{{ $item->image }}"
-                data-category="{{ $item->category->slug ?? '' }}">
-                + Add to Cart
-            </button>
-        </div>
     </div>
     @endforeach
 </div>
@@ -480,29 +465,7 @@ function updateCartBadge() {
     badge.style.display = total > 0 ? 'flex' : 'none';
 }
 
-/* ── Add to cart ── */
-document.querySelectorAll('.add-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-        e.preventDefault(); e.stopPropagation();
-        const id    = parseInt(btn.dataset.id);
-        const name  = btn.dataset.name;
-        const price = parseInt(btn.dataset.price);
-        const image = btn.dataset.image;
-        const cat   = btn.dataset.category;
-        const existing = cart.find(i => i.id === id);
-        if (existing) existing.quantity++;
-        else cart.push({ id, name, price, image, category: cat, quantity: 1 });
-        localStorage.setItem('eutCart', JSON.stringify(cart));
-        updateCartBadge();
-        // Feedback
-        btn.textContent = '✓ Added!';
-        btn.classList.add('added');
-        setTimeout(() => {
-            btn.textContent = '+ Add to Cart';
-            btn.classList.remove('added');
-        }, 1200);
-    });
-});
+
 
 /* ── Category filter ── */
 document.querySelectorAll('.cat-pill').forEach(pill => {

@@ -76,6 +76,9 @@
         .cart-item:last-child { border-bottom: none; }
         .cart-item:hover { background: rgba(255,255,255,0.015); }
 
+        /* Clickable link wrapping image + info — removed, kept for reference */
+        .item-edit-hint { display: none; }
+
         .item-img {
             width: 72px; height: 72px; border-radius: 14px;
             object-fit: cover; flex-shrink: 0;
@@ -190,19 +193,29 @@
             transition: width 0.6s ease;
         }
 
-        /* ── CHECKOUT BUTTON ── */
-        .checkout-btn {
-            display: block; width: 100%;
+        /* ── BUY NOW BAR (sticky) ── */
+        .buy-now-bar {
+            display: flex; align-items: center; justify-content: space-between;
             background: linear-gradient(135deg, #f59e0b, #facc15);
-            color: #000; padding: 16px;
-            border-radius: 14px; border: none;
+            color: #000; padding: 14px 20px;
+            border-radius: 18px; border: none;
+            text-decoration: none; cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 28px rgba(250,204,21,0.4);
+            margin-bottom: 10px;
+        }
+        .buy-now-bar:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(250,204,21,0.5); }
+        .buy-now-bar:active { transform: scale(0.98); }
+        .buy-now-left { display: flex; align-items: center; gap: 12px; }
+        .buy-now-icon { font-size: 22px; }
+        .buy-now-label { font-size: 11px; font-weight: 600; opacity: 0.7; letter-spacing: 0.04em; text-transform: uppercase; }
+        .buy-now-total { font-size: 20px; font-weight: 900; line-height: 1.1; }
+        .buy-now-cta {
             font-size: 15px; font-weight: 800;
-            text-align: center; text-decoration: none;
-            cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 4px 20px rgba(250,204,21,0.3);
+            background: rgba(0,0,0,0.12);
+            padding: 8px 16px; border-radius: 10px;
             letter-spacing: 0.01em;
         }
-        .checkout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(250,204,21,0.4); }
         .continue-btn {
             display: block; width: 100%;
             background: rgba(255,255,255,0.04);
@@ -213,6 +226,7 @@
             margin-top: 10px; transition: all 0.2s;
         }
         .continue-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
 
         /* ── TRUST BADGES ── */
         .trust-row {
@@ -280,6 +294,12 @@
         .light-mode .empty-bag { background: #fff !important; border-color: rgba(0,0,0,0.07) !important; }
         .light-mode .upsell-chip { background: #fff !important; border-color: rgba(0,0,0,0.07) !important; }
         .light-mode .upsell-name { color: #374151 !important; }
+
+        @keyframes fadeInUp {
+            from { opacity:0; transform: translateX(-50%) translateY(12px); }
+            to   { opacity:1; transform: translateX(-50%) translateY(0); }
+        }
+
 
         /* ── BOTTOM NAV ── */
         .bottom-nav {
@@ -447,9 +467,16 @@
             </div>
         </div>
 
-        <!-- Action buttons -->
-        <a href="{{ route('shop.checkout') }}" class="checkout-btn">
-            Proceed to Checkout →
+        <!-- Sticky Buy Now Bar -->
+        <a href="{{ route('shop.checkout') }}" class="buy-now-bar" id="buyNowBar">
+            <div class="buy-now-left">
+                <span class="buy-now-icon">🛒</span>
+                <div>
+                    <p class="buy-now-label">Place Order</p>
+                    <p class="buy-now-total" id="buyBarTotal">₱0</p>
+                </div>
+            </div>
+            <span class="buy-now-cta">Buy Now →</span>
         </a>
         <a href="{{ route('shop.home') }}" class="continue-btn">
             ← Continue Shopping
@@ -511,6 +538,31 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCart();
         }
     });
+
+    // ── BUY NOW: validate required flavors before proceeding to checkout ──
+    const buyNowBar = document.getElementById('buyNowBar');
+    if (buyNowBar) {
+        buyNowBar.addEventListener('click', e => {
+            // Find any item that needs a flavor but doesn't have one confirmed
+            const badItem = cart.find(item => item.requires_flavor && !item.flavor_ok);
+            if (badItem) {
+                e.preventDefault();
+                // Highlight the offending cart item
+                const el = document.querySelector(`[data-id="${badItem.id}"]`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.style.outline = '2px solid #ef4444';
+                    el.style.borderRadius = '14px';
+                    el.style.transition = 'outline 0.2s';
+                    setTimeout(() => el.style.outline = '', 2500);
+                }
+                showCartToast(`⚠️ "${badItem.name.split('(')[0].trim()}" needs a flavor selected! Tap the item to fix it.`, badItem.item_id);
+                return;
+            }
+            // All good – let the link navigate to checkout normally
+        });
+    }
+
 });
 
 let cart = JSON.parse(localStorage.getItem('eutCart') || '[]');
@@ -589,6 +641,8 @@ function renderCart() {
                 </svg>
             </button>`;
 
+
+
         list.appendChild(div);
 
         const id       = item.id;
@@ -657,6 +711,10 @@ function updateTotals() {
     document.getElementById('grandTotal').textContent    = '₱' + grand.toLocaleString();
     document.getElementById('itemSubCount').textContent  = totalQty + (totalQty === 1 ? ' item' : ' items') + ' in your order';
 
+    // Sync Buy Now bar total
+    const buyBarTotal = document.getElementById('buyBarTotal');
+    if (buyBarTotal) buyBarTotal.textContent = '₱' + grand.toLocaleString();
+
     if (discount > 0) {
         document.getElementById('discountRow').style.display   = 'flex';
         document.getElementById('discountDisplay').textContent = '-₱' + discount.toLocaleString();
@@ -676,6 +734,33 @@ function applyPromo() {
     } else {
         msgEl.innerHTML = `<span style="color:#f87171;">✕ Invalid promo code</span>`;
     }
+}
+
+// Toast with optional "Fix it" link to product page
+function showCartToast(msg, itemId) {
+    const existing = document.getElementById('cartToast');
+    if (existing) existing.remove();
+
+    const t = document.createElement('div');
+    t.id = 'cartToast';
+    t.innerHTML = `
+        <span>${msg}</span>
+        ${itemId ? `<a href="/shop/product/${itemId}" style="color:#facc15;font-weight:700;white-space:nowrap;margin-left:10px;">Fix it →</a>` : ''}
+    `;
+    Object.assign(t.style, {
+        position: 'fixed', bottom: '100px', left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#1e0a0a',
+        border: '1px solid rgba(239,68,68,0.4)',
+        color: '#f87171', padding: '12px 20px',
+        borderRadius: '14px', fontSize: '13px', fontWeight: '600',
+        zIndex: '9999', boxShadow: '0 4px 24px rgba(239,68,68,0.3)',
+        display: 'flex', alignItems: 'center', gap: '6px',
+        maxWidth: '90vw', textAlign: 'left',
+        animation: 'fadeInUp 0.3s ease',
+    });
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
 }
 </script>
 </body>

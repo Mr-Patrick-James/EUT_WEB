@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -563,6 +563,40 @@
             </div>
         </div>
 
+        <!-- ─── Cancel Order Card ─── -->
+        <div class="card" id="cancelCard" style="border-color:rgba(239,68,68,0.15); margin-bottom:14px;">
+            <div class="card-header">
+                <div>
+                    <p class="card-title">Need to Cancel?</p>
+                    <p class="card-sub" id="cancelSubText">You can cancel while your order is still being prepared.</p>
+                </div>
+                <span style="font-size:22px;">🚫</span>
+            </div>
+            <div style="padding:0 18px 18px;">
+                <!-- Shown when cancellable -->
+                <div id="cancelAllowed">
+                    <p style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.6;">
+                        Orders can only be cancelled while <strong style="color:#f3f4f6;">Pending</strong>, <strong style="color:#f3f4f6;">Accepted</strong>, or <strong style="color:#f3f4f6;">Preparing</strong>. Once a rider is assigned, cancellation is no longer possible.
+                    </p>
+                    <button onclick="openCancelModal()" style="
+                        width:100%; padding:12px; border-radius:12px;
+                        background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.3);
+                        color:#f87171; font-size:14px; font-weight:700;
+                        cursor:pointer; transition:all 0.2s;
+                    " onmouseover="this.style.background='rgba(239,68,68,0.18)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+                        Cancel My Order
+                    </button>
+                </div>
+                <!-- Shown when NOT cancellable -->
+                <div id="cancelBlocked" style="display:none;">
+                    <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;">
+                        <span style="font-size:20px;">🛵</span>
+                        <p style="font-size:12px;color:#9ca3af;line-height:1.5;">Your order is already on its way! Cancellation is no longer available at this stage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Action buttons -->
         <div style="display:flex; gap:10px;">
             <a href="{{ route('shop.home') }}" class="btn-primary">🔁 Order Again</a>
@@ -570,6 +604,60 @@
         </div>
 
     </div><!-- /view-active -->
+
+    <!-- ─── CANCEL MODAL ─── -->
+    <div id="cancelModalBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;backdrop-filter:blur(4px);" onclick="closeCancelModal()"></div>
+    <div id="cancelModal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1001;
+        background:linear-gradient(145deg,#1a0a0a,#120808);
+        border:1px solid rgba(239,68,68,0.25); border-radius:24px 24px 0 0;
+        padding:24px 20px 40px; max-width:540px; margin:0 auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div>
+                <p style="font-size:17px;font-weight:800;color:#fff;">Cancel Order</p>
+                <p style="font-size:12px;color:#6b7280;margin-top:2px;">Please tell us why you're cancelling</p>
+            </div>
+            <button onclick="closeCancelModal()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#9ca3af;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+        </div>
+
+        <!-- Reason options -->
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;" id="cancelReasons">
+            @foreach([
+                'Changed my mind',
+                'Ordered by mistake',
+                'Found a better option',
+                'Taking too long',
+                'Other reason'
+            ] as $reason)
+            <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.07);cursor:pointer;transition:all 0.2s;"
+                   onmouseover="this.style.borderColor='rgba(239,68,68,0.3)'" onmouseout="this.style.borderColor=this.querySelector('input').checked?'rgba(239,68,68,0.5)':'rgba(255,255,255,0.07)'">
+                <input type="radio" name="cancelReason" value="{{ $reason }}"
+                       style="accent-color:#ef4444;width:16px;height:16px;"
+                       onchange="document.querySelectorAll('#cancelReasons label').forEach(l=>l.style.borderColor='rgba(255,255,255,0.07)'); this.closest('label').style.borderColor='rgba(239,68,68,0.5)';">
+                <span style="font-size:13px;color:#d1d5db;font-weight:500;">{{ $reason }}</span>
+            </label>
+            @endforeach
+        </div>
+
+        <div id="cancelModalError" style="display:none;color:#f87171;font-size:12px;margin-bottom:10px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:8px;"></div>
+
+        <button id="confirmCancelBtn" onclick="submitCancel()" style="
+            width:100%; padding:14px; border-radius:14px;
+            background:linear-gradient(135deg,#ef4444,#dc2626);
+            border:none; color:#fff; font-size:15px; font-weight:800;
+            cursor:pointer; transition:all 0.2s;
+            box-shadow:0 4px 20px rgba(239,68,68,0.3);
+        ">
+            Yes, Cancel My Order
+        </button>
+        <button onclick="closeCancelModal()" style="
+            width:100%; padding:12px; margin-top:8px; border-radius:14px;
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            color:#9ca3af; font-size:14px; font-weight:600; cursor:pointer;
+        ">
+            Never Mind
+        </button>
+    </div>
+
 
     <!-- ─── PAST ORDERS VIEW ─── -->
     <div id="view-past" style="display:none;">
@@ -706,12 +794,106 @@ async function pollOrderStatus(orderId) {
             }
         }
 
-        // If delivered, stop polling
-        if (data.status === 'delivered') {
+        // If delivered or cancelled, stop polling
+        if (data.status === 'delivered' || data.status === 'cancelled') {
             localStorage.removeItem('eutActiveOrderId');
+        }
+
+        // ── Toggle cancel card based on status ──
+        const cancellable = ['pending','accepted','preparing'].includes(data.status);
+        const cancelAllowed  = document.getElementById('cancelAllowed');
+        const cancelBlocked  = document.getElementById('cancelBlocked');
+        const cancelSubText  = document.getElementById('cancelSubText');
+        if (cancelAllowed && cancelBlocked) {
+            cancelAllowed.style.display  = cancellable ? 'block' : 'none';
+            cancelBlocked.style.display  = cancellable ? 'none'  : 'block';
+            if (cancelSubText) {
+                cancelSubText.textContent = cancellable
+                    ? 'You can still cancel — order is ' + data.status_label + '.'
+                    : 'Cancellation unavailable — order is ' + data.status_label + '.';
+            }
         }
     } catch (e) { /* silently fail — will retry */ }
 }
+
+/* ── Cancel Modal ── */
+function openCancelModal() {
+    document.getElementById('cancelModalBackdrop').style.display = 'block';
+    document.getElementById('cancelModal').style.display = 'block';
+    document.getElementById('cancelModalError').style.display = 'none';
+    // Reset radio selections
+    document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
+    document.querySelectorAll('#cancelReasons label').forEach(l => l.style.borderColor = 'rgba(255,255,255,0.07)');
+}
+
+function closeCancelModal() {
+    document.getElementById('cancelModalBackdrop').style.display = 'none';
+    document.getElementById('cancelModal').style.display = 'none';
+}
+
+async function submitCancel() {
+    const selected = document.querySelector('input[name="cancelReason"]:checked');
+    const errEl    = document.getElementById('cancelModalError');
+    const btn      = document.getElementById('confirmCancelBtn');
+
+    if (!selected) {
+        errEl.textContent = '⚠ Please select a reason before cancelling.';
+        errEl.style.display = 'block';
+        return;
+    }
+    errEl.style.display = 'none';
+
+    const orderId = localStorage.getItem('eutActiveOrderId');
+    if (!orderId) {
+        errEl.textContent = 'No active order found.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    btn.textContent = 'Cancelling…';
+    btn.disabled = true;
+
+    try {
+        const res  = await fetch(`/orders/${orderId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ reason: selected.value })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            closeCancelModal();
+            localStorage.removeItem('eutActiveOrderId');
+            // Show success toast
+            const t = document.createElement('div');
+            t.textContent = '✅ Order cancelled successfully.';
+            Object.assign(t.style, {
+                position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%)',
+                background:'#0d1f17', border:'1px solid rgba(74,222,128,0.3)',
+                color:'#4ade80', padding:'12px 22px', borderRadius:'99px',
+                fontSize:'13px', fontWeight:'700', zIndex:'9999',
+                boxShadow:'0 4px 20px rgba(74,222,128,0.2)',
+            });
+            document.body.appendChild(t);
+            setTimeout(() => { t.remove(); switchTab('cancelled'); }, 2000);
+        } else {
+            errEl.textContent = data.message || 'Cancellation failed. Try again.';
+            errEl.style.display = 'block';
+            btn.textContent = 'Yes, Cancel My Order';
+            btn.disabled = false;
+        }
+    } catch (e) {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = 'block';
+        btn.textContent = 'Yes, Cancel My Order';
+        btn.disabled = false;
+    }
+}
+
 
 function updateTimeline(data) {
     const steps = [

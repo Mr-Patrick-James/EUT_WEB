@@ -602,7 +602,7 @@ const MODIFIER_GROUPS = @json($item['modifier_groups'] ?? []);
 const ADDON_GROUPS = @json($item['addon_groups'] ?? []);
 
 let sheetMode       = 'cart';
-let selectedOptions = {}; // group_id → option object
+let selectedOptions = {}; // group_id → option object OR array (multi-select)
 let selectedAddons  = {}; // addon_group_id → { name, priceType, adj }
 let currentQty      = 1;
 
@@ -629,36 +629,57 @@ function buildModifierGroups() {
     }
 
     container.innerHTML = visibleGroups.map((group, gi) => {
-        const isFlavor = group.type === 'flavor';
-        const divider  = gi < visibleGroups.length - 1
+        const isFlavor   = group.type === 'flavor';
+        const maxSel     = group.max_selections || null;
+        const isMulti    = maxSel && maxSel > 1;
+        const divider    = gi < visibleGroups.length - 1
             ? '<div style="height:1px;background:rgba(255,255,255,0.06);margin:0 18px;"></div>' : '';
 
         const optionsHtml = isFlavor
             ? buildFlavorOptions(group)
             : buildPillOptions(group);
 
+        // Label: show max hint for multi-select flavor groups
+        let labelText = group.required ? 'Required' : 'Select one';
+        if (isMulti) labelText = `Choose up to ${maxSel}`;
+        if (maxSel === 1) labelText = 'Choose 1 flavor';
+
         return `
         <div class="sheet-section" id="group_${group.id}">
             <p class="sheet-section-title">
                 ${group.name}
-                <span id="label_${group.id}">${group.required ? 'Required' : 'Select one'}</span>
+                <span id="label_${group.id}">${labelText}</span>
             </p>
             ${optionsHtml}
         </div>
         ${divider}`;
     }).join('');
 
-    // Pre-select only explicitly marked defaults — no fallback to first
+    // Pre-select defaults — multi-select groups use arrays
     MODIFIER_GROUPS.forEach(group => {
-        if (group.type === 'addon') return; // skip addons
-        const def = group.active_options.find(o => o.is_default);
-        if (def) {
-            selectedOptions[group.id] = def;
+        if (group.type === 'addon') return;
+        const maxSel = group.max_selections || null;
+        const isMulti = maxSel && maxSel > 1;
+
+        if (isMulti) {
+            // Pre-populate array with any defaults so count matches visual state
+            const defaults = group.active_options.filter(o => o.is_default);
+            selectedOptions[group.id] = defaults;
             const label = document.getElementById('label_' + group.id);
-            if (label) label.textContent = def.name;
+            if (label) {
+                if (defaults.length === 0) label.textContent = `Choose up to ${maxSel}`;
+                else label.textContent = `${defaults.length} / ${maxSel} chosen`;
+            }
+
         } else {
-            // No default — leave unselected, show 'Select one'
-            selectedOptions[group.id] = null;
+            const def = group.active_options.find(o => o.is_default);
+            if (def) {
+                selectedOptions[group.id] = def;
+                const label = document.getElementById('label_' + group.id);
+                if (label) label.textContent = def.name;
+            } else {
+                selectedOptions[group.id] = null;
+            }
         }
     });
 
@@ -706,31 +727,73 @@ function buildPillOptions(group) {
 }
 
 function selectOption(groupId, optId, isFlavor) {
-    const group = MODIFIER_GROUPS.find(g => g.id === parseInt(groupId));
+    const group   = MODIFIER_GROUPS.find(g => g.id === parseInt(groupId));
     if (!group) return;
-    const current = selectedOptions[group.id];
-    const isSame  = current && parseInt(current.id) === parseInt(optId);
+    const maxSel  = group.max_selections || null;
+    const isMulti = maxSel && maxSel > 1;
+    const opt     = group.active_options.find(o => parseInt(o.id) === parseInt(optId));
+    if (!opt) return;
 
-    // Always deselect all options in this group first
-    group.active_options.forEach(o => {
-        const el = document.getElementById('opt_' + group.id + '_' + o.id);
-        if (el) el.classList.remove('selected');
-    });
+    if (isMulti) {
+        // ── MULTI-SELECT mode ──────────────────────────────
+        let arr = selectedOptions[group.id] || [];
+        const idx = arr.findIndex(o => parseInt(o.id) === parseInt(optId));
 
-    if (isSame) {
-        // Tap same option again → unselect
-        selectedOptions[group.id] = null;
+        if (idx >= 0) {
+            // Already selected → deselect
+            arr.splice(idx, 1);
+            const el = document.getElementById('opt_' + group.id + '_' + optId);
+            if (el) el.classList.remove('selected');
+        } else {
+            // Not yet selected → check limit
+            if (arr.length >= maxSel) {
+                // Shake the label to signal limit reached
+                const label = document.getElementById('label_' + group.id);
+                if (label) {
+                    label.style.transition = 'none';
+                    label.style.color = '#ef4444';
+                    label.textContent = `Max ${maxSel} only!`;
+                    setTimeout(() => {
+                        label.style.color = '';
+                        label.textContent = `${arr.length} / ${maxSel} chosen`;
+                    }, 1200);
+                }
+                return;
+            }
+            arr.push(opt);
+            const el = document.getElementById('opt_' + group.id + '_' + optId);
+            if (el) el.classList.add('selected');
+        }
+
+        selectedOptions[group.id] = arr;
         const label = document.getElementById('label_' + group.id);
-        if (label) label.textContent = group.required ? 'Required' : 'Select one';
+        if (label) {
+            label.style.color = '';
+            if (arr.length === 0) label.textContent = `Choose up to ${maxSel}`;
+            else label.textContent = `${arr.length} / ${maxSel} chosen`;
+        }
+
     } else {
-        // Select the new option
-        const opt = group.active_options.find(o => parseInt(o.id) === parseInt(optId));
-        if (!opt) return;
-        const chosen = document.getElementById('opt_' + group.id + '_' + opt.id);
-        if (chosen) chosen.classList.add('selected');
-        selectedOptions[group.id] = opt;
-        const label = document.getElementById('label_' + group.id);
-        if (label) label.textContent = opt.name;
+        // ── SINGLE-SELECT mode (original behavior) ─────────
+        const current = selectedOptions[group.id];
+        const isSame  = current && parseInt(current.id) === parseInt(optId);
+
+        group.active_options.forEach(o => {
+            const el = document.getElementById('opt_' + group.id + '_' + o.id);
+            if (el) el.classList.remove('selected');
+        });
+
+        if (isSame) {
+            selectedOptions[group.id] = null;
+            const label = document.getElementById('label_' + group.id);
+            if (label) label.textContent = group.required ? 'Required' : 'Select one';
+        } else {
+            const chosen = document.getElementById('opt_' + group.id + '_' + opt.id);
+            if (chosen) chosen.classList.add('selected');
+            selectedOptions[group.id] = opt;
+            const label = document.getElementById('label_' + group.id);
+            if (label) label.textContent = opt.name;
+        }
     }
 
     updateTotal();
@@ -813,12 +876,21 @@ function bindQty() {
 function updateTotal() {
     let price = parseFloat(BASE_PRICE);
 
-    // Apply modifier/flavor selections
+    // Apply modifier/flavor selections (handles both single & multi-select)
     Object.entries(selectedOptions).forEach(([groupId, opt]) => {
         if (!opt) return;
-        const adj = parseFloat(opt.price_adjustment || 0);
-        if (opt.price_type === 'add')          price += adj;
-        else if (opt.price_type === 'replace') price  = adj;
+        if (Array.isArray(opt)) {
+            // Multi-select: sum all selected option adjustments
+            opt.forEach(o => {
+                const adj = parseFloat(o.price_adjustment || 0);
+                if (o.price_type === 'add') price += adj;
+            });
+        } else {
+            // Single-select
+            const adj = parseFloat(opt.price_adjustment || 0);
+            if (opt.price_type === 'add')          price += adj;
+            else if (opt.price_type === 'replace') price  = adj;
+        }
     });
 
     // Apply checked add-ons
@@ -832,6 +904,7 @@ function updateTotal() {
     document.getElementById('sheetTotal').textContent    = '₱' + total.toLocaleString();
     document.getElementById('sheetQtyLabel').textContent = currentQty;
 }
+
 
 /* ── SHEET OPEN / CLOSE ── */
 function openSheet(mode) {
@@ -863,11 +936,54 @@ function bindActions() {
 }
 
 function doAdd(goToCart) {
+
+    // ── VALIDATION: check all required groups have a selection ──────────────
+    const visibleGroups = MODIFIER_GROUPS.filter(g => g.type !== 'addon');
+    for (const group of visibleGroups) {
+        if (!group.required) continue;
+
+        const sel     = selectedOptions[group.id];
+        const isEmpty = Array.isArray(sel) ? sel.length === 0 : !sel;
+
+        if (isEmpty) {
+            // Scroll to the unselected group and flash it red
+            const groupEl = document.getElementById('group_' + group.id);
+            const labelEl = document.getElementById('label_' + group.id);
+
+            if (groupEl) {
+                groupEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                groupEl.style.transition = 'all 0.2s';
+                groupEl.style.outline = '2px solid #ef4444';
+                groupEl.style.borderRadius = '12px';
+                setTimeout(() => { groupEl.style.outline = ''; }, 2000);
+            }
+            if (labelEl) {
+                const prev = labelEl.textContent;
+                labelEl.style.color = '#ef4444';
+                labelEl.textContent = '⚠ Required – please choose!';
+                setTimeout(() => {
+                    labelEl.style.color = '';
+                    labelEl.textContent = prev;
+                }, 2000);
+            }
+
+            showToast('⚠️ Please choose a ' + group.name + ' first!');
+            return; // block the add
+        }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     let price = BASE_PRICE;
     Object.values(selectedOptions).forEach(opt => {
         if (!opt) return;
-        if (opt.price_type === 'add')          price += parseFloat(opt.price_adjustment || 0);
-        else if (opt.price_type === 'replace') price  = parseFloat(opt.price_adjustment);
+        if (Array.isArray(opt)) {
+            opt.forEach(o => {
+                if (o.price_type === 'add') price += parseFloat(o.price_adjustment || 0);
+            });
+        } else {
+            if (opt.price_type === 'add')          price += parseFloat(opt.price_adjustment || 0);
+            else if (opt.price_type === 'replace') price  = parseFloat(opt.price_adjustment);
+        }
     });
     // Add checked add-on prices
     Object.values(selectedAddons).forEach(addon => {
@@ -887,9 +1003,12 @@ function doAdd(goToCart) {
     const addonKey = Object.keys(selectedAddons).sort().join('a');
     const key      = ITEM_ID + (optKey ? '_' + optKey : '') + (addonKey ? '_ad' + addonKey : '');
 
+    // Flag whether this item required a flavor/modifier selection
+    const requiresFlavor = MODIFIER_GROUPS.some(g => g.type !== 'addon' && g.required);
+
     const existing = cart.find(i => i.id === key);
     if (existing) existing.quantity += currentQty;
-    else cart.push({ id: key, name, price: unit, image: ITEM_IMAGE, category: ITEM_CAT, quantity: currentQty });
+    else cart.push({ id: key, item_id: ITEM_ID, name, price: unit, image: ITEM_IMAGE, category: ITEM_CAT, quantity: currentQty, requires_flavor: requiresFlavor, flavor_ok: true });
 
     localStorage.setItem('eutCart', JSON.stringify(cart));
     updateCartBadge();

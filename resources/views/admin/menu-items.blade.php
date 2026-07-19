@@ -501,7 +501,6 @@ function clearAllGroups() {
 }
 
 function addGroup(type) {
-function addGroup(type) {
     var defaultLabel = type === 'flavor' ? 'No Flavor' : 'No Modifier';
     loadGroup({
         type: type, name: '', required: false, is_active: true,
