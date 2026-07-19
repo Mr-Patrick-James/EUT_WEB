@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
 
         /* ”€”€ TOPNAV ”€”€ */
         .topnav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
             background: rgba(8,8,16,0.97); backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
@@ -177,7 +177,7 @@
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(8,8,16,0.97); border-top: 1px solid rgba(255,255,255,0.07);
-            backdrop-filter: blur(20px); padding: 10px 0 14px; z-index: 100;
+            backdrop-filter: blur(20px); padding: 10px 0 14px; z-index: 9999;
         }
         .bottom-nav-inner { display: flex; max-width: 540px; margin: 0 auto; }
         .bnav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #4b5563; text-decoration: none; font-size: 10px; font-weight: 500; transition: color .15s; }
@@ -371,163 +371,135 @@
 
     <!-- -->
     <div id="view-active">
+        @foreach($active as $order)
+            @if($loop->first && $order->status === 'out_for_delivery')
+                <!-- Live Map for first out-for-delivery order -->
+                <p class="section-label">&#x1F7E3; Currently Delivering</p>
+                <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(139,92,246,.3);border-radius:18px;overflow:hidden;margin-bottom:12px;">
+                    <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:12px;font-weight:700;color:#a78bfa;">📍 Live Map</span>
+                            <span style="font-size:10px;color:#4b5563;">#{{ $order->order_number }}</span>
+                        </div>
+                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
+                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
+                        </span>
+                    </div>
+                    <div id="riderMap" style="width:100%;height:220px;"></div>
+                    <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:11px;color:#6b7280;">🟡 Restaurant → 🏠 Customer</span>
+                        <span id="riderDistText" style="font-size:11px;font-weight:700;color:#a78bfa;"></span>
+                    </div>
+                </div>
+            @endif
 
-        <!-- CURRENT DELIVERY (on the way) -->
-        <p class="section-label">&#x1F7E3; Currently Delivering</p>
+            @if($order->status === 'rider_assigned' && !$loop->first)
+                <p class="section-label" style="margin-top:20px;">🟡 Assigned — Head to Restaurant</p>
+            @elseif($order->status === 'rider_assigned' && $loop->first)
+                <p class="section-label" style="margin-top:0;">🟡 Assigned — Head to Restaurant</p>
+            @endif
 
-        <!-- Live Map -->
-        <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(139,92,246,.3);border-radius:18px;overflow:hidden;margin-bottom:12px;">
-            <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:12px;font-weight:700;color:#a78bfa;">“ Live Map</span>
-                    <span style="font-size:10px;color:#4b5563;">#EUT-00512</span>
+            <div class="order-card {{ $order->status === 'out_for_delivery' ? 'active-order' : '' }}">
+                <div class="oc-header">
+                    <div class="oc-id-row">
+                        <span class="oc-id">#{{ $order->order_number }}</span>
+                        <span class="badge {{ $order->status === 'out_for_delivery' ? 'badge-delivering' : 'badge-assigned' }}">
+                            <span class="{{ $order->status === 'out_for_delivery' ? 'pulse-dot' : '' }}"></span>
+                            {{ $order->status === 'out_for_delivery' ? 'On the Way' : 'Assigned' }}
+                        </span>
+                    </div>
+                    <div class="oc-customer">
+                        <div class="oc-avatar" style="background:rgba({{ $order->status === 'out_for_delivery' ? '139,92,246' : '245,158,11' }},.15);color:#{{ $order->status === 'out_for_delivery' ? 'a78bfa' : 'f59e0b' }};">
+                            {{ strtoupper(substr($order->user->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="oc-cname">{{ $order->user->name }}</p>
+                            <p class="oc-csub">{{ $order->user->phone ?? 'No phone' }}</p>
+                        </div>
+                    </div>
                 </div>
-                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
-                    <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
-                </span>
+                <div class="oc-body">
+                    <div class="oc-address-row">
+                        <div class="oc-addr-icon" style="background:rgba(245,158,11,.1);">
+                            <svg width="13" height="13" fill="none" stroke="#f59e0b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                        <div>
+                            <p class="oc-addr-label">Pick Up (Restaurant)</p>
+                            <p class="oc-addr-val">
+                                {{ $order->status === 'out_for_delivery' ? '✅ Picked up at ' . $order->picked_up_at->format('g:i A') : 'EUT Restaurant — Metro Naujan' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="oc-address-row">
+                        <div class="oc-addr-icon" style="background:rgba(239,68,68,.1);">
+                            <svg width="13" height="13" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <div>
+                            <p class="oc-addr-label">Deliver To</p>
+                            <p class="oc-addr-val">{{ $order->delivery_address }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="oc-items">
+                    {{ $order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ') }}
+                </div>
+                <div class="oc-footer">
+                    <div>
+                        <p class="oc-total-label">Order Total</p>
+                        <p class="oc-total">&#8369;{{ number_format($order->total, 2) }}</p>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        @if($order->user->phone)
+                            <button class="btn-call" onclick="window.location='tel:{{ $order->user->phone }}'" title="Call Customer">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            </button>
+                        @endif
+                        @if($order->status === 'rider_assigned')
+                            <form method="POST" action="{{ route('rider.orders.picked-up', $order) }}" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn-pickup">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                                    Picked Up
+                                </button>
+                            </form>
+                        @elseif($order->status === 'out_for_delivery')
+                            <button class="btn-delivered" onclick="openDeliverySheet(this)" data-order-id="{{ $order->id }}">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Mark as Delivered
+                            </button>
+                        @endif
+                    </div>
+                </div>
             </div>
-            <div id="riderMap" style="width:100%;height:220px;"></div>
-            <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:11px;color:#6b7280;">&#x1F7E1; Restaurant  †’  ”´ Customer</span>
-                <span id="riderDistText" style="font-size:11px;font-weight:700;color:#a78bfa;"></span>
-            </div>
-        </div>
+        @endforeach
 
-        <div class="order-card active-order">
-            <div class="oc-header">
-                <div class="oc-id-row">
-                    <span class="oc-id">#EUT-00512</span>
-                    <span class="badge badge-delivering"><span class="pulse-dot"></span> On the Way</span>
-                </div>
-                <div class="oc-customer">
-                    <div class="oc-avatar">A</div>
-                    <div>
-                        <p class="oc-cname">Andrea Macaraeg</p>
-                        <p class="oc-csub">09181234567</p>
-                    </div>
-                </div>
-            </div>
-            <div class="oc-body">
-                <div class="oc-address-row">
-                    <div class="oc-addr-icon" style="background:rgba(245,158,11,.1);">
-                        <svg width="13" height="13" fill="none" stroke="#f59e0b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    </div>
-                    <div>
-                        <p class="oc-addr-label">Pick Up (Restaurant)</p>
-                        <p class="oc-addr-val">œ… Picked up at 5:48 PM</p>
-                    </div>
-                </div>
-                <div class="oc-address-row">
-                    <div class="oc-addr-icon" style="background:rgba(239,68,68,.1);">
-                        <svg width="13" height="13" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="oc-addr-label">Deliver To</p>
-                        <p class="oc-addr-val">123 Sampaguita St., Brgy. Santo NiÃ±o, Metro Naujan</p>
-                    </div>
-                </div>
-            </div>
-            <div class="oc-items">EUT Classic Burger &times; 1 &middot; Crispy Fries &times; 2 &middot; Iced Tea &times; 1</div>
-            <div class="oc-footer">
-                <div>
-                    <p class="oc-total-label">Order Total</p>
-                    <p class="oc-total">&#8369;520</p>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <button class="btn-call" onclick="window.location='tel:09181234567'" title="Call Customer">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    </button>
-                    <button class="btn-delivered" onclick="openDeliverySheet(this)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Mark as Delivered
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ASSIGNED (waiting to pick up) -->
-        <p class="section-label" style="margin-top:20px;">&#x1F7E1; Assigned &mdash; Head to Restaurant</p>
-        <div class="order-card">
-            <div class="oc-header">
-                <div class="oc-id-row">
-                    <span class="oc-id">#EUT-00518</span>
-                    <span class="badge badge-assigned">Assigned</span>
-                </div>
-                <div class="oc-customer">
-                    <div class="oc-avatar" style="background:rgba(245,158,11,.15);color:#f59e0b;">B</div>
-                    <div>
-                        <p class="oc-cname">Bong Soriano</p>
-                        <p class="oc-csub">09271234567</p>
-                    </div>
-                </div>
-            </div>
-            <div class="oc-body">
-                <div class="oc-address-row">
-                    <div class="oc-addr-icon" style="background:rgba(245,158,11,.1);">
-                        <svg width="13" height="13" fill="none" stroke="#f59e0b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    </div>
-                    <div>
-                        <p class="oc-addr-label">Pick Up</p>
-                        <p class="oc-addr-val">EUT Restaurant €” Metro Naujan</p>
-                    </div>
-                </div>
-                <div class="oc-address-row">
-                    <div class="oc-addr-icon" style="background:rgba(239,68,68,.1);">
-                        <svg width="13" height="13" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="oc-addr-label">Deliver To</p>
-                        <p class="oc-addr-val">456 Rosal Ave., Brgy. Bucayao, Metro Naujan</p>
-                    </div>
-                </div>
-            </div>
-            <div class="oc-items">Gourmet Cheeseburger &times; 1 &middot; Onion Rings &times; 1</div>
-            <div class="oc-footer">
-                <div>
-                    <p class="oc-total-label">Order Total</p>
-                    <p class="oc-total">&#8369;490</p>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <button class="btn-call" onclick="window.location='tel:09271234567'" title="Call Customer">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                    </button>
-                    <button class="btn-pickup" onclick="markPickedUp(this)">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-                        Picked Up
-                    </button>
-                </div>
-            </div>
-        </div>
-
+        @if($active->isEmpty())
+            <p class="section-label" style="text-align:center;color:#6b7280;">No active orders right now</p>
+        @endif
     </div><!-- /view-active -->
 
     <!-- -->
     <div id="view-history" style="display:none;">
         <p class="section-label">Completed Today</p>
-        @php
-        $historyOrders = [
-            ['id'=>'EUT-00498','customer'=>'Celia Reyes',  'items'=>'EUT Classic Burger &times; 1',           'total'=>400,'time'=>'5:10 PM','rating'=>5],
-            ['id'=>'EUT-00481','customer'=>'Danny Torres', 'items'=>'Crispy Fries &times; 2 &middot; Iced Tea &times; 2',  'total'=>340,'time'=>'3:45 PM','rating'=>5],
-            ['id'=>'EUT-00465','customer'=>'Eva Lim',      'items'=>'Gourmet Burger &times; 1 &middot; Rings &times; 1',   'total'=>490,'time'=>'1:20 PM','rating'=>4],
-            ['id'=>'EUT-00452','customer'=>'Felix Cruz',   'items'=>'Combo Meal &times; 1',                    'total'=>380,'time'=>'12:05 PM','rating'=>5],
-        ];
-        @endphp
-        @foreach($historyOrders as $h)
+        @foreach($history as $order)
         <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
             <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                    <span style="font-size:13px;font-weight:800;color:#fff;font-family:monospace;">#{{ $h['id'] }}</span>
-                    <span style="font-size:11px;color:#4b5563;">{{ $h['time'] }}</span>
+                    <span style="font-size:13px;font-weight:800;color:#fff;font-family:monospace;">#{{ $order->order_number }}</span>
+                    <span style="font-size:11px;color:#4b5563;">{{ $order->delivered_at->format('g:i A') }}</span>
                 </div>
-                <p style="font-size:12px;font-weight:600;color:#d1d5db;margin:0 0 2px;">{{ $h['customer'] }}</p>
-                <p style="font-size:11px;color:#4b5563;margin:0;">{!! $h['items'] !!}</p>
+                <p style="font-size:12px;font-weight:600;color:#d1d5db;margin:0 0 2px;">{{ $order->user->name }}</p>
+                <p style="font-size:11px;color:#4b5563;margin:0;">{{ $order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ') }}</p>
             </div>
             <div style="text-align:right;flex-shrink:0;">
-                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">&#8369;{{ $h['total'] }}</p>
-                <p style="font-size:12px;color:#facc15;">@for($s=0;$s<$h['rating'];$s++)<span>&#11088;</span>@endfor</p>
+                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">&#8369;{{ number_format($order->total, 2) }}</p>
+                <p style="font-size:12px;color:#facc15;">⭐</p>
             </div>
         </div>
         @endforeach
+        @if($history->isEmpty())
+            <p class="section-label" style="text-align:center;color:#6b7280;">No completed orders today</p>
+        @endif
     </div>
 
     <!-- -->
@@ -571,8 +543,6 @@
         </div>
         @endforeach
     </div>
-
-</div><!-- /page-body -->
 
 </div><!-- /page-body -->
 
@@ -793,15 +763,20 @@ function toggleOnline() {
 
 /* ”€”€ Tabs ”€”€ */
 function switchTab(tab) {
-    ['active','history','earnings'].forEach(id => {
+    const allTabs = ['active','history','earnings','profile'];
+    allTabs.forEach(id => {
         const view = document.getElementById('view-' + id);
         const btn  = document.getElementById('tab-' + id);
-        if (view) view.style.display = id === tab ? 'block' : 'none';
-        if (btn)  btn.classList.toggle('active', id === tab);
+        if (view) {
+            view.style.display = id === tab ? 'block' : 'none';
+        }
+        if (btn) {
+            btn.classList.toggle('active', id === tab);
+        }
     });
     document.querySelectorAll('.bnav-item').forEach((el, i) => {
-        const tabs = ['active','history','earnings'];
-        el.classList.toggle('active', tabs[i] === tab);
+        const bnavTabs = ['active','history','earnings','profile'];
+        el.classList.toggle('active', bnavTabs[i] === tab);
     });
 }
 

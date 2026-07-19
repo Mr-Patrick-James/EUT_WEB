@@ -1,4 +1,4 @@
-﻿@extends('admin.layout')
+@extends('admin.layout')
 @section('title', 'Riders')
 
 @section('content')
@@ -22,12 +22,19 @@
 
 {{-- ── STAT CARDS ── --}}
 @php
+// Calculate real stats from database
+$totalRiders = $riders->count();
+$onlineRiders = $riders->filter(fn($r) => $r->is_available && !$r->activeOrder())->count();
+$onDeliveryRiders = $riders->filter(fn($r) => $r->activeOrder() && in_array($r->activeOrder()->status, ['rider_assigned', 'out_for_delivery']))->count();
+$offlineRiders = $totalRiders - $onlineRiders - $onDeliveryRiders;
+$deliveriesToday = \App\Models\Order::where('status', 'delivered')->whereDate('delivered_at', today())->count();
+
 $riderStats = [
-    ['label'=>'Total Riders',    'value'=>8,  'sub'=>'Registered riders',   'icon'=>'users',        'color'=>'#f59e0b','bg'=>'rgba(245,158,11,.10)'],
-    ['label'=>'Online Now',      'value'=>5,  'sub'=>'Available for orders','icon'=>'circle-check', 'color'=>'#10b981','bg'=>'rgba(16,185,129,.10)'],
-    ['label'=>'On Delivery',     'value'=>3,  'sub'=>'Currently delivering','icon'=>'bike',         'color'=>'#8b5cf6','bg'=>'rgba(139,92,246,.10)'],
-    ['label'=>'Offline',         'value'=>2,  'sub'=>'Not available',       'icon'=>'circle-x',     'color'=>'#6b7280','bg'=>'rgba(107,114,128,.10)'],
-    ['label'=>'Deliveries Today','value'=>24, 'sub'=>'Completed orders',    'icon'=>'package-check','color'=>'#3b82f6','bg'=>'rgba(59,130,246,.10)'],
+    ['label'=>'Total Riders',    'value'=>$totalRiders,      'sub'=>'Registered riders',   'icon'=>'users',        'color'=>'#f59e0b','bg'=>'rgba(245,158,11,.10)'],
+    ['label'=>'Online Now',      'value'=>$onlineRiders,     'sub'=>'Available for orders','icon'=>'circle-check', 'color'=>'#10b981','bg'=>'rgba(16,185,129,.10)'],
+    ['label'=>'On Delivery',     'value'=>$onDeliveryRiders, 'sub'=>'Currently delivering','icon'=>'bike',         'color'=>'#8b5cf6','bg'=>'rgba(139,92,246,.10)'],
+    ['label'=>'Offline',         'value'=>$offlineRiders,    'sub'=>'Not available',       'icon'=>'circle-x',     'color'=>'#6b7280','bg'=>'rgba(107,114,128,.10)'],
+    ['label'=>'Deliveries Today','value'=>$deliveriesToday,  'sub'=>'Completed orders',    'icon'=>'package-check','color'=>'#3b82f6','bg'=>'rgba(59,130,246,.10)'],
 ];
 @endphp
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 mb-6">
@@ -110,41 +117,54 @@ $riderStats = [
         <tbody id="ridersTbody">
 
 @php
-$riders = [
-    ['id'=>1,'name'=>'Juan dela Cruz',    'initials'=>'JD','phone'=>'09171234567','vehicle'=>'Motorcycle','status'=>'on_delivery','order'=>'#EUT-00512','deliveries'=>7,'rating'=>4.9,'joined'=>'Jan 12, 2026'],
-    ['id'=>2,'name'=>'Maria Santos',      'initials'=>'MS','phone'=>'09281234567','vehicle'=>'Bicycle',   'status'=>'online',      'order'=>null,         'deliveries'=>4,'rating'=>4.7,'joined'=>'Feb 03, 2026'],
-    ['id'=>3,'name'=>'Pedro Reyes',       'initials'=>'PR','phone'=>'09351234567','vehicle'=>'Motorcycle','status'=>'on_delivery','order'=>'#EUT-00509','deliveries'=>6,'rating'=>4.8,'joined'=>'Mar 15, 2026'],
-    ['id'=>4,'name'=>'Ana Gomez',         'initials'=>'AG','phone'=>'09461234567','vehicle'=>'Bicycle',   'status'=>'online',      'order'=>null,         'deliveries'=>3,'rating'=>4.6,'joined'=>'Apr 01, 2026'],
-    ['id'=>5,'name'=>'Carlo Villanueva',  'initials'=>'CV','phone'=>'09571234567','vehicle'=>'Motorcycle','status'=>'online',      'order'=>null,         'deliveries'=>5,'rating'=>4.9,'joined'=>'Apr 20, 2026'],
-    ['id'=>6,'name'=>'Rosa Dela Torre',   'initials'=>'RD','phone'=>'09681234567','vehicle'=>'Motorcycle','status'=>'on_delivery','order'=>'#EUT-00514','deliveries'=>4,'rating'=>4.5,'joined'=>'May 08, 2026'],
-    ['id'=>7,'name'=>'Dennis Ocampo',     'initials'=>'DO','phone'=>'09791234567','vehicle'=>'Bicycle',   'status'=>'offline',     'order'=>null,         'deliveries'=>0,'rating'=>4.3,'joined'=>'Jun 10, 2026'],
-    ['id'=>8,'name'=>'Liza Mangubat',     'initials'=>'LM','phone'=>'09891234567','vehicle'=>'Motorcycle','status'=>'offline',     'order'=>null,         'deliveries'=>0,'rating'=>4.7,'joined'=>'Jul 01, 2026'],
-];
 $statusMap = [
     'online'      => ['label'=>'Online',      'color'=>'#10b981','bg'=>'rgba(16,185,129,.12)','icon'=>'circle-check'],
     'on_delivery' => ['label'=>'On Delivery', 'color'=>'#8b5cf6','bg'=>'rgba(139,92,246,.12)','icon'=>'bike'],
     'offline'     => ['label'=>'Offline',     'color'=>'#6b7280','bg'=>'rgba(107,114,128,.12)','icon'=>'circle-x'],
 ];
 @endphp
-@foreach($riders as $r)
-@php $st = $statusMap[$r['status']]; @endphp
-<tr data-name="{{ strtolower($r['name']) }}" data-status="{{ $r['status'] }}">
+@foreach($riders as $rider)
+@php
+    // Determine status based on is_available and active order
+    $activeOrder = $rider->activeOrder();
+    if ($activeOrder && in_array($activeOrder->status, ['rider_assigned', 'out_for_delivery'])) {
+        $currentStatus = 'on_delivery';
+    } else if ($rider->is_available) {
+        $currentStatus = 'online';
+    } else {
+        $currentStatus = 'offline';
+    }
+    $st = $statusMap[$currentStatus];
+    // Get initials from name
+    $nameParts = explode(' ', $rider->user->name);
+    $initials = '';
+    foreach ($nameParts as $part) {
+        $initials .= strtoupper(substr($part, 0, 1));
+    }
+    $initials = substr($initials, 0, 2);
+    // Get today's deliveries count
+    $todayDeliveries = \App\Models\Order::where('rider_id', $rider->id)
+        ->where('status', 'delivered')
+        ->whereDate('delivered_at', today())
+        ->count();
+@endphp
+<tr data-name="{{ strtolower($rider->user->name) }}" data-status="{{ $currentStatus }}">
     <td>
         <div style="display:flex;align-items:center;gap:.6rem;">
             <div style="width:2.25rem;height:2.25rem;border-radius:50%;background:rgba(245,158,11,.18);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-weight:800;font-size:.75rem;flex-shrink:0;border:2px solid rgba(245,158,11,.25);">
-                {{ $r['initials'] }}
+                {{ $initials }}
             </div>
             <div>
-                <p style="font-weight:600;color:var(--text-strong);font-size:.875rem;margin:0 0 .15rem;">{{ $r['name'] }}</p>
-                <p style="font-size:.7rem;color:var(--text-muted);margin:0;">Joined {{ $r['joined'] }}</p>
+                <p style="font-weight:600;color:var(--text-strong);font-size:.875rem;margin:0 0 .15rem;">{{ $rider->user->name }}</p>
+                <p style="font-size:.7rem;color:var(--text-muted);margin:0;">Joined {{ $rider->created_at->format('M d, Y') }}</p>
             </div>
         </div>
     </td>
-    <td style="font-size:.8rem;color:var(--text-body);">{{ $r['phone'] }}</td>
+    <td style="font-size:.8rem;color:var(--text-body);">{{ $rider->phone }}</td>
     <td>
         <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;color:var(--text-subtle);">
-            <i data-lucide="{{ $r['vehicle']==='Motorcycle' ? 'bike' : 'bicycle' }}" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
-            {{ $r['vehicle'] }}
+            <i data-lucide="{{ $rider->vehicle_type==='motorcycle' ? 'bike' : 'bicycle' }}" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
+            {{ ucfirst($rider->vehicle_type) }}
         </span>
     </td>
     <td>
@@ -154,30 +174,34 @@ $statusMap = [
         </span>
     </td>
     <td style="font-size:.8rem;">
-        @if($r['order'])
-            <a href="{{ route('admin.orders') }}" style="color:var(--accent);font-weight:600;font-family:monospace;">{{ $r['order'] }}</a>
+        @if($activeOrder)
+            <a href="{{ route('admin.orders') }}" style="color:var(--accent);font-weight:600;font-family:monospace;">#{{ $activeOrder->order_number }}</a>
         @else
             <span style="color:var(--text-muted);">—</span>
         @endif
     </td>
     <td>
-        <span style="font-size:.875rem;font-weight:700;color:var(--text-strong);">{{ $r['deliveries'] }}</span>
+        <span style="font-size:.875rem;font-weight:700;color:var(--text-strong);">{{ $todayDeliveries }}</span>
         <span style="font-size:.72rem;color:var(--text-muted);margin-left:.25rem;">orders</span>
     </td>
     <td>
-        <span style="font-size:.875rem;font-weight:700;color:#facc15;">⭐ {{ number_format($r['rating'],1) }}</span>
+        <span style="font-size:.875rem;font-weight:700;color:#facc15;">⭐ {{ number_format($rider->rating,1) }}</span>
     </td>
     <td>
         <div style="display:flex;gap:.4rem;align-items:center;">
-            <button class="btn-icon-edit" onclick="openRiderDetail({{ $r['id'] }})" title="View Details">
+            <button class="btn-icon-edit" onclick="openRiderDetail({{ $rider->id }})" title="View Details">
                 <i data-lucide="eye" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
             </button>
             <button class="btn-icon-archive" onclick="openModal('editRiderModal')" title="Edit">
                 <i data-lucide="pencil" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
             </button>
-            <button class="btn-icon-delete" onclick="confirmRemoveRider('{{ $r['name'] }}')" title="Remove">
-                <i data-lucide="user-x" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
-            </button>
+            <form method="POST" action="{{ route('admin.riders.destroy', $rider) }}" onsubmit="return confirm('Remove {{ $rider->user->name }} from riders? This action cannot be undone.');" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-icon-delete" title="Remove">
+                    <i data-lucide="user-x" style="width:.8rem;height:.8rem;stroke-width:2;"></i>
+                </button>
+            </form>
         </div>
     </td>
 </tr>
@@ -386,11 +410,40 @@ $statusMap = [
 
 <script>
 @php
-$ridersJson = json_encode(array_map(fn($r) => [
-    'id'=>$r['id'],'name'=>$r['name'],'initials'=>$r['initials'],
-    'phone'=>$r['phone'],'vehicle'=>$r['vehicle'],'status'=>$r['status'],
-    'order'=>$r['order'],'deliveries'=>$r['deliveries'],'rating'=>$r['rating'],
-], $riders));
+$ridersJson = $riders->map(function($rider) {
+    $activeOrder = $rider->activeOrder();
+    if ($activeOrder && in_array($activeOrder->status, ['rider_assigned', 'out_for_delivery'])) {
+        $currentStatus = 'on_delivery';
+    } else if ($rider->is_available) {
+        $currentStatus = 'online';
+    } else {
+        $currentStatus = 'offline';
+    }
+    // Get initials from name
+    $nameParts = explode(' ', $rider->user->name);
+    $initials = '';
+    foreach ($nameParts as $part) {
+        $initials .= strtoupper(substr($part, 0, 1));
+    }
+    $initials = substr($initials, 0, 2);
+    // Get today's deliveries count
+    $todayDeliveries = \App\Models\Order::where('rider_id', $rider->id)
+        ->where('status', 'delivered')
+        ->whereDate('delivered_at', today())
+        ->count();
+    return [
+        'id' => $rider->id,
+        'name' => $rider->user->name,
+        'initials' => $initials,
+        'phone' => $rider->phone,
+        'vehicle' => ucfirst($rider->vehicle_type),
+        'status' => $currentStatus,
+        'order' => $activeOrder ? '#' . $activeOrder->order_number : null,
+        'deliveries' => $todayDeliveries,
+        'rating' => $rider->rating,
+        'joined' => $rider->created_at->format('M d, Y'),
+    ];
+})->values();
 $statusMapJson = json_encode($statusMap);
 @endphp
 const RIDERS = {!! $ridersJson !!};
