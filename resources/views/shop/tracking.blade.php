@@ -6,320 +6,105 @@
     <title>My Orders - EUT Restaurant</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { background: #080810; color: #fff; min-height: 100vh; }
-
-        /* ── NAVBAR ── */
-        .topnav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            background: rgba(8,8,16,0.92);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .topnav-inner {
-            max-width: 540px; margin: 0 auto;
-            padding: 14px 16px 0;
-        }
-        .topnav-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0; }
-        .back-btn {
-            width: 36px; height: 36px; border-radius: 10px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            display: flex; align-items: center; justify-content: center;
-            color: #9ca3af; cursor: pointer; text-decoration: none;
-            transition: all 0.2s; flex-shrink: 0;
-        }
-        .back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-        .topnav-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
-        .theme-btn {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-        }
-        .theme-btn:hover { background: rgba(255,255,255,0.12); }
-
-        /* ── TABS ── */
-        .tabs-bar {
-            display: flex; gap: 0; margin-top: 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .tab {
-            padding: 10px 20px; font-size: 13px; font-weight: 600;
-            color: #6b7280; background: none; border: none;
-            border-bottom: 2px solid transparent;
-            cursor: pointer; transition: all 0.2s;
-            position: relative; bottom: -1px;
-        }
-        .tab.active { color: #facc15; border-bottom-color: #facc15; }
-        .tab-dot {
-            display: inline-block; width: 6px; height: 6px;
-            background: #ef4444; border-radius: 50;
-            margin-left: 5px; vertical-align: middle;
-            animation: blink 1.5s ease-in-out infinite;
-        }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-        /* ── PAGE BODY ── */
-        .page-body { max-width: 540px; margin: 0 auto; padding: 130px 16px 110px; }
-
-        /* ── CARDS ── */
-        .card {
-            background: linear-gradient(145deg, #12131f, #0e0f1a);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px; overflow: hidden;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            transition: border-color 0.25s, transform 0.2s;
-        }
-        .card:hover { border-color: rgba(250,204,21,0.2); }
-        .card-header {
-            padding: 16px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.01em; }
-        .card-sub { font-size: 11px; color: #4b5563; margin-top: 2px; }
-
-        /* ── BADGES ── */
-        .badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 11px; border-radius: 99px;
-            font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
-        }
-        .badge-live { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
-        .badge-done { background: rgba(34,197,94,0.10); color: #4ade80; border: 1px solid rgba(34,197,94,0.22); }
-        .badge-cancelled { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.18); }
-        .badge-pulse { width: 7px; height: 7px; background: #ef4444; border-radius: 50%; animation: blink 1.2s infinite; }
-
-        /* ── PROGRESS ── */
-        .progress-wrap { padding: 16px 18px 12px; }
-        .progress-eta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .progress-eta-label { font-size: 11px; color: #6b7280; }
-        .progress-eta-time { font-size: 13px; font-weight: 700; color: #facc15; }
-        .progress-track { height: 6px; background: #1a1b2e; border-radius: 99px; overflow: hidden; position: relative; }
-        .progress-fill {
-            height: 100%; border-radius: 99px;
-            background: linear-gradient(90deg, #dc2626, #f59e0b, #facc15);
-            position: relative; transition: width 1.2s cubic-bezier(.4,0,.2,1);
-        }
-        .progress-fill::after {
-            content: ''; position: absolute; right: -1px; top: 50%;
-            transform: translateY(-50%);
-            width: 12px; height: 12px; border-radius: 50%;
-            background: #facc15;
-            box-shadow: 0 0 10px #facc15, 0 0 20px rgba(250,204,21,0.4);
-        }
-        .progress-steps {
-            display: flex; justify-content: space-between;
-            margin-top: 8px;
-        }
-        .progress-step-label { font-size: 10px; color: #374151; }
-        .progress-step-label.done { color: #facc15; }
-        .progress-step-label.active { color: #ef4444; }
-
-        /* ── TIMELINE ── */
-        .timeline { padding: 4px 18px 18px; }
-        .t-step { display: flex; gap: 14px; position: relative; }
-        .t-spine { display: flex; flex-direction: column; align-items: center; width: 18px; flex-shrink: 0; }
-        .t-dot {
-            width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
-            margin-top: 3px; position: relative; z-index: 1;
-        }
-        .t-dot-done { background: #facc15; box-shadow: 0 0 0 3px rgba(250,204,21,0.15), 0 0 14px rgba(250,204,21,0.4); }
-        .t-dot-active {
-            background: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239,68,68,0.15), 0 0 14px rgba(239,68,68,0.5);
-            animation: pulse-red 1.5s ease-in-out infinite;
-        }
-        .t-dot-pending { background: #1f2937; border: 2px solid #2d3748; }
-        @keyframes pulse-red {
-            0%,100%{ box-shadow: 0 0 0 3px rgba(239,68,68,0.15), 0 0 10px rgba(239,68,68,0.4); }
-            50%{ box-shadow: 0 0 0 6px rgba(239,68,68,0.08), 0 0 20px rgba(239,68,68,0.6); }
-        }
-        .t-line { width: 2px; flex: 1; min-height: 32px; margin: 4px 0; border-radius: 2px; }
-        .t-line-done { background: linear-gradient(180deg, #facc15, rgba(250,204,21,0.2)); }
-        .t-line-active { background: linear-gradient(180deg, #ef4444, rgba(239,68,68,0.1)); }
-        .t-line-pending { background: #1a1b2e; }
-        .t-content { padding-bottom: 24px; flex: 1; }
-        .t-content:last-child { padding-bottom: 0; }
-        .t-label-done { font-size: 13px; font-weight: 600; color: #fff; }
-        .t-label-active { font-size: 13px; font-weight: 700; color: #ef4444; }
-        .t-label-pending { font-size: 13px; font-weight: 500; color: #374151; }
-        .t-desc { font-size: 11px; color: #4b5563; margin-top: 3px; line-height: 1.5; }
-        .t-desc-active { font-size: 11px; color: #9ca3af; margin-top: 3px; }
-        .t-check {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 14px; height: 14px; background: #facc15;
-            border-radius: 50%; margin-right: 4px; flex-shrink: 0;
-        }
-
-        /* ── ORDER ITEMS ── */
-        .item-row {
-            display: flex; align-items: center; gap: 12px;
-            padding: 13px 18px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .item-row:last-child { border-bottom: none; }
-        .item-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
-        .item-name { font-size: 13px; font-weight: 600; color: #e5e7eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-qty { font-size: 11px; color: #4b5563; margin-top: 3px; }
-        .item-price { font-size: 13px; font-weight: 700; color: #facc15; flex-shrink: 0; margin-left: auto; }
-
-        /* ── TOTALS ── */
-        .totals { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .total-row:last-child { margin-bottom: 0; }
-        .total-label { font-size: 12px; color: #6b7280; }
-        .total-value { font-size: 12px; color: #9ca3af; }
-        .total-grand-label { font-size: 14px; font-weight: 700; color: #fff; }
-        .total-grand-value { font-size: 16px; font-weight: 800; color: #facc15; }
-        .total-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 10px 0; }
-
-        /* ── DELIVERY INFO ── */
-        .info-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .info-row:last-child { border-bottom: none; }
-        .info-icon {
-            width: 34px; height: 34px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .info-text-label { font-size: 10px; color: #4b5563; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .info-text-val { font-size: 13px; color: #e5e7eb; font-weight: 500; }
-        .info-text-sub { font-size: 11px; color: #6b7280; margin-top: 1px; }
-
-        /* ── PAST ORDER CARDS ── */
-        .pcard {
-            background: linear-gradient(145deg, #12131f, #0e0f1a);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px; overflow: hidden;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            transition: border-color 0.2s, transform 0.15s;
-        }
-        .pcard:hover { border-color: rgba(250,204,21,0.18); transform: translateY(-1px); }
-        .pcard-cancelled { border-color: rgba(239,68,68,0.12) !important; }
-        .pcard-cancelled:hover { border-color: rgba(239,68,68,0.3) !important; }
-
-        .pcard-header { padding: 14px 18px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .pcard-id-row { display: flex; justify-content: space-between; align-items: center; }
-        .pcard-id { font-size: 13px; font-weight: 700; color: #fff; }
-        .pcard-date { font-size: 11px; color: #4b5563; margin-top: 3px; }
-
-        .pcard-items { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .pcard-item-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .pcard-item-row:last-child { margin-bottom: 0; }
-        .pcard-item-img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
-        .pcard-item-name { font-size: 12px; color: #d1d5db; font-weight: 500; flex: 1; }
-        .pcard-item-price { font-size: 12px; font-weight: 700; color: #9ca3af; }
-
-        .pcard-footer { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
-        .pcard-total { font-size: 16px; font-weight: 800; color: #facc15; }
-        .pcard-total-label { font-size: 10px; color: #4b5563; }
-
-        /* Cancelled strikethrough style */
-        .pcard-cancelled .pcard-total { color: #6b7280 !important; text-decoration: line-through; }
-        .pcard-cancelled .pcard-item-name { color: #4b5563 !important; }
-
-        /* Cancelled reason box */
-        .cancel-reason {
-            margin: 0 18px 14px;
-            background: rgba(239,68,68,0.06);
-            border: 1px solid rgba(239,68,68,0.15);
-            border-radius: 10px;
-            padding: 10px 14px;
-            display: flex; align-items: flex-start; gap: 8px;
-        }
-        .cancel-reason-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-        .cancel-reason-text { font-size: 11px; color: #9ca3af; line-height: 1.5; }
-        .cancel-reason-title { font-size: 12px; font-weight: 600; color: #f87171; margin-bottom: 2px; }
-
-        /* ── ACTION BUTTONS ── */
-        .btn-primary {
-            flex: 1; background: linear-gradient(135deg, #f59e0b, #facc15);
-            color: #000; padding: 14px; border-radius: 14px;
-            font-weight: 700; font-size: 14px; text-align: center;
-            text-decoration: none; display: block;
-            box-shadow: 0 4px 16px rgba(250,204,21,0.25);
-            transition: all 0.2s;
-        }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(250,204,21,0.35); }
-        .btn-ghost {
-            flex: 1; background: rgba(255,255,255,0.04);
-            color: #9ca3af; padding: 14px; border-radius: 14px;
-            font-weight: 600; font-size: 14px; text-align: center;
-            text-decoration: none; display: block;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.2s;
-        }
-        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
-        .btn-reorder {
-            background: linear-gradient(135deg, #f59e0b, #facc15);
-            color: #000; padding: 8px 18px; border-radius: 99px;
-            font-size: 12px; font-weight: 700; text-decoration: none;
-            display: inline-block; transition: all 0.2s;
-            box-shadow: 0 2px 10px rgba(250,204,21,0.2);
-        }
-        .btn-reorder:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(250,204,21,0.35); }
-
-        /* ── EMPTY STATE ── */
-        .empty-state { text-align: center; padding: 64px 24px; }
-        .empty-icon { font-size: 60px; margin-bottom: 18px; opacity: 0.7; }
-        .empty-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .empty-sub { font-size: 13px; color: #4b5563; margin-bottom: 24px; line-height: 1.6; }
-
-        /* ── DECORATIVE GLOW ── */
-        .active-glow {
-            position: relative; overflow: hidden;
-        }
-        .active-glow::before {
-            content: '';
-            position: absolute; top: -60px; right: -40px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(250,204,21,0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        /* ── LIGHT MODE ── */
-        .light-mode body { background: #f0f0f8 !important; color: #111 !important; }
-        .light-mode .topnav { background: rgba(255,255,255,0.95) !important; border-color: rgba(0,0,0,0.07) !important; }
-        .light-mode .card, .light-mode .pcard { background: #fff !important; border-color: rgba(0,0,0,0.07) !important; box-shadow: 0 2px 16px rgba(0,0,0,0.06) !important; }
-        .light-mode .pcard-cancelled { border-color: rgba(239,68,68,0.2) !important; }
-        .light-mode .card-title, .light-mode .pcard-id, .light-mode .t-label-done, .light-mode .t-label-active { color: #111 !important; }
-        .light-mode .t-label-pending { color: #9ca3af !important; }
-        .light-mode .t-line-pending, .light-mode .progress-track { background: #e5e7eb !important; }
-        .light-mode .t-dot-pending { background: #e5e7eb !important; border-color: #d1d5db !important; }
-        .light-mode .item-name, .light-mode .info-text-val, .light-mode .total-grand-label { color: #111 !important; }
-        .light-mode .back-btn, .light-mode .theme-btn { background: rgba(0,0,0,0.05) !important; border-color: rgba(0,0,0,0.08) !important; color: #555 !important; }
-        .light-mode .active-glow::before { background: radial-gradient(circle, rgba(250,204,21,0.08) 0%, transparent 70%) !important; }
-        .light-mode .cancel-reason { background: rgba(239,68,68,0.04) !important; }
-
-        /* ── BOTTOM NAV ── */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(8,8,16,0.97);
-            border-top: 1px solid rgba(255,255,255,0.07);
-            backdrop-filter: blur(20px);
-            padding: 10px 0 14px; z-index: 100;
-        }
-        @media (min-width: 1024px) { .bottom-nav { display: none; } }
-        .bottom-nav-inner { display: flex; }
-        .bnav-item {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            gap: 3px; color: #4b5563; text-decoration: none;
-            font-size: 10px; font-weight: 500; transition: color 0.15s;
-        }
-        .bnav-item.active { color: #facc15; }
-    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif;}
+body{background:#080810;color:#fff;min-height:100vh;}
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);}
+.topnav-inner{max-width:540px;margin:0 auto;padding:14px 16px 0;}
+.topnav-row{display:flex;align-items:center;gap:10px;}
+.back-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:#9ca3af;cursor:pointer;text-decoration:none;transition:all .2s;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+.topnav-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#fff;flex:1;}
+.theme-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.tabs-bar{display:flex;margin-top:14px;border-bottom:1px solid rgba(255,255,255,.06);}
+.tab{padding:10px 20px;font-size:13px;font-weight:600;color:#6b7280;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;position:relative;bottom:-1px;}
+.tab.active{color:#facc15;border-bottom-color:#facc15;}
+.tab-dot{display:inline-block;width:6px;height:6px;background:#ef4444;border-radius:50%;margin-left:5px;vertical-align:middle;animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.page-body{max-width:540px;margin:0 auto;padding:130px 16px 110px;}
+.card{background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:border-color .25s;}
+.card:hover{border-color:rgba(250,204,21,.2);}
+.card-header{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:13px;font-weight:700;color:#fff;}
+.card-sub{font-size:11px;color:#4b5563;margin-top:2px;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;font-size:11px;font-weight:700;}
+.badge-live{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+.badge-done{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.22);}
+.badge-cancelled{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.18);}
+.badge-pulse{width:7px;height:7px;background:#ef4444;border-radius:50%;animation:blink 1.2s infinite;}
+.progress-eta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.progress-eta-label{font-size:11px;color:#6b7280;}
+.progress-eta-time{font-size:13px;font-weight:700;color:#facc15;}
+.progress-track{height:6px;background:#1a1b2e;border-radius:99px;overflow:hidden;position:relative;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#dc2626,#f59e0b,#facc15);transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.progress-steps{display:flex;justify-content:space-between;margin-top:8px;}
+.progress-step-label{font-size:10px;color:#374151;}
+.progress-step-label.done{color:#facc15;}
+.progress-step-label.active{color:#ef4444;}
+.item-row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.04);}
+.item-row:last-child{border-bottom:none;}
+.item-img{width:50px;height:50px;border-radius:12px;object-fit:cover;flex-shrink:0;}
+.item-name{font-size:13px;font-weight:600;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-qty{font-size:11px;color:#4b5563;margin-top:3px;}
+.item-price{font-size:13px;font-weight:700;color:#facc15;flex-shrink:0;margin-left:auto;}
+.totals{padding:14px 18px;border-top:1px solid rgba(255,255,255,.05);}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.total-row:last-child{margin-bottom:0;}
+.total-label{font-size:12px;color:#6b7280;}
+.total-value{font-size:12px;color:#9ca3af;}
+.total-grand-label{font-size:14px;font-weight:700;color:#fff;}
+.total-grand-value{font-size:16px;font-weight:800;color:#facc15;}
+.total-divider{border:none;border-top:1px solid rgba(255,255,255,.05);margin:10px 0;}
+.info-row{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);}
+.info-row:last-child{border-bottom:none;}
+.info-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.info-text-label{font-size:10px;color:#4b5563;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;}
+.info-text-val{font-size:13px;color:#e5e7eb;font-weight:500;}
+.info-text-sub{font-size:11px;color:#6b7280;margin-top:1px;}
+.pcard{background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:border-color .2s,transform .15s;}
+.pcard:hover{border-color:rgba(250,204,21,.18);transform:translateY(-1px);}
+.pcard-cancelled{border-color:rgba(239,68,68,.12)!important;}
+.pcard-header{padding:14px 18px 12px;border-bottom:1px solid rgba(255,255,255,.05);}
+.pcard-id-row{display:flex;justify-content:space-between;align-items:center;}
+.pcard-id{font-size:13px;font-weight:700;color:#fff;}
+.pcard-date{font-size:11px;color:#4b5563;margin-top:3px;}
+.pcard-items{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);}
+.pcard-item-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.pcard-item-row:last-child{margin-bottom:0;}
+.pcard-item-img{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+.pcard-item-name{font-size:12px;color:#d1d5db;font-weight:500;flex:1;}
+.pcard-item-price{font-size:12px;font-weight:700;color:#9ca3af;}
+.pcard-footer{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;}
+.pcard-total{font-size:16px;font-weight:800;color:#facc15;}
+.pcard-total-label{font-size:10px;color:#4b5563;}
+.pcard-cancelled .pcard-total{color:#6b7280!important;text-decoration:line-through;}
+.cancel-reason{margin:0 18px 14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;}
+.cancel-reason-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.cancel-reason-text{font-size:11px;color:#9ca3af;line-height:1.5;}
+.cancel-reason-title{font-size:12px;font-weight:600;color:#f87171;margin-bottom:2px;}
+.btn-primary{background:linear-gradient(135deg,#f59e0b,#facc15);color:#000;padding:14px;border-radius:14px;font-weight:700;font-size:14px;text-align:center;text-decoration:none;display:block;box-shadow:0 4px 16px rgba(250,204,21,.25);transition:all .2s;}
+.btn-ghost{background:rgba(255,255,255,.04);color:#9ca3af;padding:14px;border-radius:14px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;display:block;border:1px solid rgba(255,255,255,.08);transition:all .2s;}
+.btn-reorder{background:linear-gradient(135deg,#f59e0b,#facc15);color:#000;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block;transition:all .2s;box-shadow:0 2px 10px rgba(250,204,21,.2);}
+.empty-state{text-align:center;padding:64px 24px;}
+.empty-icon{font-size:60px;margin-bottom:18px;opacity:.7;}
+.empty-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;}
+.empty-sub{font-size:13px;color:#4b5563;margin-bottom:24px;line-height:1.6;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,.97);border-top:1px solid rgba(255,255,255,.07);backdrop-filter:blur(20px);padding:10px 0 14px;z-index:100;}
+@media(min-width:1024px){.bottom-nav{display:none;}}
+.bottom-nav-inner{display:flex;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#4b5563;text-decoration:none;font-size:10px;font-weight:500;transition:color .15s;}
+.bnav-item.active{color:#facc15;}
+.light-mode body{background:#f0f0f8!important;color:#111!important;}
+.light-mode .topnav{background:rgba(255,255,255,.95)!important;border-color:rgba(0,0,0,.07)!important;}
+.light-mode .card,.light-mode .pcard{background:#fff!important;border-color:rgba(0,0,0,.07)!important;}
+.light-mode .card-title,.light-mode .pcard-id,.light-mode .item-name,.light-mode .info-text-val,.light-mode .total-grand-label{color:#111!important;}
+.light-mode .back-btn,.light-mode .theme-btn{background:rgba(0,0,0,.05)!important;border-color:rgba(0,0,0,.08)!important;color:#555!important;}
+</style>
 <body>
 
-<!-- ══════════════════════════════
-     NAVBAR
-══════════════════════════════ -->
+<!-- NAVBAR -->
 <nav class="topnav">
     <div class="topnav-inner">
         <div class="topnav-row">
@@ -330,7 +115,7 @@
             </a>
             <span class="topnav-title">My Orders</span>
             <button id="shopThemeToggle" class="theme-btn">
-                <svg id="shopSunIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" style="color:#facc15; display:none;">
+                <svg id="shopSunIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" style="color:#facc15;display:none;">
                     <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                 </svg>
                 <svg id="shopMoonIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" style="color:#9ca3af;">
@@ -340,7 +125,7 @@
         </div>
         <div class="tabs-bar">
             <button class="tab active" id="tab-active" onclick="switchTab('active')">
-                Active <span class="tab-dot"></span>
+                Active <span class="tab-dot" id="activeDot"></span>
             </button>
             <button class="tab" id="tab-past" onclick="switchTab('past')">Past Orders</button>
             <button class="tab" id="tab-cancelled" onclick="switchTab('cancelled')">Cancelled</button>
@@ -348,376 +133,85 @@
     </div>
 </nav>
 
-<!-- ══════════════════════════════
-     PAGE BODY
-══════════════════════════════ -->
+<!-- PAGE BODY -->
 <div class="page-body">
-
-    <!-- ─── ACTIVE VIEW ─── -->
+    <!-- ACTIVE VIEW -->
     <div id="view-active">
-
-        <!-- Hero status banner -->
-        <div style="background: linear-gradient(135deg, #1a0a00, #1a1200, #0e0f1a); border: 1px solid rgba(250,204,21,0.15); border-radius: 20px; padding: 20px 18px; margin-bottom: 14px; position: relative; overflow: hidden;">
-            <div style="position:absolute; top:-30px; right:-30px; width:140px; height:140px; background: radial-gradient(circle, rgba(250,204,21,0.08) 0%, transparent 70%); pointer-events:none;"></div>
-            <div style="position:absolute; bottom:-20px; left:-20px; width:100px; height:100px; background: radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 70%); pointer-events:none;"></div>
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; position:relative; z-index:1;">
-                <div>
-                    <p style="font-size:10px; color:#6b7280; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;">Order ID</p>
-                    <p style="font-size:15px; font-weight:800; color:#fff; letter-spacing:0.01em;">#EUT-{{ str_pad(rand(1,99999),5,'0',STR_PAD_LEFT) }}</p>
-                </div>
-                <span class="badge badge-live"><span class="badge-pulse"></span> Preparing</span>
-            </div>
-            <div style="position:relative; z-index:1;">
-                <div class="progress-eta-row">
-                    <span class="progress-eta-label">Estimated delivery</span>
-                    <span class="progress-eta-time">{{ date('g:i A', strtotime('+35 minutes')) }}</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="progressBar" style="width:40%"></div>
-                </div>
-                <div class="progress-steps">
-                    <span class="progress-step-label done">Placed</span>
-                    <span class="progress-step-label active">Preparing</span>
-                    <span class="progress-step-label">On the way</span>
-                    <span class="progress-step-label">Delivered</span>
-                </div>
-            </div>
+        <div class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <p class="empty-title">Loading orders…</p>
         </div>
-
-        <!-- Timeline card -->
-        <div class="card active-glow">
-            <div class="card-header">
-                <div>
-                    <p class="card-title">Delivery Timeline</p>
-                    <p class="card-sub">Real-time order status</p>
-                </div>
-                <svg width="18" height="18" fill="none" stroke="#facc15" viewBox="0 0 24 24" style="opacity:0.6;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
-            </div>
-            <div class="timeline">
-
-                <!-- Step 1 done -->
-                <div class="t-step">
-                    <div class="t-spine">
-                        <div class="t-dot t-dot-done">
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#000" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"/>
-                            </svg>
-                        </div>
-                        <div class="t-line t-line-done"></div>
-                    </div>
-                    <div class="t-content">
-                        <p class="t-label-done">Order Placed</p>
-                        <p class="t-desc">{{ date('g:i A') }} · Received &amp; confirmed</p>
-                    </div>
-                </div>
-
-                <!-- Step 2 active -->
-                <div class="t-step">
-                    <div class="t-spine">
-                        <div class="t-dot t-dot-active"></div>
-                        <div class="t-line t-line-active"></div>
-                    </div>
-                    <div class="t-content">
-                        <p class="t-label-active">🍳 Preparing Your Food</p>
-                        <p class="t-desc-active">{{ date('g:i A', strtotime('+5 minutes')) }} · Our chefs are crafting your order right now</p>
-                    </div>
-                </div>
-
-                <!-- Step 3 pending -->
-                <div class="t-step">
-                    <div class="t-spine">
-                        <div class="t-dot t-dot-pending"></div>
-                        <div class="t-line t-line-pending"></div>
-                    </div>
-                    <div class="t-content">
-                        <p class="t-label-pending">Out for Delivery</p>
-                        <p class="t-desc">Est. {{ date('g:i A', strtotime('+25 minutes')) }}</p>
-                    </div>
-                </div>
-
-                <!-- Step 4 pending -->
-                <div class="t-step">
-                    <div class="t-spine">
-                        <div class="t-dot t-dot-pending"></div>
-                    </div>
-                    <div class="t-content" style="padding-bottom:0;">
-                        <p class="t-label-pending">Delivered 🎉</p>
-                        <p class="t-desc">Est. {{ date('g:i A', strtotime('+40 minutes')) }}</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Live Map card -->
-        <div class="card" style="margin-bottom:14px;">
-            <div class="card-header">
-                <div>
-                    <p class="card-title">Live Tracking</p>
-                    <p class="card-sub" id="mapStatusText">Rider is heading to you</p>
-                </div>
-                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);padding:4px 10px;border-radius:99px;">
-                    <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>
-                    Live
-                </span>
-            </div>
-            <div id="trackingMap" style="width:100%;height:260px;border-radius:0 0 20px 20px;overflow:hidden;"></div>
-            <div style="padding:10px 18px 12px;display:flex;align-items:center;justify-content:space-between;">
-                <div style="display:flex;align-items:center;gap:14px;font-size:11px;color:#6b7280;">
-                    <span style="display:flex;align-items:center;gap:5px;">
-                        <span style="width:10px;height:10px;background:#facc15;border-radius:50%;display:inline-block;"></span> Restaurant
-                    </span>
-                    <span style="display:flex;align-items:center;gap:5px;">
-                        <span style="width:10px;height:10px;background:#ef4444;border-radius:50%;display:inline-block;"></span> Your location
-                    </span>
-                    <span style="display:flex;align-items:center;gap:5px;">
-                        <span style="width:10px;height:10px;background:#10b981;border-radius:50%;display:inline-block;"></span> Rider
-                    </span>
-                </div>
-                <span id="riderEtaText" style="font-size:11px;font-weight:700;color:#facc15;"></span>
-            </div>
-        </div>
-
-        <!-- Order items card -->
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <p class="card-title">Order Items</p>
-                    <p class="card-sub" id="itemCountBadge">Loading…</p>
-                </div>
-                <svg width="16" height="16" fill="none" stroke="#6b7280" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-            </div>
-            <div id="orderItemsList"></div>
-            <div class="totals">
-                <div class="total-row">
-                    <span class="total-label">Subtotal</span>
-                    <span class="total-value" id="orderSubtotal">₱0</span>
-                </div>
-                <div class="total-row">
-                    <span class="total-label">Delivery fee</span>
-                    <span class="total-value">₱50</span>
-                </div>
-                <hr class="total-divider">
-                <div class="total-row">
-                    <span class="total-grand-label">Total</span>
-                    <span class="total-grand-value" id="orderTotal">₱0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delivery details card -->
-        <div class="card" style="margin-bottom:20px;">
-            <div class="card-header">
-                <p class="card-title">Delivery Details</p>
-            </div>
-            <div class="info-row">
-                <div class="info-icon" style="background:rgba(239,68,68,0.1);">
-                    <svg width="16" height="16" fill="none" stroke="#f87171" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="info-text-label">Delivery Address</p>
-                    <p class="info-text-val">123 Food Street, Culinary District</p>
-                    <p class="info-text-sub">Metro Manila, 1234</p>
-                </div>
-            </div>
-            <div class="info-row">
-                <div class="info-icon" style="background:rgba(250,204,21,0.1);">
-                    <svg width="16" height="16" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="info-text-label">Estimated Arrival</p>
-                    <p class="info-text-val">{{ date('g:i A', strtotime('+30 minutes')) }} – {{ date('g:i A', strtotime('+45 minutes')) }}</p>
-                </div>
-            </div>
-            <div class="info-row">
-                <div class="info-icon" style="background:rgba(96,165,250,0.1);">
-                    <svg width="16" height="16" fill="none" stroke="#60a5fa" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="info-text-label">Payment Method</p>
-                    <p class="info-text-val">Cash on Delivery</p>
-                </div>
-            </div>
-            <div class="info-row" style="border:none;">
-                <div class="info-icon" style="background:rgba(167,139,250,0.1);">
-                    <svg width="16" height="16" fill="none" stroke="#a78bfa" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="info-text-label">Rider</p>
-                    <p class="info-text-val">Juan dela Cruz</p>
-                    <p class="info-text-sub">⭐ 4.9 · On the way to restaurant</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ─── Cancel Order Card ─── -->
-        <div class="card" id="cancelCard" style="border-color:rgba(239,68,68,0.15); margin-bottom:14px;">
-            <div class="card-header">
-                <div>
-                    <p class="card-title">Need to Cancel?</p>
-                    <p class="card-sub" id="cancelSubText">You can cancel while your order is still being prepared.</p>
-                </div>
-                <span style="font-size:22px;">🚫</span>
-            </div>
-            <div style="padding:0 18px 18px;">
-                <!-- Shown when cancellable -->
-                <div id="cancelAllowed">
-                    <p style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.6;">
-                        Orders can only be cancelled while <strong style="color:#f3f4f6;">Pending</strong>, <strong style="color:#f3f4f6;">Accepted</strong>, or <strong style="color:#f3f4f6;">Preparing</strong>. Once a rider is assigned, cancellation is no longer possible.
-                    </p>
-                    <button onclick="openCancelModal()" style="
-                        width:100%; padding:12px; border-radius:12px;
-                        background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.3);
-                        color:#f87171; font-size:14px; font-weight:700;
-                        cursor:pointer; transition:all 0.2s;
-                    " onmouseover="this.style.background='rgba(239,68,68,0.18)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
-                        Cancel My Order
-                    </button>
-                </div>
-                <!-- Shown when NOT cancellable -->
-                <div id="cancelBlocked" style="display:none;">
-                    <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;">
-                        <span style="font-size:20px;">🛵</span>
-                        <p style="font-size:12px;color:#9ca3af;line-height:1.5;">Your order is already on its way! Cancellation is no longer available at this stage.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action buttons -->
-        <div style="display:flex; gap:10px;">
-            <a href="{{ route('shop.home') }}" class="btn-primary">🔁 Order Again</a>
-            <a href="{{ route('shop.home') }}" class="btn-ghost">← Back to Menu</a>
-        </div>
-
-    </div><!-- /view-active -->
-
-    <!-- ─── CANCEL MODAL ─── -->
-    <div id="cancelModalBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;backdrop-filter:blur(4px);" onclick="closeCancelModal()"></div>
-    <div id="cancelModal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1001;
-        background:linear-gradient(145deg,#1a0a0a,#120808);
-        border:1px solid rgba(239,68,68,0.25); border-radius:24px 24px 0 0;
-        padding:24px 20px 40px; max-width:540px; margin:0 auto;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-            <div>
-                <p style="font-size:17px;font-weight:800;color:#fff;">Cancel Order</p>
-                <p style="font-size:12px;color:#6b7280;margin-top:2px;">Please tell us why you're cancelling</p>
-            </div>
-            <button onclick="closeCancelModal()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#9ca3af;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
-        </div>
-
-        <!-- Reason options -->
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;" id="cancelReasons">
-            @foreach([
-                'Changed my mind',
-                'Ordered by mistake',
-                'Found a better option',
-                'Taking too long',
-                'Other reason'
-            ] as $reason)
-            <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.07);cursor:pointer;transition:all 0.2s;"
-                   onmouseover="this.style.borderColor='rgba(239,68,68,0.3)'" onmouseout="this.style.borderColor=this.querySelector('input').checked?'rgba(239,68,68,0.5)':'rgba(255,255,255,0.07)'">
-                <input type="radio" name="cancelReason" value="{{ $reason }}"
-                       style="accent-color:#ef4444;width:16px;height:16px;"
-                       onchange="document.querySelectorAll('#cancelReasons label').forEach(l=>l.style.borderColor='rgba(255,255,255,0.07)'); this.closest('label').style.borderColor='rgba(239,68,68,0.5)';">
-                <span style="font-size:13px;color:#d1d5db;font-weight:500;">{{ $reason }}</span>
-            </label>
-            @endforeach
-        </div>
-
-        <div id="cancelModalError" style="display:none;color:#f87171;font-size:12px;margin-bottom:10px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:8px;"></div>
-
-        <button id="confirmCancelBtn" onclick="submitCancel()" style="
-            width:100%; padding:14px; border-radius:14px;
-            background:linear-gradient(135deg,#ef4444,#dc2626);
-            border:none; color:#fff; font-size:15px; font-weight:800;
-            cursor:pointer; transition:all 0.2s;
-            box-shadow:0 4px 20px rgba(239,68,68,0.3);
-        ">
-            Yes, Cancel My Order
-        </button>
-        <button onclick="closeCancelModal()" style="
-            width:100%; padding:12px; margin-top:8px; border-radius:14px;
-            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
-            color:#9ca3af; font-size:14px; font-weight:600; cursor:pointer;
-        ">
-            Never Mind
-        </button>
     </div>
 
-
-    <!-- ─── PAST ORDERS VIEW ─── -->
+    <!-- PAST ORDERS VIEW -->
     <div id="view-past" style="display:none;">
         <div id="pastOrdersList"></div>
         <div class="empty-state" id="pastEmpty" style="display:none;">
             <div class="empty-icon">📦</div>
             <p class="empty-title">No completed orders yet</p>
-            <p class="empty-sub">Your delivered orders will appear here once you've received them.</p>
-            <a href="{{ route('shop.home') }}" class="btn-primary" style="display:inline-block; width:auto; padding:12px 28px; border-radius:99px;">Start Ordering</a>
+            <p class="empty-sub">Your delivered orders will appear here.</p>
+            <a href="{{ route('shop.home') }}" class="btn-primary" style="display:inline-block;width:auto;padding:12px 28px;border-radius:99px;">Start Ordering</a>
         </div>
     </div>
 
-    <!-- ─── CANCELLED VIEW ─── -->
+    <!-- CANCELLED VIEW -->
     <div id="view-cancelled" style="display:none;">
         <div id="cancelledOrdersList"></div>
         <div class="empty-state" id="cancelledEmpty" style="display:none;">
             <div class="empty-icon">✅</div>
             <p class="empty-title">No cancelled orders</p>
             <p class="empty-sub">Great news — you haven't had to cancel any orders.</p>
-            <a href="{{ route('shop.home') }}" class="btn-primary" style="display:inline-block; width:auto; padding:12px 28px; border-radius:99px;">Browse Menu</a>
+            <a href="{{ route('shop.home') }}" class="btn-primary" style="display:inline-block;width:auto;padding:12px 28px;border-radius:99px;">Browse Menu</a>
         </div>
     </div>
+</div>
 
-</div><!-- /page-body -->
+<!-- CANCEL MODAL -->
+<div id="cancelModalBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;backdrop-filter:blur(4px);" onclick="closeCancelModal()"></div>
+<div id="cancelModal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1001;background:linear-gradient(145deg,#1a0a0a,#120808);border:1px solid rgba(239,68,68,.25);border-radius:24px 24px 0 0;padding:24px 20px 40px;max-width:540px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div>
+            <p style="font-size:17px;font-weight:800;color:#fff;">Cancel Order</p>
+            <p style="font-size:12px;color:#6b7280;margin-top:2px;">Please tell us why you're cancelling</p>
+        </div>
+        <button onclick="closeCancelModal()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#9ca3af;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;" id="cancelReasons">
+        @foreach(['Changed my mind','Ordered by mistake','Found a better option','Taking too long','Other reason'] as $reason)
+        <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,.07);cursor:pointer;transition:all .2s;">
+            <input type="radio" name="cancelReason" value="{{ $reason }}" style="accent-color:#ef4444;width:16px;height:16px;"
+                   onchange="document.querySelectorAll('#cancelReasons label').forEach(l=>l.style.borderColor='rgba(255,255,255,.07)');this.closest('label').style.borderColor='rgba(239,68,68,.5)';">
+            <span style="font-size:13px;color:#d1d5db;font-weight:500;">{{ $reason }}</span>
+        </label>
+        @endforeach
+    </div>
+    <div id="cancelModalError" style="display:none;color:#f87171;font-size:12px;margin-bottom:10px;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px;"></div>
+    <button id="confirmCancelBtn" onclick="submitCancel()" style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,.3);">Yes, Cancel My Order</button>
+    <button onclick="closeCancelModal()" style="width:100%;padding:12px;margin-top:8px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;">Never Mind</button>
+</div>
 
-<!-- ══════════════════════════════
-     BOTTOM NAV
-══════════════════════════════ -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
     <div class="bottom-nav-inner">
         <a href="{{ route('shop.home') }}" class="bnav-item">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             Home
         </a>
         <a href="{{ route('shop.tracking') }}" class="bnav-item active">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             Orders
         </a>
         <a href="{{ route('shop.cart') }}" class="bnav-item">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             Cart
         </a>
         <a href="{{ route('shop.profile') }}" class="bnav-item">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             Profile
         </a>
     </div>
 </nav>
 
-<!-- ══════════════════════════════
-     SCRIPTS
-══════════════════════════════ -->
 <script>
 /* ── Theme ── */
 function applyTheme(t) {
@@ -725,163 +219,56 @@ function applyTheme(t) {
     document.getElementById('shopSunIcon').style.display  = t === 'dark'  ? 'block' : 'none';
     document.getElementById('shopMoonIcon').style.display = t === 'light' ? 'block' : 'none';
 }
-document.addEventListener('DOMContentLoaded', () => {
-    applyTheme(localStorage.getItem('eutTheme') || 'dark');
-    document.getElementById('shopThemeToggle').addEventListener('click', () => {
-        const t = (localStorage.getItem('eutTheme') || 'dark') === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('eutTheme', t);
-        applyTheme(t);
+
+/* ── Tab switching ── */
+function switchTab(tab) {
+    ['active','past','cancelled'].forEach(id => {
+        document.getElementById('view-' + id).style.display = id === tab ? 'block' : 'none';
+        document.getElementById('tab-' + id).classList.toggle('active', id === tab);
     });
-    loadOrderItems();
-    buildPastOrders();
-    buildCancelledOrders();
-    setTimeout(() => { document.getElementById('progressBar').style.width = '40%'; }, 300);
-
-    // ── Poll real order status if we have an active order ID ──
-    const activeOrderId = localStorage.getItem('eutActiveOrderId');
-    if (activeOrderId) {
-        pollOrderStatus(activeOrderId);
-        setInterval(() => pollOrderStatus(activeOrderId), 5000);
-    }
-});
-
-async function pollOrderStatus(orderId) {
-    try {
-        const res  = await fetch(`/orders/${orderId}`, {
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-
-        // Update status badge
-        const badge = document.querySelector('.badge-live');
-        if (badge) badge.innerHTML = `<span class="badge-pulse"></span> ${data.status_label}`;
-
-        // Update progress bar
-        const progressMap = {
-            'pending': 10, 'accepted': 20, 'preparing': 40,
-            'rider_assigned': 60, 'out_for_delivery': 80, 'delivered': 100,
-        };
-        const pct = progressMap[data.status] || 10;
-        const bar = document.getElementById('progressBar');
-        if (bar) bar.style.width = pct + '%';
-
-        // Update progress step labels
-        const steps = document.querySelectorAll('.progress-step-label');
-        const stepMap = {
-            'pending':          0, 'accepted':          0, 'preparing':       1,
-            'rider_assigned':   2, 'out_for_delivery':  2, 'delivered':       3,
-        };
-        const activeStep = stepMap[data.status] ?? 0;
-        steps.forEach((s, i) => {
-            s.classList.remove('done', 'active');
-            if (i < activeStep) s.classList.add('done');
-            else if (i === activeStep) s.classList.add('active');
-        });
-
-        // Update timeline
-        updateTimeline(data);
-
-        // Update rider info & map
-        if (data.rider) {
-            const riderEl = document.querySelector('.info-text-val');
-            if (riderEl && riderEl.closest('.info-row')?.querySelector('[stroke="#a78bfa"]')) {
-                riderEl.textContent = data.rider.name;
-            }
-            // Update rider marker on map if positions available
-            if (data.rider.lat && data.rider.lng && riderMarker) {
-                riderMarker.setLatLng([data.rider.lat, data.rider.lng]);
-            }
-        }
-
-        // If delivered or cancelled, stop polling
-        if (data.status === 'delivered' || data.status === 'cancelled') {
-            localStorage.removeItem('eutActiveOrderId');
-        }
-
-        // ── Toggle cancel card based on status ──
-        const cancellable = ['pending','accepted','preparing'].includes(data.status);
-        const cancelAllowed  = document.getElementById('cancelAllowed');
-        const cancelBlocked  = document.getElementById('cancelBlocked');
-        const cancelSubText  = document.getElementById('cancelSubText');
-        if (cancelAllowed && cancelBlocked) {
-            cancelAllowed.style.display  = cancellable ? 'block' : 'none';
-            cancelBlocked.style.display  = cancellable ? 'none'  : 'block';
-            if (cancelSubText) {
-                cancelSubText.textContent = cancellable
-                    ? 'You can still cancel — order is ' + data.status_label + '.'
-                    : 'Cancellation unavailable — order is ' + data.status_label + '.';
-            }
-        }
-    } catch (e) { /* silently fail — will retry */ }
 }
 
 /* ── Cancel Modal ── */
-function openCancelModal() {
+let currentCancelOrderId = null;
+
+function openCancelModal(orderId) {
+    currentCancelOrderId = orderId;
     document.getElementById('cancelModalBackdrop').style.display = 'block';
     document.getElementById('cancelModal').style.display = 'block';
     document.getElementById('cancelModalError').style.display = 'none';
-    // Reset radio selections
     document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
-    document.querySelectorAll('#cancelReasons label').forEach(l => l.style.borderColor = 'rgba(255,255,255,0.07)');
+    document.querySelectorAll('#cancelReasons label').forEach(l => l.style.borderColor = 'rgba(255,255,255,.07)');
 }
 
 function closeCancelModal() {
     document.getElementById('cancelModalBackdrop').style.display = 'none';
     document.getElementById('cancelModal').style.display = 'none';
+    currentCancelOrderId = null;
 }
 
 async function submitCancel() {
     const selected = document.querySelector('input[name="cancelReason"]:checked');
-    const errEl    = document.getElementById('cancelModalError');
-    const btn      = document.getElementById('confirmCancelBtn');
-
-    if (!selected) {
-        errEl.textContent = '⚠ Please select a reason before cancelling.';
-        errEl.style.display = 'block';
-        return;
-    }
+    const errEl = document.getElementById('cancelModalError');
+    const btn   = document.getElementById('confirmCancelBtn');
+    if (!selected) { errEl.textContent = '⚠ Please select a reason.'; errEl.style.display = 'block'; return; }
+    if (!currentCancelOrderId) { errEl.textContent = 'No order selected.'; errEl.style.display = 'block'; return; }
     errEl.style.display = 'none';
-
-    const orderId = localStorage.getItem('eutActiveOrderId');
-    if (!orderId) {
-        errEl.textContent = 'No active order found.';
-        errEl.style.display = 'block';
-        return;
-    }
-
     btn.textContent = 'Cancelling…';
     btn.disabled = true;
-
     try {
-        const res  = await fetch(`/orders/${orderId}/cancel`, {
+        const res  = await fetch(`/orders/${currentCancelOrderId}/cancel`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: JSON.stringify({ reason: selected.value })
         });
         const data = await res.json();
-
         if (data.success) {
             closeCancelModal();
-            localStorage.removeItem('eutActiveOrderId');
-            // Show success toast
-            const t = document.createElement('div');
-            t.textContent = '✅ Order cancelled successfully.';
-            Object.assign(t.style, {
-                position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%)',
-                background:'#0d1f17', border:'1px solid rgba(74,222,128,0.3)',
-                color:'#4ade80', padding:'12px 22px', borderRadius:'99px',
-                fontSize:'13px', fontWeight:'700', zIndex:'9999',
-                boxShadow:'0 4px 20px rgba(74,222,128,0.2)',
-            });
-            document.body.appendChild(t);
-            setTimeout(() => { t.remove(); switchTab('cancelled'); }, 2000);
+            await loadAllOrders();
+            switchTab('cancelled');
+            showToast('✅ Order cancelled.');
         } else {
-            errEl.textContent = data.message || 'Cancellation failed. Try again.';
+            errEl.textContent = data.message || 'Failed.';
             errEl.style.display = 'block';
             btn.textContent = 'Yes, Cancel My Order';
             btn.disabled = false;
@@ -894,308 +281,278 @@ async function submitCancel() {
     }
 }
 
-
-function updateTimeline(data) {
-    const steps = [
-        { key: 'placed',     label: 'Order Placed',        time: data.placed_at,    desc: 'Received & confirmed' },
-        { key: 'preparing',  label: '&#x1F373; Preparing', time: data.accepted_at,  desc: 'Our chefs are crafting your order' },
-        { key: 'rider',      label: 'Out for Delivery',    time: data.picked_up_at, desc: data.rider ? data.rider.name + ' · On the way' : 'Rider heading to you' },
-        { key: 'delivered',  label: 'Delivered &#x1F389;', time: data.delivered_at, desc: 'Enjoy your meal!' },
-    ];
-
-    const statusOrder = ['pending','accepted','preparing','rider_assigned','out_for_delivery','delivered'];
-    const currentIdx  = statusOrder.indexOf(data.status);
-
-    const stepEls = document.querySelectorAll('.t-step');
-    stepEls.forEach((el, i) => {
-        const dot  = el.querySelector('.t-dot');
-        const line = el.querySelector('.t-line');
-        const lbl  = el.querySelector('[class^="t-label"]');
-
-        if (!dot) return;
-        dot.className  = 't-dot ' + (i < currentIdx ? 't-dot-done' : i === currentIdx ? 't-dot-active' : 't-dot-pending');
-        if (line) line.className = 't-line ' + (i < currentIdx ? 't-line-done' : i === currentIdx ? 't-line-active' : 't-line-pending');
-        if (lbl)  lbl.className  = i < currentIdx ? 't-label-done' : i === currentIdx ? 't-label-active' : 't-label-pending';
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    Object.assign(t.style, {
+        position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%)',
+        background:'#0d1f17', border:'1px solid rgba(74,222,128,.3)',
+        color:'#4ade80', padding:'12px 22px', borderRadius:'99px',
+        fontSize:'13px', fontWeight:'700', zIndex:'9999',
     });
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
 }
 
-/* ── Tabs ── */
-function switchTab(tab) {
-    ['active','past','cancelled'].forEach(id => {
-        document.getElementById('view-' + id).style.display = (id === tab) ? 'block' : 'none';
-        const btn = document.getElementById('tab-' + id);
-        btn.classList.toggle('active', id === tab);
-    });
+/* ── Load All Orders from API ── */
+async function loadAllOrders() {
+    try {
+        const res = await fetch('/orders', {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        renderActiveOrders(data.active || []);
+        renderPastOrders(data.past || []);
+        renderCancelledOrders(data.cancelled || []);
+        const dot = document.getElementById('activeDot');
+        if (dot) dot.style.display = (data.active || []).length ? 'inline-block' : 'none';
+    } catch (e) {
+        console.error('Failed to load orders:', e);
+    }
 }
 
-/* ── Cart → Active order items ── */
-function loadOrderItems() {
-    // Prefer last completed order, fall back to current cart
-    const lastOrder = JSON.parse(localStorage.getItem('eutLastOrder') || 'null');
-    const cart = lastOrder ? lastOrder.items.map(i => ({
-        name: i.name, price: i.price, quantity: i.qty, image: i.img
-    })) : JSON.parse(localStorage.getItem('eutCart') || '[]');
+/* ── Status config ── */
+const STATUS_MAP = {
+    pending:          { label: 'Order Placed',      progress: 10 },
+    accepted:         { label: 'Accepted',           progress: 20 },
+    preparing:        { label: 'Preparing',          progress: 40 },
+    rider_assigned:   { label: 'Rider Assigned',     progress: 60 },
+    out_for_delivery: { label: 'Out for Delivery',   progress: 80 },
+    delivered:        { label: 'Delivered',          progress: 100 },
+};
 
-    const list = document.getElementById('orderItemsList');
-    let sub = 0;
-    if (!cart.length) {
-        list.innerHTML = '<div style="padding:20px 18px; font-size:13px; color:#4b5563; text-align:center;">No items in active order</div>';
-        document.getElementById('itemCountBadge').textContent = '0 items';
-        document.getElementById('orderSubtotal').textContent = '₱0';
-        document.getElementById('orderTotal').textContent = '₱50';
+/* ── Modifier tags HTML ── */
+function modifierTagsHtml(modifiers) {
+    if (!modifiers || !modifiers.length) return '';
+    const typeColors = {
+        flavor:   { bg:'rgba(59,130,246,.12)',  color:'#3b82f6', icon:'🌶' },
+        modifier: { bg:'rgba(139,92,246,.12)',  color:'#8b5cf6', icon:'⚙' },
+        addon:    { bg:'rgba(245,158,11,.12)',  color:'#d97706', icon:'➕' },
+    };
+    const tags = modifiers
+        .filter(m => !/^no\s/i.test(m.name))
+        .map(m => {
+            const tc  = typeColors[m.type] || typeColors.modifier;
+            const adj = parseFloat(m.price_adjustment || 0);
+            const extra = (m.price_type === 'add' && adj > 0)
+                ? ` <span style="color:#4ade80;font-size:.6rem;">+₱${adj.toLocaleString()}</span>`
+                : '';
+            return `<span style="display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .55rem;border-radius:99px;font-size:.68rem;font-weight:600;background:${tc.bg};color:${tc.color};border:1px solid ${tc.color}30;">${tc.icon} ${m.name}${extra}</span>`;
+        });
+    if (!tags.length) return '';
+    return `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${tags.join('')}</div>`;
+}
+
+/* ── Render Active Orders ── */
+function renderActiveOrders(orders) {
+    const view = document.getElementById('view-active');
+    if (!orders.length) {
+        view.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p class="empty-title">No active orders</p>
+                <p class="empty-sub">Place an order and track it here in real-time.</p>
+                <a href="{{ route('shop.home') }}" class="btn-primary" style="display:inline-block;width:auto;padding:12px 28px;border-radius:99px;">Browse Menu</a>
+            </div>`;
         return;
     }
-    const total = cart.reduce((s,i) => s + i.quantity, 0);
-    document.getElementById('itemCountBadge').textContent = total + (total === 1 ? ' item' : ' items');
-    list.innerHTML = cart.map(item => {
-        sub += item.price * item.quantity;
-        return `<div class="item-row">
-            <img src="${item.image}" alt="${item.name}" class="item-img">
-            <div style="flex:1; min-width:0;">
-                <p class="item-name">${item.name}</p>
-                <p class="item-qty">Qty: ${item.quantity}</p>
-            </div>
-            <p class="item-price">₱${(item.price * item.quantity).toLocaleString()}</p>
-        </div>`;
-    }).join('');
-    document.getElementById('orderSubtotal').textContent = '₱' + sub.toLocaleString();
-    document.getElementById('orderTotal').textContent = '₱' + (sub + 50).toLocaleString();
+    view.innerHTML = orders.map(o => buildActiveCard(o)).join('');
 }
 
-/* ── Past Orders (delivered) ── */
-const mockPastOrders = [
-    {
-        id: 'EUT-00421', date: 'July 15, 2026 · 7:32 PM', total: 820,
-        items: [
-            { name: 'EUT Classic Burger', qty: 1, price: 350, img: '/images/hero-burger.jpg' },
-            { name: 'Crispy French Fries', qty: 2, price: 120, img: '/images/french-fries.jpg' },
-            { name: 'Iced Tea', qty: 1, price: 80, img: '/images/combo-meal.jpg' },
-        ]
-    },
-    {
-        id: 'EUT-00388', date: 'July 10, 2026 · 12:15 PM', total: 420,
-        items: [
-            { name: 'Gourmet Cheeseburger', qty: 1, price: 420, img: '/images/gourmet-burger.jpg' },
-        ]
-    },
-    {
-        id: 'EUT-00344', date: 'June 28, 2026 · 8:05 PM', total: 950,
-        items: [
-            { name: 'EUT Classic Burger', qty: 2, price: 350, img: '/images/hero-burger.jpg' },
-            { name: 'Crispy French Fries', qty: 1, price: 120, img: '/images/french-fries.jpg' },
-        ]
-    },
-];
+function buildActiveCard(o) {
+    const st = STATUS_MAP[o.status] || STATUS_MAP.pending;
+    const cancellable = ['pending','accepted','preparing'].includes(o.status);
+    const isPlaced     = o.status === 'pending';
+    const isPreparing  = ['accepted','preparing'].includes(o.status);
+    const isOnWay      = ['rider_assigned','out_for_delivery'].includes(o.status);
+    const isDelivered  = o.status === 'delivered';
 
-function buildPastOrders() {
-    // Merge real orders from localStorage with mock history
-    const realOrders = JSON.parse(localStorage.getItem('eutOrderHistory') || '[]');
-    const allOrders = [...realOrders, ...mockPastOrders];
-    const list = document.getElementById('pastOrdersList');
-    if (!allOrders.length) { document.getElementById('pastEmpty').style.display = 'block'; return; }
-    list.innerHTML = allOrders.map(o => `
+    const itemsHtml = o.items.map(item => `
+        <div class="item-row">
+            <img src="${item.image}" class="item-img" alt="${item.name}">
+            <div style="flex:1;min-width:0;">
+                <p class="item-name">${item.name}</p>
+                <p class="item-qty">Qty: ${item.qty}</p>
+                ${modifierTagsHtml(item.modifiers)}
+            </div>
+            <p class="item-price">₱${Number(item.subtotal).toLocaleString()}</p>
+        </div>`).join('');
+
+    const riderHtml = o.rider ? `
+        <div class="info-row" style="border:none;">
+            <div class="info-icon" style="background:rgba(167,139,250,.1);">
+                <svg width="16" height="16" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+            <div>
+                <p class="info-text-label">Rider</p>
+                <p class="info-text-val">${o.rider.name}</p>
+                <p class="info-text-sub">⭐ ${o.rider.rating} · ${o.rider.phone}</p>
+            </div>
+        </div>` : '';
+
+    const cancelHtml = cancellable ? `
+        <div style="padding:14px 18px;">
+            <button onclick="openCancelModal(${o.id})" style="width:100%;padding:12px;border-radius:12px;background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.3);color:#f87171;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;">
+                Cancel Order
+            </button>
+        </div>` : '';
+
+    return `
+    <div class="card" style="margin-bottom:20px;position:relative;overflow:hidden;" data-order-id="${o.id}">
+        <div style="position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(250,204,21,.06) 0%,transparent 70%);pointer-events:none;"></div>
+        <!-- Status banner -->
+        <div style="background:linear-gradient(135deg,#1a0a00,#1a1200,#0e0f1a);border-bottom:1px solid rgba(250,204,21,.1);padding:20px 18px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                <div>
+                    <p style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Order ID</p>
+                    <p style="font-size:15px;font-weight:800;color:#fff;">#${o.order_number}</p>
+                    <p style="font-size:11px;color:#4b5563;margin-top:2px;">${o.placed_at}</p>
+                </div>
+                <span class="badge badge-live"><span class="badge-pulse"></span> ${st.label}</span>
+            </div>
+            <div class="progress-eta-row">
+                <span class="progress-eta-label">Status</span>
+                <span class="progress-eta-time">${st.label}</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width:${st.progress}%"></div>
+            </div>
+            <div class="progress-steps">
+                <span class="progress-step-label ${isPlaced ? 'active' : 'done'}">Placed</span>
+                <span class="progress-step-label ${isPreparing ? 'active' : isPlaced ? '' : 'done'}">Preparing</span>
+                <span class="progress-step-label ${isOnWay ? 'active' : (isPlaced||isPreparing) ? '' : 'done'}">On the way</span>
+                <span class="progress-step-label ${isDelivered ? 'done' : ''}">Delivered</span>
+            </div>
+        </div>
+        <!-- Items -->
+        <div class="card-header">
+            <div>
+                <p class="card-title">Order Items</p>
+                <p class="card-sub">${o.items.length} item(s)</p>
+            </div>
+        </div>
+        ${itemsHtml}
+        <div class="totals">
+            <div class="total-row"><span class="total-label">Subtotal</span><span class="total-value">₱${Number(o.subtotal).toLocaleString()}</span></div>
+            <div class="total-row"><span class="total-label">Delivery fee</span><span class="total-value">₱${Number(o.delivery_fee).toLocaleString()}</span></div>
+            <hr class="total-divider">
+            <div class="total-row"><span class="total-grand-label">Total</span><span class="total-grand-value">₱${Number(o.total).toLocaleString()}</span></div>
+        </div>
+        <!-- Delivery details -->
+        <div class="card-header" style="margin-top:4px;">
+            <p class="card-title">Delivery Details</p>
+        </div>
+        <div class="info-row">
+            <div class="info-icon" style="background:rgba(239,68,68,.1);">
+                <svg width="16" height="16" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+                <p class="info-text-label">Address</p>
+                <p class="info-text-val">${o.delivery_address}</p>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-icon" style="background:rgba(96,165,250,.1);">
+                <svg width="16" height="16" fill="none" stroke="#60a5fa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            </div>
+            <div>
+                <p class="info-text-label">Payment</p>
+                <p class="info-text-val" style="text-transform:capitalize;">${o.payment_method}</p>
+            </div>
+        </div>
+        ${riderHtml}
+        ${cancelHtml}
+    </div>`;
+}
+
+/* ── Render Past Orders ── */
+function renderPastOrders(orders) {
+    const list  = document.getElementById('pastOrdersList');
+    const empty = document.getElementById('pastEmpty');
+    if (!orders.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    list.innerHTML = orders.map(o => `
         <div class="pcard">
             <div class="pcard-header">
                 <div class="pcard-id-row">
-                    <span class="pcard-id">#${o.id}</span>
+                    <span class="pcard-id">#${o.order_number}</span>
                     <span class="badge badge-done">✓ Delivered</span>
                 </div>
-                <p class="pcard-date">${o.date}</p>
+                <p class="pcard-date">${o.placed_at}</p>
             </div>
             <div class="pcard-items">
                 ${o.items.map(i => `
                 <div class="pcard-item-row">
-                    <img src="${i.img}" class="pcard-item-img" alt="${i.name}">
+                    <img src="${i.image}" class="pcard-item-img" alt="${i.name}">
                     <span class="pcard-item-name">${i.name} × ${i.qty}</span>
-                    <span class="pcard-item-price">₱${(i.price * i.qty).toLocaleString()}</span>
+                    <span class="pcard-item-price">₱${Number(i.subtotal).toLocaleString()}</span>
                 </div>`).join('')}
             </div>
             <div class="pcard-footer">
                 <div>
                     <p class="pcard-total-label">Total paid</p>
-                    <p class="pcard-total">₱${o.total.toLocaleString()}</p>
+                    <p class="pcard-total">₱${Number(o.total).toLocaleString()}</p>
                 </div>
                 <a href="{{ route('shop.home') }}" class="btn-reorder">🔁 Reorder</a>
             </div>
         </div>`).join('');
 }
 
-/* ── Cancelled Orders ── */
-const cancelledOrders = [
-    {
-        id: 'EUT-00301', date: 'July 3, 2026 · 6:20 PM', total: 470,
-        reason: 'Restaurant was temporarily closed',
-        refund: 'Full refund processed · July 3, 2026',
-        items: [
-            { name: 'Combo Meal Deluxe', qty: 1, price: 390, img: '/images/combo-meal.jpg' },
-            { name: 'Iced Tea', qty: 1, price: 80, img: '/images/combo-meal.jpg' },
-        ]
-    },
-    {
-        id: 'EUT-00278', date: 'June 20, 2026 · 1:45 PM', total: 350,
-        reason: 'Cancelled by customer before preparation',
-        refund: 'Full refund processed · June 20, 2026',
-        items: [
-            { name: 'EUT Classic Burger', qty: 1, price: 350, img: '/images/hero-burger.jpg' },
-        ]
-    },
-];
-
-function buildCancelledOrders() {
-    const list = document.getElementById('cancelledOrdersList');
-    if (!cancelledOrders.length) { document.getElementById('cancelledEmpty').style.display = 'block'; return; }
-    list.innerHTML = cancelledOrders.map(o => `
+/* ── Render Cancelled Orders ── */
+function renderCancelledOrders(orders) {
+    const list  = document.getElementById('cancelledOrdersList');
+    const empty = document.getElementById('cancelledEmpty');
+    if (!orders.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    list.innerHTML = orders.map(o => `
         <div class="pcard pcard-cancelled">
             <div class="pcard-header">
                 <div class="pcard-id-row">
-                    <span class="pcard-id" style="color:#9ca3af;">#${o.id}</span>
+                    <span class="pcard-id" style="color:#9ca3af;">#${o.order_number}</span>
                     <span class="badge badge-cancelled">✕ Cancelled</span>
                 </div>
-                <p class="pcard-date">${o.date}</p>
+                <p class="pcard-date">${o.placed_at}</p>
             </div>
-            <div class="pcard-items" style="opacity:0.5;">
+            <div class="pcard-items" style="opacity:.5;">
                 ${o.items.map(i => `
                 <div class="pcard-item-row">
-                    <img src="${i.img}" class="pcard-item-img" alt="${i.name}" style="filter:grayscale(1);">
-                    <span class="pcard-item-name" style="text-decoration:line-through; color:#4b5563;">${i.name} × ${i.qty}</span>
-                    <span class="pcard-item-price" style="color:#4b5563; text-decoration:line-through;">₱${(i.price * i.qty).toLocaleString()}</span>
+                    <img src="${i.image}" class="pcard-item-img" alt="${i.name}" style="filter:grayscale(1);">
+                    <span class="pcard-item-name" style="text-decoration:line-through;color:#4b5563;">${i.name} × ${i.qty}</span>
+                    <span class="pcard-item-price" style="color:#4b5563;text-decoration:line-through;">₱${Number(i.subtotal).toLocaleString()}</span>
                 </div>`).join('')}
             </div>
+            ${o.cancel_reason ? `
             <div class="cancel-reason">
                 <span class="cancel-reason-icon">⚠️</span>
                 <div>
                     <p class="cancel-reason-title">Cancellation Reason</p>
-                    <p class="cancel-reason-text">${o.reason}</p>
-                    <p class="cancel-reason-text" style="color:#4ade80; margin-top:4px;">✓ ${o.refund}</p>
+                    <p class="cancel-reason-text">${o.cancel_reason}</p>
                 </div>
-            </div>
+            </div>` : ''}
             <div class="pcard-footer">
                 <div>
                     <p class="pcard-total-label">Order total</p>
-                    <p class="pcard-total">₱${o.total.toLocaleString()}</p>
+                    <p class="pcard-total">₱${Number(o.total).toLocaleString()}</p>
                 </div>
-                <a href="{{ route('shop.home') }}" class="btn-reorder" style="background:linear-gradient(135deg,#374151,#4b5563); color:#e5e7eb; box-shadow:none;">Try Again</a>
+                <a href="{{ route('shop.home') }}" class="btn-reorder" style="background:linear-gradient(135deg,#374151,#4b5563);color:#e5e7eb;box-shadow:none;">Try Again</a>
             </div>
         </div>`).join('');
 }
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(localStorage.getItem('eutTheme') || 'dark');
+    document.getElementById('shopThemeToggle').addEventListener('click', () => {
+        const t = (localStorage.getItem('eutTheme') || 'dark') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('eutTheme', t);
+        applyTheme(t);
+    });
+    loadAllOrders();
+    setInterval(loadAllOrders, 5000);
+});
 </script>
 
-<!-- LEAFLET + OSRM LIVE TRACKING MAP -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const RESTAURANT = [13.3213129, 121.3027265];
-const CUSTOMER   = [13.3265, 121.3085];
-let riderPos     = [13.3235, 121.3050];
-let trackingMap  = null;
-let riderMarker  = null;
-let routeLine    = null;
-let roadPoints   = [];
-let simStep      = 0;
-
-async function fetchOSRMRoute(from, to) {
-    const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
-    try {
-        const res  = await fetch(url);
-        const data = await res.json();
-        if (data.code === 'Ok' && data.routes.length) {
-            return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-        }
-    } catch (e) { console.warn('OSRM error:', e); }
-    return null;
-}
-
-async function initTrackingMap() {
-    const el = document.getElementById('trackingMap');
-    if (!el || trackingMap) return;
-
-    trackingMap = L.map('trackingMap', { zoomControl: true });
-
-    // Google Satellite — full PH coverage
-    L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-        attribution: '&copy; Google Maps',
-        maxZoom: 20,
-    }).addTo(trackingMap);
-
-    // Google Hybrid labels overlay (roads + street names on satellite)
-    L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
-        attribution: '',
-        maxZoom: 20,
-        opacity: 0.85,
-    }).addTo(trackingMap);
-
-    // Restaurant marker
-    L.marker(RESTAURANT, { icon: L.divIcon({
-        html: `<div style="background:#facc15;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F354;</span></div>`,
-        className:'', iconSize:[38,38], iconAnchor:[19,38],
-    })}).addTo(trackingMap).bindPopup('<b>EUT Restaurant</b><br>Metro Naujan');
-
-    // Customer marker
-    L.marker(CUSTOMER, { icon: L.divIcon({
-        html: `<div style="background:#ef4444;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #b91c1c;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F3E0;</span></div>`,
-        className:'', iconSize:[38,38], iconAnchor:[19,38],
-    })}).addTo(trackingMap).bindPopup('<b>Your Location</b>');
-
-    // Rider marker
-    riderMarker = L.marker(riderPos, { icon: L.divIcon({
-        html: `<div style="background:#10b981;width:46px;height:46px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 14px rgba(16,185,129,0.7);">&#x1F6F5;</div>`,
-        className:'', iconSize:[46,46], iconAnchor:[23,23],
-    })}).addTo(trackingMap).bindPopup('<b>Juan dela Cruz</b><br>&#11088; 4.9 · Your Rider');
-
-    trackingMap.fitBounds([RESTAURANT, CUSTOMER, riderPos], { padding:[40,40] });
-
-    // Fetch OSRM route: rider position -> customer
-    const seg1 = await fetchOSRMRoute(RESTAURANT, riderPos);
-    const seg2 = await fetchOSRMRoute(riderPos, CUSTOMER);
-
-    if (seg1 && seg2) {
-        roadPoints = [...seg1, ...seg2];
-        routeLine = L.polyline(roadPoints, { color:'#facc15', weight:5, opacity:1 }).addTo(trackingMap);
-        trackingMap.fitBounds(routeLine.getBounds(), { padding:[40,40] });
-    } else {
-        routeLine = L.polyline([RESTAURANT, riderPos, CUSTOMER], { color:'#facc15', weight:3, opacity:0.7, dashArray:'8 6' }).addTo(trackingMap);
-    }
-
-    simulateRiderMovement();
-}
-
-function simulateRiderMovement() {
-    if (!roadPoints.length) {
-        let step = 0, totalSteps = 60;
-        const dLat = (CUSTOMER[0]-riderPos[0])/totalSteps;
-        const dLng = (CUSTOMER[1]-riderPos[1])/totalSteps;
-        setInterval(() => {
-            step++;
-            riderPos = [riderPos[0]+dLat, riderPos[1]+dLng];
-            if (riderMarker) riderMarker.setLatLng(riderPos);
-            if (routeLine)   routeLine.setLatLngs([RESTAURANT, riderPos, CUSTOMER]);
-            updateTrackingETA(step, totalSteps);
-        }, 3000);
-        return;
-    }
-    // Walk along actual road points
-    setInterval(() => {
-        if (simStep >= roadPoints.length - 1) return;
-        simStep++;
-        riderPos = roadPoints[simStep];
-        riderMarker.setLatLng(riderPos);
-        // trim route line — restaurant pin stays, rider moves forward
-        routeLine.setLatLngs(roadPoints.slice(simStep));
-        updateTrackingETA(simStep, roadPoints.length);
-    }, 2500);
-}
-
-function updateTrackingETA(step, total) {
-    const minsLeft = Math.max(0, Math.round(35 * (1 - step / total)));
-    const etaEl    = document.getElementById('riderEtaText');
-    const statusEl = document.getElementById('mapStatusText');
-    if (etaEl) etaEl.textContent = minsLeft > 0 ? `~${minsLeft} min away` : 'Arriving now!';
-    if (statusEl && minsLeft === 0) statusEl.textContent = 'Rider has arrived!';
-}
-
-document.addEventListener('DOMContentLoaded', initTrackingMap);
-</script>
-
-
 </body>
 </html>

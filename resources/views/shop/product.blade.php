@@ -1006,9 +1006,43 @@ function doAdd(goToCart) {
     // Flag whether this item required a flavor/modifier selection
     const requiresFlavor = MODIFIER_GROUPS.some(g => g.type !== 'addon' && g.required);
 
+    // Build modifiers array for backend (flavors, modifiers, addons)
+    const modifiers = [];
+    Object.values(selectedOptions).filter(Boolean).forEach(opt => {
+        // Find parent group to get type
+        const group = MODIFIER_GROUPS.find(g => g.options && g.options.find(o => o.id === opt.id));
+        if (group && !/^no\s/i.test(opt.name)) {  // skip "No Flavor" / "No X" defaults
+            modifiers.push({
+                type:              group.type,
+                name:              opt.name,
+                price_type:        opt.price_type,
+                price_adjustment:  parseFloat(opt.price_adjustment || 0),
+            });
+        }
+    });
+    Object.entries(selectedAddons).forEach(([groupId, addon]) => {
+        modifiers.push({
+            type:              'addon',
+            name:              addon.name,
+            price_type:        addon.priceType,
+            price_adjustment:  parseFloat(addon.adj || 0),
+        });
+    });
+
     const existing = cart.find(i => i.id === key);
     if (existing) existing.quantity += currentQty;
-    else cart.push({ id: key, item_id: ITEM_ID, name, price: unit, image: ITEM_IMAGE, category: ITEM_CAT, quantity: currentQty, requires_flavor: requiresFlavor, flavor_ok: true });
+    else cart.push({
+        id:              key,
+        item_id:         ITEM_ID,
+        name,
+        price:           unit,
+        image:           ITEM_IMAGE,
+        category:        ITEM_CAT,
+        quantity:        currentQty,
+        requires_flavor: requiresFlavor,
+        flavor_ok:       true,
+        modifiers,       // ← NEW: full modifier data for backend
+    });
 
     localStorage.setItem('eutCart', JSON.stringify(cart));
     updateCartBadge();

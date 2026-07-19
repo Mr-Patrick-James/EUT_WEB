@@ -349,20 +349,8 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // Save order ID for tracking page + keep localStorage history
-                    localStorage.setItem('eutActiveOrderId', data.order_id);
-                    localStorage.setItem('eutLastOrder', JSON.stringify({
-                        id: data.order_number,
-                        total: data.total,
-                        items: cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price, img: i.image })),
-                        date: new Date().toLocaleString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }),
-                    }));
-
-                    const history = JSON.parse(localStorage.getItem('eutOrderHistory') || '[]');
-                    history.unshift(JSON.parse(localStorage.getItem('eutLastOrder')));
-                    localStorage.setItem('eutOrderHistory', JSON.stringify(history));
+                    // Clear cart and redirect to tracking
                     localStorage.setItem('eutCart', JSON.stringify([]));
-
                     window.location.href = '{{ route("shop.tracking") }}';
                 } else {
                     alert(data.message || 'Order failed. Please try again.');

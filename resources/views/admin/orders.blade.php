@@ -62,8 +62,7 @@ $statusConfig = [
 
 {{-- ── TABLE CARD ── --}}
 <div class="section-card">
-    <div class="filter-bar">
-        <div style="display:flex;align-items:center;gap:.5rem;">
+    <div class="filter-bar">        <div style="display:flex;align-items:center;gap:.5rem;">
             <i data-lucide="filter" style="width:.875rem;height:.875rem;color:var(--text-muted);stroke-width:2;"></i>
             <select onchange="location='{{ route('admin.orders') }}?status='+this.value" class="admin-input" style="max-width:160px;">
                 <option value="" {{ !request('status') ? 'selected':'' }}>All Statuses</option>
@@ -165,4 +164,187 @@ $statusConfig = [
         </tbody>
     </table>
 </div>
+
+{{-- ══════════ ORDER DETAIL MODAL ══════════ --}}
+<div id="orderDetailModal" class="modal-backdrop" onclick="closeModalBackdrop(event,'orderDetailModal')">
+    <div class="modal-box modal-lg">
+        <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:.5rem;">
+                <i data-lucide="receipt" style="width:1.1rem;height:1.1rem;color:#10b981;stroke-width:2;"></i>
+                <h3 class="modal-title" id="odTitle">Order Detail</h3>
+            </div>
+            <button onclick="closeModal('orderDetailModal')" class="modal-close">
+                <i data-lucide="x" style="width:1rem;height:1rem;stroke-width:2.5;"></i>
+            </button>
+        </div>
+        <div id="odBody" class="modal-body" style="gap:.75rem;">
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);">Loading...</div>
+        </div>
+    </div>
+</div>
+
+{{-- Build order data map for JS --}}
+@php
+$ordersMap = [];
+foreach($orders as $o) {
+    $ordersMap[$o->id] = [
+        'id'           => $o->id,
+        'order_number' => $o->order_number,
+        'status'       => $o->status,
+        'customer'     => $o->user?->name ?? 'Guest',
+        'email'        => $o->user?->email ?? '',
+        'address'      => $o->delivery_address,
+        'payment'      => $o->payment_method,
+        'subtotal'     => $o->subtotal,
+        'delivery_fee' => $o->delivery_fee,
+        'total'        => $o->total,
+        'notes'        => $o->notes,
+        'date'         => $o->created_at->format('M d, Y g:i A'),
+        'items'        => $o->items->map(fn($i) => [
+            'name'      => $i->item_name,
+            'qty'       => $i->quantity,
+            'price'     => $i->unit_price,
+            'subtotal'  => $i->subtotal,
+            'modifiers' => $i->modifiers ?? [],  // JSON column — flavors, modifiers, addons
+        ])->toArray(),
+    ];
+}
+@endphp
+
+<script>
+var ORDERS_MAP = @json($ordersMap);
+var STATUS_CONFIG = @json($statusConfig);
+
+function showOrderDetail(id) {
+    var o = ORDERS_MAP[id];
+    if (!o) { alert('Order not found.'); return; }
+
+    var sc = STATUS_CONFIG[o.status] || STATUS_CONFIG['pending'];
+
+    // Badge color map
+    var badgeMap = {
+        pending:   'background:rgba(245,158,11,.12);color:#d97706;',
+        preparing: 'background:rgba(59,130,246,.12);color:#2563eb;',
+        out:       'background:rgba(139,92,246,.12);color:#7c3aed;',
+        delivered: 'background:rgba(16,185,129,.12);color:#16a34a;',
+        cancelled: 'background:rgba(239,68,68,.12);color:#dc2626;',
+    };
+    var badgeStyle = badgeMap[o.status] || badgeMap['pending'];
+
+    // Build items rows
+    var itemsHtml = '';
+    o.items.forEach(function(item) {
+        // ── Build modifier tags ──────────────────────────────
+        var modHtml = '';
+        var mods = item.modifiers || [];
+        if (Array.isArray(mods) && mods.length) {
+            var tagColors = {
+                flavor:   { bg:'rgba(59,130,246,.12)',  color:'#3b82f6' },
+                modifier: { bg:'rgba(139,92,246,.12)',  color:'#8b5cf6' },
+                addon:    { bg:'rgba(245,158,11,.12)',   color:'#d97706' },
+            };
+            var tags = '';
+            mods.forEach(function(mod) {
+                if (!mod || !mod.name) return;
+                // Skip "No Flavor" / "No X" defaults in display
+                if (/^no\s/i.test(mod.name)) return;
+                var type   = mod.type || 'modifier';
+                var tc     = tagColors[type] || tagColors['modifier'];
+                var price  = '';
+                if (mod.price_type === 'add' && parseFloat(mod.price_adjustment) > 0) {
+                    price = ' <span style="color:#4ade80;font-size:.6rem;">+₱' + Number(mod.price_adjustment).toLocaleString() + '</span>';
+                } else if (mod.price_type === 'replace') {
+                    price = ' <span style="color:#a78bfa;font-size:.6rem;">=₱' + Number(mod.price_adjustment).toLocaleString() + '</span>';
+                }
+                var typeIcon = type === 'flavor' ? '🌶' : (type === 'addon' ? '➕' : '⚙');
+                tags +=
+                    '<span style="display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .55rem;border-radius:9999px;font-size:.68rem;font-weight:600;background:' + tc.bg + ';color:' + tc.color + ';border:1px solid ' + tc.color + '30;">' +
+                        typeIcon + ' ' + mod.name + price +
+                    '</span>';
+            });
+            if (tags) {
+                modHtml = '<div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.35rem;">' + tags + '</div>';
+            }
+        }
+
+        itemsHtml +=
+            '<div style="padding:.625rem 0;border-bottom:1px solid var(--border-divider);">' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">' +
+                    '<div style="display:flex;align-items:center;gap:.5rem;flex:1;min-width:0;">' +
+                        '<span style="font-size:.7rem;font-weight:700;background:rgba(250,204,21,.12);color:#d97706;border-radius:4px;padding:2px 7px;flex-shrink:0;">×' + item.qty + '</span>' +
+                        '<span style="font-size:.8rem;color:var(--text-strong);font-weight:600;">' + item.name + '</span>' +
+                    '</div>' +
+                    '<span style="font-size:.8rem;font-weight:700;color:var(--text-body);flex-shrink:0;">₱' + Number(item.subtotal).toLocaleString() + '</span>' +
+                '</div>' +
+                modHtml +
+            '</div>';
+    });
+
+    var html =
+        // Header info row
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">' +
+            '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.875rem 1rem;">' +
+                '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .3rem;">Order Number</p>' +
+                '<p style="font-size:.9375rem;font-weight:800;color:var(--text-strong);margin:0;font-family:monospace;">' + o.order_number + '</p>' +
+            '</div>' +
+            '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.875rem 1rem;">' +
+                '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .3rem;">Status</p>' +
+                '<span style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;' + badgeStyle + '">' + sc.label + '</span>' +
+            '</div>' +
+        '</div>' +
+
+        // Customer info
+        '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.875rem 1rem;">' +
+            '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .5rem;">Customer</p>' +
+            '<div style="display:flex;align-items:center;gap:.625rem;">' +
+                '<div style="width:2.25rem;height:2.25rem;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875rem;flex-shrink:0;">' + o.customer.charAt(0).toUpperCase() + '</div>' +
+                '<div>' +
+                    '<p style="font-weight:600;color:var(--text-strong);margin:0 0 .1rem;font-size:.875rem;">' + o.customer + '</p>' +
+                    '<p style="color:var(--text-muted);font-size:.75rem;margin:0;">' + o.email + '</p>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+
+        // Delivery address + date
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">' +
+            '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.875rem 1rem;">' +
+                '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .3rem;">Delivery Address</p>' +
+                '<p style="font-size:.8rem;color:var(--text-body);margin:0;line-height:1.4;">' + o.address + '</p>' +
+            '</div>' +
+            '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.875rem 1rem;">' +
+                '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .3rem;">Payment · Date</p>' +
+                '<p style="font-size:.8rem;font-weight:600;color:var(--text-body);margin:0 0 .2rem;text-transform:capitalize;">' + o.payment + '</p>' +
+                '<p style="font-size:.72rem;color:var(--text-muted);margin:0;">' + o.date + '</p>' +
+            '</div>' +
+        '</div>' +
+
+        // Items
+        '<div>' +
+            '<p style="font-size:.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 .5rem;">Items Ordered</p>' +
+            '<div style="background:var(--bg-filter);border-radius:.625rem;padding:.75rem 1rem;">' +
+                itemsHtml +
+                // Totals
+                '<div style="display:flex;justify-content:space-between;padding:.5rem 0;font-size:.8rem;">' +
+                    '<span style="color:var(--text-muted);">Subtotal</span><span style="color:var(--text-body);">₱' + Number(o.subtotal).toLocaleString() + '</span>' +
+                '</div>' +
+                '<div style="display:flex;justify-content:space-between;padding:.3rem 0;font-size:.8rem;">' +
+                    '<span style="color:var(--text-muted);">Delivery Fee</span><span style="color:var(--text-body);">₱' + Number(o.delivery_fee).toLocaleString() + '</span>' +
+                '</div>' +
+                '<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-top:1px solid var(--border-divider);margin-top:.25rem;">' +
+                    '<span style="font-weight:700;color:var(--text-strong);">Total</span>' +
+                    '<span style="font-weight:800;font-size:1rem;color:var(--accent);">₱' + Number(o.total).toLocaleString() + '</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+
+        // Notes
+        (o.notes ? '<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:.625rem;padding:.75rem 1rem;"><p style="font-size:.68rem;color:#d97706;text-transform:uppercase;letter-spacing:.06em;margin:0 0 .3rem;font-weight:700;">📝 Note from Customer</p><p style="font-size:.8rem;color:var(--text-body);margin:0;">' + o.notes + '</p></div>' : '');
+
+    document.getElementById('odTitle').textContent = 'Order ' + o.order_number;
+    document.getElementById('odBody').innerHTML = html;
+    openModal('orderDetailModal');
+    lucide.createIcons();
+}
+</script>
+
 @endsection
