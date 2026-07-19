@@ -525,24 +525,145 @@ class AdminController extends Controller
 
     public function orders(Request $request)
     {
-        $orders = collect([
-            ['id'=>1001,'customer'=>'Juan Dela Cruz', 'items'=>'EUT Classic Combo',        'total'=>550,'status'=>'delivered','date'=>'2026-07-17 10:30'],
-            ['id'=>1002,'customer'=>'Maria Santos',   'items'=>'Gourmet Cheeseburger × 2', 'total'=>840,'status'=>'preparing','date'=>'2026-07-17 11:05'],
-            ['id'=>1003,'customer'=>'Pedro Reyes',    'items'=>'Spicy Combo + Fries',       'total'=>740,'status'=>'pending',  'date'=>'2026-07-17 11:22'],
-            ['id'=>1004,'customer'=>'Ana Villanueva', 'items'=>'BBQ Bacon Burger + Tea',    'total'=>590,'status'=>'out',      'date'=>'2026-07-17 11:45'],
-            ['id'=>1005,'customer'=>'Jose Bautista',  'items'=>'Veggie Delight × 3',        'total'=>960,'status'=>'cancelled','date'=>'2026-07-17 12:00'],
-            ['id'=>1006,'customer'=>'Liza Gomez',     'items'=>'Gourmet Combo',             'total'=>650,'status'=>'delivered','date'=>'2026-07-17 12:15'],
-            ['id'=>1007,'customer'=>'Ramon Cruz',     'items'=>'Classic Fries × 4',         'total'=>480,'status'=>'preparing','date'=>'2026-07-17 12:30'],
-            ['id'=>1008,'customer'=>'Elena Torres',   'items'=>'Mushroom Swiss + Smoothie', 'total'=>595,'status'=>'pending',  'date'=>'2026-07-17 12:44'],
-        ]);
+        $query = \App\Models\Order::with(['user', 'rider.user', 'items']);
 
         if ($request->filled('status')) {
-            $orders = $orders->filter(fn($o) => $o['status'] === $request->status)->values();
+            $query->where('status', $request->status);
         }
 
-        $statusCounts = ['pending'=>2,'preparing'=>2,'out'=>1,'delivered'=>2,'cancelled'=>1];
+        $orders = $query->latest()->get();
 
-        return view('admin.orders', compact('orders', 'statusCounts'));
+        $statusCounts = [
+            'pending'          => \App\Models\Order::where('status', 'pending')->count(),
+            'preparing'        => \App\Models\Order::whereIn('status', ['accepted','preparing'])->count(),
+            'out'              => \App\Models\Order::whereIn('status', ['rider_assigned','out_for_delivery'])->count(),
+            'delivered'        => \App\Models\Order::where('status', 'delivered')->count(),
+            'cancelled'        => \App\Models\Order::where('status', 'cancelled')->count(),
+        ];
+
+        $availableRiders = \App\Models\Rider::with('user')
+            ->where('is_available', true)
+            ->get();
+
+        return view('admin.orders', compact('orders', 'statusCounts', 'availableRiders'));
+    }
+
+    public function acceptOrder(\App\Models\Order $order)
+    {
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Order cannot be accepted.');
+        }
+        $order->update(['status' => 'accepted', 'accepted_at' => now()]);
+        return back()->with('success', "Order #{$order->order_number} accepted.");
+    }
+
+    public function assignRider(Request $request, \App\Models\Order $order)
+    {
+        $request->validate(['rider_id' => 'required|exists:riders,id']);
+
+        if (!$order->isAssignable()) {
+            return back()->with('error', 'Order cannot be assigned at this stage.');
+        }
+
+        $order->update([
+            'rider_id'    => $request->rider_id,
+            'status'      => 'rider_assigned',
+            'assigned_at' => now(),
+        ]);
+
+        return back()->with('success', "Rider assigned to order #{$order->order_number}.");
+    }
+
+    public function updateOrderStatus(Request $request, \App\Models\Order $order)
+    {
+        $request->validate(['status' => 'required|in:accepted,preparing,rider_assigned,out_for_delivery,delivered,cancelled']);
+        $order->update(['status' => $request->status]);
+        return back()->with('success', "Order #{$order->order_number} updated.");
+    }
+
+    public function riderLocations()
+    {
+        $riders = \App\Models\Rider::with('user')
+            ->where('is_available', true)
+            ->whereNotNull('current_lat')
+            ->get()
+            ->map(fn($r) => [
+                'id'     => $r->id,
+                'name'   => $r->user->name,
+                'lat'    => $r->current_lat,
+                'lng'    => $r->current_lng,
+                'status' => $r->status_label,
+                'order'  => $r->activeOrder()?->order_number,
+            ]);
+
+        return response()->json($riders);
+    }
+
+    // ════════════════════════════════════════════════════════
+    // RIDERS
+    // ════════════════════════════════════════════════════════
+
+    public function riders(Request $request)
+    {
+        $riders = \App\Models\Rider::with('user')
+            ->when($request->filled('status'), function ($q) use ($request) {
+                if ($request->status === 'online') {
+                    $q->where('is_available', true);
+                } elseif ($request->status === 'offline') {
+                    $q->where('is_available', false);
+                }
+            })
+            ->get();
+
+        return view('admin.riders', compact('riders'));
+    }
+
+    public function storeRider(Request $request)
+    {
+        $request->validate([
+            'name'         => 'required|string|max:100',
+            'email'        => 'required|email|unique:users,email',
+            'phone'        => 'required|string|max:20',
+            'vehicle_type' => 'required|in:motorcycle,bicycle',
+            'plate_number' => 'nullable|string|max:20',
+            'password'     => 'required|string|min:8',
+        ]);
+
+        $user = \App\Models\User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt($request->password),
+            'role'     => 'rider',
+        ]);
+
+        \App\Models\Rider::create([
+            'user_id'      => $user->id,
+            'phone'        => $request->phone,
+            'vehicle_type' => $request->vehicle_type,
+            'plate_number' => $request->plate_number,
+            'is_available' => false,
+        ]);
+
+        return back()->with('success', "Rider {$user->name} created successfully.");
+    }
+
+    public function updateRider(Request $request, \App\Models\Rider $rider)
+    {
+        $request->validate([
+            'phone'        => 'nullable|string|max:20',
+            'vehicle_type' => 'required|in:motorcycle,bicycle',
+            'plate_number' => 'nullable|string|max:20',
+        ]);
+
+        $rider->update($request->only('phone', 'vehicle_type', 'plate_number'));
+        return back()->with('success', 'Rider updated.');
+    }
+
+    public function removeRider(\App\Models\Rider $rider)
+    {
+        $rider->user->update(['role' => 'user']);
+        $rider->delete();
+        return back()->with('success', 'Rider removed.');
     }
 
     // ════════════════════════════════════════════════════════

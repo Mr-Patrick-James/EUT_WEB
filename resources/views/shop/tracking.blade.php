@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -451,6 +451,35 @@
             </div>
         </div>
 
+        <!-- Live Map card -->
+        <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+                <div>
+                    <p class="card-title">Live Tracking</p>
+                    <p class="card-sub" id="mapStatusText">Rider is heading to you</p>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);padding:4px 10px;border-radius:99px;">
+                    <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>
+                    Live
+                </span>
+            </div>
+            <div id="trackingMap" style="width:100%;height:260px;border-radius:0 0 20px 20px;overflow:hidden;"></div>
+            <div style="padding:10px 18px 12px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:14px;font-size:11px;color:#6b7280;">
+                    <span style="display:flex;align-items:center;gap:5px;">
+                        <span style="width:10px;height:10px;background:#facc15;border-radius:50%;display:inline-block;"></span> Restaurant
+                    </span>
+                    <span style="display:flex;align-items:center;gap:5px;">
+                        <span style="width:10px;height:10px;background:#ef4444;border-radius:50%;display:inline-block;"></span> Your location
+                    </span>
+                    <span style="display:flex;align-items:center;gap:5px;">
+                        <span style="width:10px;height:10px;background:#10b981;border-radius:50%;display:inline-block;"></span> Rider
+                    </span>
+                </div>
+                <span id="riderEtaText" style="font-size:11px;font-weight:700;color:#facc15;"></span>
+            </div>
+        </div>
+
         <!-- Order items card -->
         <div class="card">
             <div class="card-header">
@@ -618,9 +647,95 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrderItems();
     buildPastOrders();
     buildCancelledOrders();
-    // animate progress bar
     setTimeout(() => { document.getElementById('progressBar').style.width = '40%'; }, 300);
+
+    // ── Poll real order status if we have an active order ID ──
+    const activeOrderId = localStorage.getItem('eutActiveOrderId');
+    if (activeOrderId) {
+        pollOrderStatus(activeOrderId);
+        setInterval(() => pollOrderStatus(activeOrderId), 5000);
+    }
 });
+
+async function pollOrderStatus(orderId) {
+    try {
+        const res  = await fetch(`/orders/${orderId}`, {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update status badge
+        const badge = document.querySelector('.badge-live');
+        if (badge) badge.innerHTML = `<span class="badge-pulse"></span> ${data.status_label}`;
+
+        // Update progress bar
+        const progressMap = {
+            'pending': 10, 'accepted': 20, 'preparing': 40,
+            'rider_assigned': 60, 'out_for_delivery': 80, 'delivered': 100,
+        };
+        const pct = progressMap[data.status] || 10;
+        const bar = document.getElementById('progressBar');
+        if (bar) bar.style.width = pct + '%';
+
+        // Update progress step labels
+        const steps = document.querySelectorAll('.progress-step-label');
+        const stepMap = {
+            'pending':          0, 'accepted':          0, 'preparing':       1,
+            'rider_assigned':   2, 'out_for_delivery':  2, 'delivered':       3,
+        };
+        const activeStep = stepMap[data.status] ?? 0;
+        steps.forEach((s, i) => {
+            s.classList.remove('done', 'active');
+            if (i < activeStep) s.classList.add('done');
+            else if (i === activeStep) s.classList.add('active');
+        });
+
+        // Update timeline
+        updateTimeline(data);
+
+        // Update rider info & map
+        if (data.rider) {
+            const riderEl = document.querySelector('.info-text-val');
+            if (riderEl && riderEl.closest('.info-row')?.querySelector('[stroke="#a78bfa"]')) {
+                riderEl.textContent = data.rider.name;
+            }
+            // Update rider marker on map if positions available
+            if (data.rider.lat && data.rider.lng && riderMarker) {
+                riderMarker.setLatLng([data.rider.lat, data.rider.lng]);
+            }
+        }
+
+        // If delivered, stop polling
+        if (data.status === 'delivered') {
+            localStorage.removeItem('eutActiveOrderId');
+        }
+    } catch (e) { /* silently fail — will retry */ }
+}
+
+function updateTimeline(data) {
+    const steps = [
+        { key: 'placed',     label: 'Order Placed',        time: data.placed_at,    desc: 'Received & confirmed' },
+        { key: 'preparing',  label: '&#x1F373; Preparing', time: data.accepted_at,  desc: 'Our chefs are crafting your order' },
+        { key: 'rider',      label: 'Out for Delivery',    time: data.picked_up_at, desc: data.rider ? data.rider.name + ' · On the way' : 'Rider heading to you' },
+        { key: 'delivered',  label: 'Delivered &#x1F389;', time: data.delivered_at, desc: 'Enjoy your meal!' },
+    ];
+
+    const statusOrder = ['pending','accepted','preparing','rider_assigned','out_for_delivery','delivered'];
+    const currentIdx  = statusOrder.indexOf(data.status);
+
+    const stepEls = document.querySelectorAll('.t-step');
+    stepEls.forEach((el, i) => {
+        const dot  = el.querySelector('.t-dot');
+        const line = el.querySelector('.t-line');
+        const lbl  = el.querySelector('[class^="t-label"]');
+
+        if (!dot) return;
+        dot.className  = 't-dot ' + (i < currentIdx ? 't-dot-done' : i === currentIdx ? 't-dot-active' : 't-dot-pending');
+        if (line) line.className = 't-line ' + (i < currentIdx ? 't-line-done' : i === currentIdx ? 't-line-active' : 't-line-pending');
+        if (lbl)  lbl.className  = i < currentIdx ? 't-label-done' : i === currentIdx ? 't-label-active' : 't-label-pending';
+    });
+}
 
 /* ── Tabs ── */
 function switchTab(tab) {
@@ -782,5 +897,123 @@ function buildCancelledOrders() {
         </div>`).join('');
 }
 </script>
+
+<!-- LEAFLET + OSRM LIVE TRACKING MAP -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const RESTAURANT = [13.3213129, 121.3027265];
+const CUSTOMER   = [13.3265, 121.3085];
+let riderPos     = [13.3235, 121.3050];
+let trackingMap  = null;
+let riderMarker  = null;
+let routeLine    = null;
+let roadPoints   = [];
+let simStep      = 0;
+
+async function fetchOSRMRoute(from, to) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
+    try {
+        const res  = await fetch(url);
+        const data = await res.json();
+        if (data.code === 'Ok' && data.routes.length) {
+            return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        }
+    } catch (e) { console.warn('OSRM error:', e); }
+    return null;
+}
+
+async function initTrackingMap() {
+    const el = document.getElementById('trackingMap');
+    if (!el || trackingMap) return;
+
+    trackingMap = L.map('trackingMap', { zoomControl: true });
+
+    // Google Satellite — full PH coverage
+    L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        attribution: '&copy; Google Maps',
+        maxZoom: 20,
+    }).addTo(trackingMap);
+
+    // Google Hybrid labels overlay (roads + street names on satellite)
+    L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
+        attribution: '',
+        maxZoom: 20,
+        opacity: 0.85,
+    }).addTo(trackingMap);
+
+    // Restaurant marker
+    L.marker(RESTAURANT, { icon: L.divIcon({
+        html: `<div style="background:#facc15;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F354;</span></div>`,
+        className:'', iconSize:[38,38], iconAnchor:[19,38],
+    })}).addTo(trackingMap).bindPopup('<b>EUT Restaurant</b><br>Metro Naujan');
+
+    // Customer marker
+    L.marker(CUSTOMER, { icon: L.divIcon({
+        html: `<div style="background:#ef4444;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #b91c1c;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F3E0;</span></div>`,
+        className:'', iconSize:[38,38], iconAnchor:[19,38],
+    })}).addTo(trackingMap).bindPopup('<b>Your Location</b>');
+
+    // Rider marker
+    riderMarker = L.marker(riderPos, { icon: L.divIcon({
+        html: `<div style="background:#10b981;width:46px;height:46px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 14px rgba(16,185,129,0.7);">&#x1F6F5;</div>`,
+        className:'', iconSize:[46,46], iconAnchor:[23,23],
+    })}).addTo(trackingMap).bindPopup('<b>Juan dela Cruz</b><br>&#11088; 4.9 · Your Rider');
+
+    trackingMap.fitBounds([RESTAURANT, CUSTOMER, riderPos], { padding:[40,40] });
+
+    // Fetch OSRM route: rider position -> customer
+    const seg1 = await fetchOSRMRoute(RESTAURANT, riderPos);
+    const seg2 = await fetchOSRMRoute(riderPos, CUSTOMER);
+
+    if (seg1 && seg2) {
+        roadPoints = [...seg1, ...seg2];
+        routeLine = L.polyline(roadPoints, { color:'#facc15', weight:5, opacity:1 }).addTo(trackingMap);
+        trackingMap.fitBounds(routeLine.getBounds(), { padding:[40,40] });
+    } else {
+        routeLine = L.polyline([RESTAURANT, riderPos, CUSTOMER], { color:'#facc15', weight:3, opacity:0.7, dashArray:'8 6' }).addTo(trackingMap);
+    }
+
+    simulateRiderMovement();
+}
+
+function simulateRiderMovement() {
+    if (!roadPoints.length) {
+        let step = 0, totalSteps = 60;
+        const dLat = (CUSTOMER[0]-riderPos[0])/totalSteps;
+        const dLng = (CUSTOMER[1]-riderPos[1])/totalSteps;
+        setInterval(() => {
+            step++;
+            riderPos = [riderPos[0]+dLat, riderPos[1]+dLng];
+            if (riderMarker) riderMarker.setLatLng(riderPos);
+            if (routeLine)   routeLine.setLatLngs([RESTAURANT, riderPos, CUSTOMER]);
+            updateTrackingETA(step, totalSteps);
+        }, 3000);
+        return;
+    }
+    // Walk along actual road points
+    setInterval(() => {
+        if (simStep >= roadPoints.length - 1) return;
+        simStep++;
+        riderPos = roadPoints[simStep];
+        riderMarker.setLatLng(riderPos);
+        // trim route line — restaurant pin stays, rider moves forward
+        routeLine.setLatLngs(roadPoints.slice(simStep));
+        updateTrackingETA(simStep, roadPoints.length);
+    }, 2500);
+}
+
+function updateTrackingETA(step, total) {
+    const minsLeft = Math.max(0, Math.round(35 * (1 - step / total)));
+    const etaEl    = document.getElementById('riderEtaText');
+    const statusEl = document.getElementById('mapStatusText');
+    if (etaEl) etaEl.textContent = minsLeft > 0 ? `~${minsLeft} min away` : 'Arriving now!';
+    if (statusEl && minsLeft === 0) statusEl.textContent = 'Rider has arrived!';
+}
+
+document.addEventListener('DOMContentLoaded', initTrackingMap);
+</script>
+
+
 </body>
 </html>

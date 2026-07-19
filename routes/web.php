@@ -19,12 +19,16 @@ Route::get('/shop/profile', [ShopController::class, 'profile'])->name('shop.prof
 // Public pages
 // -------------------------------------------------------
 Route::get('/', function () {
-    return view('restaurant');
+    return view('landing');
 })->name('home');
 
 Route::get('/welcome', function () {
     return view('welcome');
 });
+
+Route::get('/restaurant', function () {
+    return view('restaurant');
+})->name('restaurant');
 
 Route::get('/example', function () {
     return view('example');
@@ -35,8 +39,28 @@ Route::get('/menu-pdf', function () {
 });
 
 // -------------------------------------------------------
-// Auth — Email login & signup (JSON responses for modal)
+// Rider panel
 // -------------------------------------------------------
+Route::prefix('rider')->name('rider.')->middleware(['auth', 'rider'])->group(function () {
+    Route::get('/dashboard',                        [\App\Http\Controllers\RiderController::class, 'dashboard'])->name('dashboard');
+    Route::patch('/status',                         [\App\Http\Controllers\RiderController::class, 'updateStatus'])->name('status');
+    Route::patch('/location',                       [\App\Http\Controllers\RiderController::class, 'updateLocation'])->name('location');
+    Route::get('/orders',                           [\App\Http\Controllers\RiderController::class, 'orders'])->name('orders');
+    Route::post('/orders/{order}/picked-up',        [\App\Http\Controllers\RiderController::class, 'pickedUp'])->name('orders.picked-up');
+    Route::post('/orders/{order}/delivered',        [\App\Http\Controllers\RiderController::class, 'delivered'])->name('orders.delivered');
+    Route::get('/earnings',                         [\App\Http\Controllers\RiderController::class, 'earnings'])->name('earnings');
+});
+
+// -------------------------------------------------------
+// Orders (authenticated customers)
+// -------------------------------------------------------
+Route::middleware('auth')->group(function () {
+    Route::post('/orders',                  [\App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders',                   [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}',           [\App\Http\Controllers\OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/cancel',   [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
+});
+
 Route::post('/auth/login',  [AuthController::class, 'login'])->name('auth.login');
 Route::post('/auth/signup', [AuthController::class, 'signup'])->name('auth.signup');
 Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');
@@ -87,7 +111,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/modifier-groups/{group}/options/{option}', [AdminController::class, 'deleteModifierOption'])->name('modifier-options.delete');
 
     // ── Orders ─────────────────────────────────────────────
-    Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/orders',                           [AdminController::class, 'orders'])->name('orders');
+    Route::post('/orders/{order}/accept',           [AdminController::class, 'acceptOrder'])->name('orders.accept');
+    Route::post('/orders/{order}/assign-rider',     [AdminController::class, 'assignRider'])->name('orders.assign-rider');
+    Route::patch('/orders/{order}/status',          [AdminController::class, 'updateOrderStatus'])->name('orders.status');
+    Route::get('/riders/locations',                 [AdminController::class, 'riderLocations'])->name('riders.locations');
+
+    // ── Riders ─────────────────────────────────────────────
+    Route::get('/riders',                           [AdminController::class, 'riders'])->name('riders');
+    Route::post('/riders',                          [AdminController::class, 'storeRider'])->name('riders.store');
+    Route::patch('/riders/{rider}',                 [AdminController::class, 'updateRider'])->name('riders.update');
+    Route::delete('/riders/{rider}',                [AdminController::class, 'removeRider'])->name('riders.destroy');
 
     // ── Settings ───────────────────────────────────────────
     Route::get ('/settings',          [AdminController::class, 'settings'])->name('settings');

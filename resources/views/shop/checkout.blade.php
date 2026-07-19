@@ -306,38 +306,75 @@
 
         renderCheckout();
 
-        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        document.getElementById('checkoutForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Save completed order to localStorage history
             const cart = JSON.parse(localStorage.getItem('eutCart') || '[]');
-            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-            const orderId = 'EUT-' + String(Math.floor(Math.random() * 99999)).padStart(5, '0');
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
-                + ' · ' + now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+            if (!cart.length) { alert('Your cart is empty.'); return; }
 
-            const completedOrder = {
-                id: orderId,
-                date: dateStr,
-                total: subtotal + 50,
-                items: cart.map(i => ({
-                    name: i.name,
-                    qty: i.quantity,
-                    price: i.price,
-                    img: i.image
-                }))
-            };
+            const submitBtn = this.querySelector('button[type=submit]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Placing order...';
 
-            const history = JSON.parse(localStorage.getItem('eutOrderHistory') || '[]');
-            history.unshift(completedOrder); // newest first
-            localStorage.setItem('eutOrderHistory', JSON.stringify(history));
-            localStorage.setItem('eutLastOrder', JSON.stringify(completedOrder));
+            const address      = document.querySelector('textarea[name=address]')?.value || '';
+            const barangay     = document.querySelector('input[name=city]')?.value || '';
+            const paymentRaw   = document.querySelector('input[name=payment]:checked')?.value || 'cod';
+            const payment      = paymentRaw === 'cod' ? 'cash' : paymentRaw; // map cod → cash
+            const notes        = document.querySelector('textarea[name=notes]')?.value || '';
 
-            // Clear cart
-            localStorage.setItem('eutCart', JSON.stringify([]));
+            // Build items array for API
+            const items = cart.map(i => ({
+                id:        i.id,
+                qty:       i.quantity,
+                modifiers: i.modifiers || [],
+            }));
 
-            window.location.href = '{{ route('shop.tracking') }}';
+            try {
+                const res = await fetch('{{ route("orders.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        items,
+                        delivery_address:  address,
+                        delivery_barangay: barangay,
+                        payment_method:    payment,
+                        notes,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Save order ID for tracking page + keep localStorage history
+                    localStorage.setItem('eutActiveOrderId', data.order_id);
+                    localStorage.setItem('eutLastOrder', JSON.stringify({
+                        id: data.order_number,
+                        total: data.total,
+                        items: cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price, img: i.image })),
+                        date: new Date().toLocaleString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }),
+                    }));
+
+                    const history = JSON.parse(localStorage.getItem('eutOrderHistory') || '[]');
+                    history.unshift(JSON.parse(localStorage.getItem('eutLastOrder')));
+                    localStorage.setItem('eutOrderHistory', JSON.stringify(history));
+                    localStorage.setItem('eutCart', JSON.stringify([]));
+
+                    window.location.href = '{{ route("shop.tracking") }}';
+                } else {
+                    alert(data.message || 'Order failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Place Order';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error. Please check your connection and try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Place Order';
+            }
         });
     </script>
 </body>
