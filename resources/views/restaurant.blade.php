@@ -1908,7 +1908,8 @@ async function doLogin() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': '1'
             },
             body: JSON.stringify({ email, password })
         });
@@ -1948,7 +1949,8 @@ async function doSignup() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': '1'
             },
             body: JSON.stringify({ name, email, password, password_confirmation: password })
         });

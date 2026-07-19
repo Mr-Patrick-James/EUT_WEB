@@ -388,7 +388,7 @@
                         @endif
                     </span>
                 </div>
-                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
+                <span id="gpsStatusLabel" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
                     <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
                 </span>
             </div>
@@ -1022,7 +1022,7 @@ async function initRiderMap() {
                 updateRiderDist();
             },
             () => {}, // Don't simulate if we can't get GPS
-            { enableHighAccuracy: true, maximumAge: 5000 }
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
         );
     }
 }
@@ -1074,10 +1074,34 @@ function pingLocation(lat, lng) {
     }).catch(() => {});
 }
 
+function showGpsWarning(msg) {
+    const el = document.getElementById('gpsStatusLabel');
+    if (el) { el.textContent = '⚠ ' + msg; el.style.color = '#f59e0b'; }
+}
+
+if (!window.isSecureContext) {
+    showGpsWarning('GPS requires HTTPS — location may be inaccurate');
+}
+
 if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(pos => {
-        pingLocation(pos.coords.latitude, pos.coords.longitude);
-    }, null, { enableHighAccuracy: true, maximumAge: 10000 });
+    navigator.geolocation.watchPosition(
+        pos => {
+            const el = document.getElementById('gpsStatusLabel');
+            if (el) { el.textContent = '● GPS Live'; el.style.color = '#22c55e'; }
+            pingLocation(pos.coords.latitude, pos.coords.longitude);
+        },
+        err => {
+            const msgs = {
+                1: 'Location permission denied',
+                2: 'Position unavailable',
+                3: 'GPS request timed out',
+            };
+            showGpsWarning(msgs[err.code] || 'GPS error');
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+    );
+} else {
+    showGpsWarning('GPS not supported on this browser');
 }
 </script>
 </body>
