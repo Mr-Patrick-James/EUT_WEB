@@ -147,14 +147,66 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // ── GET /orders — customer order history ───────────────
+    // ── GET /orders — customer order history (grouped by status) ───
     public function index()
     {
-        $orders = Order::with('items')
+        $orders = Order::with(['items', 'rider.user'])
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
 
-        return response()->json($orders);
+        $active    = [];
+        $past      = [];
+        $cancelled = [];
+
+        foreach ($orders as $order) {
+            $data = [
+                'id'               => $order->id,
+                'order_number'     => $order->order_number,
+                'status'           => $order->status,
+                'status_label'     => $order->status_label,
+                'subtotal'         => $order->subtotal,
+                'delivery_fee'     => $order->delivery_fee,
+                'total'            => $order->total,
+                'delivery_address' => $order->delivery_address,
+                'payment_method'   => $order->payment_method,
+                'notes'            => $order->notes,
+                'cancel_reason'    => $order->cancel_reason,
+                'placed_at'        => $order->created_at->format('M d, Y g:i A'),
+                'accepted_at'      => $order->accepted_at?->format('g:i A'),
+                'picked_up_at'     => $order->picked_up_at?->format('g:i A'),
+                'delivered_at'     => $order->delivered_at?->format('g:i A'),
+                'cancelled_at'     => $order->cancelled_at?->format('g:i A'),
+                'rider'            => $order->rider ? [
+                    'name'    => $order->rider->user->name,
+                    'phone'   => $order->rider->phone,
+                    'rating'  => $order->rider->rating,
+                    'lat'     => $order->rider->current_lat,
+                    'lng'     => $order->rider->current_lng,
+                ] : null,
+                'items' => $order->items->map(fn($i) => [
+                    'name'      => $i->item_name,
+                    'qty'       => $i->quantity,
+                    'price'     => $i->unit_price,
+                    'subtotal'  => $i->subtotal,
+                    'image'     => '/images/hero-burger.jpg', // fallback — ideally store in order_items
+                    'modifiers' => $i->modifiers ?? [],
+                ]),
+            ];
+
+            if ($order->status === 'cancelled') {
+                $cancelled[] = $data;
+            } elseif ($order->status === 'delivered') {
+                $past[] = $data;
+            } else {
+                $active[] = $data;
+            }
+        }
+
+        return response()->json([
+            'active'    => $active,
+            'past'      => $past,
+            'cancelled' => $cancelled,
+        ]);
     }
 }
