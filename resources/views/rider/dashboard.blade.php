@@ -371,32 +371,49 @@
 
     <!-- -->
     <div id="view-active">
-        @foreach($active as $order)
-            @if($loop->first && $order->status === 'out_for_delivery')
-                <!-- Live Map for first out-for-delivery order -->
-                <p class="section-label">&#x1F7E3; Currently Delivering</p>
-                <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(139,92,246,.3);border-radius:18px;overflow:hidden;margin-bottom:12px;">
-                    <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:12px;font-weight:700;color:#a78bfa;">📍 Live Map</span>
-                            <span style="font-size:10px;color:#4b5563;">#{{ $order->order_number }}</span>
-                        </div>
-                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
-                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
-                        </span>
-                    </div>
-                    <div id="riderMap" style="width:100%;height:220px;"></div>
-                    <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
-                        <span style="font-size:11px;color:#6b7280;">🟡 Restaurant → 🏠 Customer</span>
-                        <span id="riderDistText" style="font-size:11px;font-weight:700;color:#a78bfa;"></span>
-                    </div>
+        <!-- Live Map -->
+        <p class="section-label">&#x1F7E3; Currently Delivering</p>
+        <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(139,92,246,.3);border-radius:18px;overflow:hidden;margin-bottom:12px;">
+            <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:12px;font-weight:700;color:#a78bfa;">📍 Live Map</span>
+                    <span style="font-size:10px;color:#4b5563;">
+                        @php
+                            $activeOrder = $active->firstWhere('status', 'out_for_delivery') ?? $active->first();
+                        @endphp
+                        @if($activeOrder)
+                            #{{ $activeOrder->order_number }}
+                        @else
+                            Your Location
+                        @endif
+                    </span>
                 </div>
-            @endif
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
+                    <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
+                </span>
+            </div>
+            <div id="riderMap" style="width:100%;height:220px;"></div>
+            <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:11px;color:#6b7280;">
+                    @if($activeOrder && $activeOrder->status === 'out_for_delivery')
+                        🟡 Restaurant → 🏠 Customer
+                    @elseif($activeOrder && $activeOrder->status === 'rider_assigned')
+                        🟡 Restaurant
+                    @else
+                        📍 Your Location
+                    @endif
+                </span>
+                <span id="riderDistText" style="font-size:11px;font-weight:700;color:#a78bfa;"></span>
+            </div>
+        </div>
 
-            @if($order->status === 'rider_assigned' && !$loop->first)
-                <p class="section-label" style="margin-top:20px;">🟡 Assigned — Head to Restaurant</p>
-            @elseif($order->status === 'rider_assigned' && $loop->first)
+        @foreach($active as $order)
+            @if($loop->first && $order->status === 'rider_assigned')
                 <p class="section-label" style="margin-top:0;">🟡 Assigned — Head to Restaurant</p>
+            @elseif($order->status === 'rider_assigned')
+                <p class="section-label" style="margin-top:20px;">🟡 Assigned — Head to Restaurant</p>
+            @elseif($loop->first && $order->status === 'out_for_delivery')
+                <!-- no label, map already has it -->
             @endif
 
             <div class="order-card {{ $order->status === 'out_for_delivery' ? 'active-order' : '' }}">
@@ -895,9 +912,24 @@ function dismissSuccess() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const RESTAURANT_R = [13.3213129, 121.3027265];
-const CUSTOMER_R   = [13.3265, 121.3085];
-let myPos          = [13.3235, 121.3050];
+<?php
+// Get restaurant coordinates (fixed for now, can make dynamic later)
+$restaurantPos = [13.3213129, 121.3027265];
+// Get rider's current position from database
+$riderPos = [$rider->current_lat ?? 13.3235, $rider->current_lng ?? 121.3050];
+// Get active order (if any)
+$activeOrder = $active->firstWhere('status', 'out_for_delivery') ?? $active->first();
+$customerPos = null;
+$customerName = null;
+if ($activeOrder && $activeOrder->delivery_lat && $activeOrder->delivery_lng) {
+    $customerPos = [$activeOrder->delivery_lat, $activeOrder->delivery_lng];
+    $customerName = $activeOrder->user->name;
+}
+?>
+const RESTAURANT_R = [<?= $restaurantPos[0] ?>, <?= $restaurantPos[1] ?>];
+const CUSTOMER_R   = <?= $customerPos ? json_encode($customerPos) : 'null' ?>;
+const CUSTOMER_NAME = <?= $customerName ? json_encode($customerName) : 'null' ?>;
+let myPos          = [<?= $riderPos[0] ?>, <?= $riderPos[1] ?>];
 let myMarker       = null;
 let riderRouteL    = null;
 let riderMapL      = null;
@@ -935,32 +967,46 @@ async function initRiderMap() {
         opacity: 0.85,
     }).addTo(riderMapL);
 
+    // Add restaurant marker
     L.marker(RESTAURANT_R, { icon: L.divIcon({
         html: `<div style="background:#facc15;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F354;</span></div>`,
         className:'', iconSize:[38,38], iconAnchor:[19,38],
     })}).addTo(riderMapL).bindPopup('<b>EUT Restaurant</b>');
 
-    L.marker(CUSTOMER_R, { icon: L.divIcon({
-        html: `<div style="background:#ef4444;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #b91c1c;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F3E0;</span></div>`,
-        className:'', iconSize:[38,38], iconAnchor:[19,38],
-    })}).addTo(riderMapL).bindPopup('<b>Andrea Macaraeg</b><br>123 Sampaguita St.');
+    let customerMarker = null;
 
+    // Add customer marker only if we have an active order
+    if (CUSTOMER_R) {
+        customerMarker = L.marker(CUSTOMER_R, { icon: L.divIcon({
+            html: `<div style="background:#ef4444;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #b91c1c;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F3E0;</span></div>`,
+            className:'', iconSize:[38,38], iconAnchor:[19,38],
+        })}).addTo(riderMapL).bindPopup(`<b>${CUSTOMER_NAME ?? 'Customer'}</b>`);
+    }
+
+    // Add rider marker
     myMarker = L.marker(myPos, { icon: L.divIcon({
         html: `<div style="background:#8b5cf6;width:46px;height:46px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 14px rgba(139,92,246,0.7);">&#x1F6F5;</div>`,
         className:'', iconSize:[46,46], iconAnchor:[23,23],
     })}).addTo(riderMapL).bindPopup('<b>You (Rider)</b>');
 
-    riderMapL.fitBounds([RESTAURANT_R, CUSTOMER_R, myPos], { padding:[44,44] });
+    // Fit bounds depending on whether we have a customer or not
+    if (CUSTOMER_R) {
+        riderMapL.fitBounds([RESTAURANT_R, CUSTOMER_R, myPos], { padding:[44,44] });
 
-    const seg1 = await fetchOSRMRoute(RESTAURANT_R, myPos);
-    const seg2 = await fetchOSRMRoute(myPos, CUSTOMER_R);
+        // Fetch route
+        const seg1 = await fetchOSRMRoute(RESTAURANT_R, myPos);
+        const seg2 = await fetchOSRMRoute(myPos, CUSTOMER_R);
 
-    if (seg1 && seg2) {
-        roadPoints = [...seg1, ...seg2];
-        riderRouteL = L.polyline(roadPoints, { color:'#8b5cf6', weight:5, opacity:1 }).addTo(riderMapL);
-        riderMapL.fitBounds(riderRouteL.getBounds(), { padding:[40,40] });
+        if (seg1 && seg2) {
+            roadPoints = [...seg1, ...seg2];
+            riderRouteL = L.polyline(roadPoints, { color:'#8b5cf6', weight:5, opacity:1 }).addTo(riderMapL);
+            riderMapL.fitBounds(riderRouteL.getBounds(), { padding:[40,40] });
+        } else {
+            riderRouteL = L.polyline([RESTAURANT_R, myPos, CUSTOMER_R], { color:'#8b5cf6', weight:3, opacity:0.7, dashArray:'8 5' }).addTo(riderMapL);
+        }
     } else {
-        riderRouteL = L.polyline([RESTAURANT_R, myPos, CUSTOMER_R], { color:'#8b5cf6', weight:3, opacity:0.7, dashArray:'8 5' }).addTo(riderMapL);
+        // No active order: just fit to restaurant and rider
+        riderMapL.fitBounds([RESTAURANT_R, myPos], { padding:[44,44] });
     }
 
     if (navigator.geolocation) {
@@ -969,14 +1015,16 @@ async function initRiderMap() {
                 myPos = [pos.coords.latitude, pos.coords.longitude];
                 myMarker.setLatLng(myPos);
                 riderMapL.panTo(myPos);
-                const fresh = await fetchOSRMRoute(myPos, CUSTOMER_R);
-                if (fresh && riderRouteL) riderRouteL.setLatLngs(fresh);
+                if (CUSTOMER_R && riderRouteL) {
+                    const fresh = await fetchOSRMRoute(myPos, CUSTOMER_R);
+                    if (fresh) riderRouteL.setLatLngs(fresh);
+                }
                 updateRiderDist();
             },
-            () => simulateRiderPos(),
+            () => {}, // Don't simulate if we can't get GPS
             { enableHighAccuracy: true, maximumAge: 5000 }
         );
-    } else { simulateRiderPos(); }
+    }
 }
 
 function simulateRiderPos() {
@@ -1006,9 +1054,13 @@ function simulateRiderPos() {
 function updateRiderDist() {
     const el = document.getElementById('riderDistText');
     if (!el) return;
-    const d = Math.sqrt(Math.pow(CUSTOMER_R[0]-myPos[0],2)+Math.pow(CUSTOMER_R[1]-myPos[1],2));
-    const dist = Math.round(d * 111000);
-    el.textContent = dist > 30 ? `~${dist}m to customer` : 'Almost there!';
+    if (CUSTOMER_R) {
+        const d = Math.sqrt(Math.pow(CUSTOMER_R[0]-myPos[0],2)+Math.pow(CUSTOMER_R[1]-myPos[1],2));
+        const dist = Math.round(d * 111000);
+        el.textContent = dist > 30 ? `~${dist}m to customer` : 'Almost there!';
+    } else {
+        el.textContent = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initRiderMap);
