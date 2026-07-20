@@ -16,7 +16,7 @@ class OrderController extends Controller
         $request->validate([
             'items'            => 'required|array|min:1',
             'items.*.id'       => 'required',
-            'items.*.qty'      => 'required|integer|min:1',
+            'items.*.qty'      => 'required|integer|min:1|max:99',
             'items.*.modifiers'=> 'nullable|array',
             'delivery_address' => 'required|string|max:255',
             'delivery_barangay'=> 'nullable|string|max:100',
@@ -26,40 +26,57 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            $subtotal = 0;
+            $subtotal  = 0;
             $lineItems = [];
 
             foreach ($request->items as $line) {
-                // Cart ID may be composite like "5_12-14" — extract the base menu item ID
+                // Cart IDs may be composite like "5_12-14" — extract the base menu item ID
                 $menuItemId = (int) explode('_', $line['id'])[0];
-                $menuItem = MenuItem::findOrFail($menuItemId);
-                $qty      = (int) $line['qty'];
-                $price    = $menuItem->price;
+                $menuItem   = MenuItem::findOrFail($menuItemId);
+                $qty        = (int) $line['qty'];
+                $price      = (float) $menuItem->price;
 
-                // Add modifier price adjustments
+                // Build a clean, normalised modifiers snapshot
                 $modifierSummary = [];
-                if (!empty($line['modifiers'])) {
+                if (!empty($line['modifiers']) && is_array($line['modifiers'])) {
                     foreach ($line['modifiers'] as $mod) {
-                        $price += (float) ($mod['price_adjustment'] ?? 0);
-                        $modifierSummary[] = $mod;
+                        $adj  = (float) ($mod['price_adjustment'] ?? 0);
+                        $type = $mod['price_type'] ?? 'none';
+
+                        // Only 'add' type adjusts the running price
+                        if ($type === 'add') {
+                            $price += $adj;
+                        } elseif ($type === 'replace' && $adj > 0) {
+                            $price = $adj;
+                        }
+
+                        $modifierSummary[] = [
+                            'type'             => $mod['type']             ?? 'modifier',
+                            'name'             => $mod['name']             ?? '',
+                            'price_type'       => $type,
+                            'price_adjustment' => $adj,
+                        ];
                     }
                 }
 
-                $lineSub  = $price * $qty;
-                $subtotal += $lineSub;
+                $price    = round($price, 2);
+                $lineSub  = round($price * $qty, 2);
+                $subtotal = round($subtotal + $lineSub, 2);
 
                 $lineItems[] = [
                     'menu_item_id' => $menuItemId,
                     'item_name'    => $menuItem->name,
+                    'image'        => $menuItem->image,   // snapshot the image path
                     'unit_price'   => $price,
                     'quantity'     => $qty,
                     'subtotal'     => $lineSub,
-                    'modifiers'    => $modifierSummary ?: null,
+                    'modifiers'    => !empty($modifierSummary) ? $modifierSummary : null,
                 ];
             }
 
-            $deliveryFee = 50;
-            $total       = $subtotal + $deliveryFee;
+            // Delivery fee: free if subtotal ≥ ₱500, otherwise ₱50
+            $deliveryFee = $subtotal >= 500 ? 0 : 50;
+            $total       = round($subtotal + $deliveryFee, 2);
 
             $order = Order::create([
                 'user_id'          => auth()->id(),
@@ -88,6 +105,7 @@ class OrderController extends Controller
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
+            \Log::error('Order store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'Order failed. Please try again.'], 500);
         }
     }
@@ -122,10 +140,12 @@ class OrderController extends Controller
                 'lng'     => $order->rider->current_lng,
             ] : null,
             'items' => $order->items->map(fn($i) => [
-                'name'     => $i->item_name,
-                'qty'      => $i->quantity,
-                'price'    => $i->unit_price,
-                'subtotal' => $i->subtotal,
+                'name'      => $i->item_name,
+                'qty'       => $i->quantity,
+                'price'     => $i->unit_price,
+                'subtotal'  => $i->subtotal,
+                'image'     => $i->image ? asset($i->image) : asset('images/hero-burger.jpg'),
+                'modifiers' => $i->modifiers ?? [],
             ]),
         ]);
     }
@@ -184,14 +204,16 @@ class OrderController extends Controller
                     'lat'     => $order->rider->current_lat,
                     'lng'     => $order->rider->current_lng,
                 ] : null,
-                'items' => $order->items->map(fn($i) => [
-                    'name'      => $i->item_name,
-                    'qty'       => $i->quantity,
-                    'price'     => $i->unit_price,
-                    'subtotal'  => $i->subtotal,
-                    'image'     => '/images/hero-burger.jpg', // fallback — ideally store in order_items
-                    'modifiers' => $i->modifiers ?? [],
-                ]),
+                'items' => $order->items->map(function($i) {
+                    return [
+                        'name'      => $i->item_name,
+                        'qty'       => $i->quantity,
+                        'price'     => $i->unit_price,
+                        'subtotal'  => $i->subtotal,
+                        'image'     => $i->image ? asset($i->image) : asset('images/hero-burger.jpg'),
+                        'modifiers' => $i->modifiers ?? [],
+                    ];
+                }),
             ];
 
             if ($order->status === 'cancelled') {

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $item['name'] }} - EUT Restaurant</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title><?php echo e($item['name']); ?> - EUT Restaurant</title>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -350,12 +350,12 @@
 <!-- ══════════ NAVBAR ══════════ -->
 <nav class="topnav">
     <div class="topnav-inner">
-        <a href="{{ route('shop.home') }}" class="back-btn">
+        <a href="<?php echo e(route('shop.home')); ?>" class="back-btn">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
-        <span class="nav-title">{{ $item['name'] }}</span>
+        <span class="nav-title"><?php echo e($item['name']); ?></span>
         <button id="shopThemeToggle" class="nav-cart-btn" style="color:#9ca3af;">
             <svg id="shopSunIcon" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" style="color:#facc15;display:none;">
                 <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -364,7 +364,7 @@
                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
             </svg>
         </button>
-        <a href="{{ route('shop.cart') }}" class="nav-cart-btn">
+        <a href="<?php echo e(route('shop.cart')); ?>" class="nav-cart-btn">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -378,32 +378,32 @@
 
     <!-- Hero image -->
     <div class="product-hero">
-        <img src="{{ $item['image'] ? asset($item['image']) : 'https://placehold.co/800x500/1a1a2e/facc15?text=' . urlencode($item['name']) }}" alt="{{ $item['name'] }}" class="product-hero-img">
+        <img src="<?php echo e($item['image'] ? asset($item['image']) : 'https://placehold.co/800x500/1a1a2e/facc15?text=' . urlencode($item['name'])); ?>" alt="<?php echo e($item['name']); ?>" class="product-hero-img">
         <div class="product-hero-overlay"></div>
-        @if(!empty($item['featured']))
+        <?php if(!empty($item['featured'])): ?>
             <span class="hero-badge-hot">🔥 Hot Item</span>
-        @endif
+        <?php endif; ?>
         <span class="hero-badge-rating">
             <svg width="11" height="11" fill="#facc15" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.538-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-            4.9 · {{ rand(120,4800) }} reviews
+            4.9 · <?php echo e(rand(120,4800)); ?> reviews
         </span>
     </div>
 
     <!-- Info section -->
     <div class="info-section">
-        <p class="info-category">{{ ucfirst($item['category']['name'] ?? 'Food') }}</p>
-        <h1 class="info-name">{{ $item['name'] }}</h1>
+        <p class="info-category"><?php echo e(ucfirst($item['category']['name'] ?? 'Food')); ?></p>
+        <h1 class="info-name"><?php echo e($item['name']); ?></h1>
         <div class="info-meta">
             <span class="info-rating">
                 <svg width="12" height="12" fill="#facc15" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.538-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 4.9
             </span>
-            <span class="info-reviews">{{ rand(120,4800) }} reviews</span>
-            <span class="info-sold">{{ rand(500,9999) }}+ sold</span>
+            <span class="info-reviews"><?php echo e(rand(120,4800)); ?> reviews</span>
+            <span class="info-sold"><?php echo e(rand(500,9999)); ?>+ sold</span>
         </div>
-        <p class="info-desc">{{ $item['description'] }}</p>
+        <p class="info-desc"><?php echo e($item['description']); ?></p>
         <div class="info-price-row">
-            <span class="info-price">₱{{ number_format($item['price'], 0) }}</span>
+            <span class="info-price">₱<?php echo e(number_format($item['price'], 0)); ?></span>
             <span class="info-price-note">base price</span>
         </div>
         <div class="info-stock">
@@ -417,17 +417,17 @@
     <!-- Description card -->
     <div class="desc-card">
         <p class="desc-card-title">About this item</p>
-        <p class="desc-card-text">{{ $item['description'] }}</p>
-        @if(!empty($item['ingredients']))
+        <p class="desc-card-text"><?php echo e($item['description']); ?></p>
+        <?php if(!empty($item['ingredients'])): ?>
         <div style="margin-top:12px;">
             <p style="font-size:11px; font-weight:700; color:#6b7280; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Ingredients</p>
             <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                @foreach($item['ingredients'] as $ing)
-                <span style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#9ca3af; padding:4px 10px; border-radius:99px; font-size:11px;">{{ $ing }}</span>
-                @endforeach
+                <?php $__currentLoopData = $item['ingredients']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ing): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <span style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#9ca3af; padding:4px 10px; border-radius:99px; font-size:11px;"><?php echo e($ing); ?></span>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 
     <!-- Nutrition info card -->
@@ -470,11 +470,11 @@
 
     <!-- Sheet header -->
     <div class="sheet-header">
-        <img src="{{ $item['image'] ? asset($item['image']) : 'https://placehold.co/120x120/1a1a2e/facc15?text=' . urlencode($item['name']) }}" alt="{{ $item['name'] }}" class="sheet-thumb">
+        <img src="<?php echo e($item['image'] ? asset($item['image']) : 'https://placehold.co/120x120/1a1a2e/facc15?text=' . urlencode($item['name'])); ?>" alt="<?php echo e($item['name']); ?>" class="sheet-thumb">
         <div style="flex:1; min-width:0;">
-            <p class="sheet-item-name">{{ $item['name'] }}</p>
+            <p class="sheet-item-name"><?php echo e($item['name']); ?></p>
             <div class="sheet-item-price-row">
-                <span class="sheet-price" id="sheetPrice">₱{{ number_format($item['price'], 0) }}</span>
+                <span class="sheet-price" id="sheetPrice">₱<?php echo e(number_format($item['price'], 0)); ?></span>
                 <span class="sheet-price-note">· <span id="sheetQtyLabel">1</span> serving</span>
             </div>
             <div style="display:flex; align-items:center; gap:4px; margin-top:3px;">
@@ -527,7 +527,7 @@
     <div class="sheet-divider"></div>
     <div class="sheet-total-row">
         <span class="sheet-total-label">Total</span>
-        <span class="sheet-total-val" id="sheetTotal">₱{{ number_format($item['price'], 0) }}</span>
+        <span class="sheet-total-val" id="sheetTotal">₱<?php echo e(number_format($item['price'], 0)); ?></span>
     </div>
 
     <!-- Action buttons -->
@@ -540,19 +540,19 @@
 <!-- ══════════ BOTTOM NAV ══════════ -->
 <nav class="bottom-nav">
     <div class="bottom-nav-inner">
-        <a href="{{ route('shop.home') }}" class="bnav-item">
+        <a href="<?php echo e(route('shop.home')); ?>" class="bnav-item">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
             Menu
         </a>
-        <a href="{{ route('shop.tracking') }}" class="bnav-item">
+        <a href="<?php echo e(route('shop.tracking')); ?>" class="bnav-item">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             Orders
         </a>
-        <a href="{{ route('shop.cart') }}" class="bnav-item">
+        <a href="<?php echo e(route('shop.cart')); ?>" class="bnav-item">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             Cart
         </a>
-        <a href="{{ route('shop.profile') }}" class="bnav-item">
+        <a href="<?php echo e(route('shop.profile')); ?>" class="bnav-item">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             Profile
         </a>
@@ -589,17 +589,17 @@ function updateCartBadge() {
     el.style.display = total > 0 ? 'flex' : 'none';
 }
 
-const BASE_PRICE = {{ $item['price'] }};
-const ITEM_ID    = {{ $item['id'] }};
-const ITEM_NAME  = @json($item['name']);
-const ITEM_IMAGE = @json($item['image']);
-const ITEM_CAT   = @json($item['category']['slug'] ?? 'food');
+const BASE_PRICE = <?php echo e($item['price']); ?>;
+const ITEM_ID    = <?php echo e($item['id']); ?>;
+const ITEM_NAME  = <?php echo json_encode($item['name'], 15, 512) ?>;
+const ITEM_IMAGE = <?php echo json_encode($item['image'], 15, 512) ?>;
+const ITEM_CAT   = <?php echo json_encode($item['category']['slug'] ?? 'food', 15, 512) ?>;
 
 // ── Modifier groups from DB ──────────────────────────────
-const MODIFIER_GROUPS = @json($item['modifier_groups'] ?? []);
+const MODIFIER_GROUPS = <?php echo json_encode($item['modifier_groups'] ?? [], 15, 512) ?>;
 
 // ── Add-on groups from DB ─────────────────────────────────
-const ADDON_GROUPS = @json($item['addon_groups'] ?? []);
+const ADDON_GROUPS = <?php echo json_encode($item['addon_groups'] ?? [], 15, 512) ?>;
 
 let sheetMode       = 'cart';
 let selectedOptions = {}; // group_id → option object OR array (multi-select)
@@ -1047,7 +1047,7 @@ function doAdd(goToCart) {
     localStorage.setItem('eutCart', JSON.stringify(cart));
     updateCartBadge();
     closeSheet();
-    if (goToCart) window.location.href = '{{ route("shop.checkout") }}';
+    if (goToCart) window.location.href = '<?php echo e(route("shop.checkout")); ?>';
     else showToast('Added to cart! 🛒');
 }
 
@@ -1106,3 +1106,4 @@ function showToast(msg) {
 </style>
 </body>
 </html>
+<?php /**PATH C:\Users\patri\Desktop\EUT_WEB\resources\views/shop/product.blade.php ENDPATH**/ ?>

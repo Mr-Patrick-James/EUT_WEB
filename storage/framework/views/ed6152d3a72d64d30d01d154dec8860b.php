@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - EUT Restaurant</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif;}
@@ -151,7 +151,7 @@
 <!-- NAVBAR -->
 <nav class="topnav">
     <div class="topnav-inner">
-        <a href="{{ route('shop.cart') }}" class="back-btn">
+        <a href="<?php echo e(route('shop.cart')); ?>" class="back-btn">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
         </a>
         <span class="topnav-title">Checkout</span>
@@ -177,14 +177,14 @@
                     <svg width="15" height="15" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
                 <span class="card-title">Delivery Address</span>
-                @auth
+                <?php if(auth()->guard()->check()): ?>
                 <button type="button" onclick="openAddressPicker()" style="font-size:11px;font-weight:700;color:#facc15;background:none;border:none;cursor:pointer;padding:0;">
                     Change
                 </button>
-                @endauth
+                <?php endif; ?>
             </div>
 
-            @auth
+            <?php if(auth()->guard()->check()): ?>
             <!-- Selected address display (filled by JS) -->
             <div id="addrSelectedWrap">
                 <div class="addr-selected" onclick="openAddressPicker()">
@@ -197,14 +197,14 @@
                     <svg class="addr-chevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>
             </div>
-            @endauth
+            <?php endif; ?>
 
-            @guest
+            <?php if(auth()->guard()->guest()): ?>
             <div class="addr-empty">
                 <p class="addr-empty-txt">Log in to use saved addresses</p>
-                <a href="{{ route('restaurant') }}" class="btn-add-addr">Log in</a>
+                <a href="<?php echo e(route('restaurant')); ?>" class="btn-add-addr">Log in</a>
             </div>
-            @endguest
+            <?php endif; ?>
         </div>
 
         <!-- Payment Method -->
@@ -280,12 +280,12 @@
                 </div>
             </div>
 
-            @guest
-            <div class="guest-notice">⚠️ Please <a href="{{ route('restaurant') }}">log in</a> to place your order.</div>
-            @endguest
-            @auth
+            <?php if(auth()->guard()->guest()): ?>
+            <div class="guest-notice">⚠️ Please <a href="<?php echo e(route('restaurant')); ?>">log in</a> to place your order.</div>
+            <?php endif; ?>
+            <?php if(auth()->guard()->check()): ?>
             <button type="submit" class="place-btn" id="placeOrderBtn">🛒 Place Order</button>
-            @endauth
+            <?php endif; ?>
         </div>
       </div><!-- /right -->
 
@@ -296,10 +296,10 @@
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
     <div class="bottom-nav-inner">
-        <a href="{{ route('shop.home') }}" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>Menu</a>
-        <a href="{{ route('shop.tracking') }}" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Orders</a>
-        <a href="{{ route('shop.cart') }}" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Cart</a>
-        <a href="{{ route('shop.profile') }}" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>Profile</a>
+        <a href="<?php echo e(route('shop.home')); ?>" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>Menu</a>
+        <a href="<?php echo e(route('shop.tracking')); ?>" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Orders</a>
+        <a href="<?php echo e(route('shop.cart')); ?>" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Cart</a>
+        <a href="<?php echo e(route('shop.profile')); ?>" class="bnav-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>Profile</a>
     </div>
 </nav>
 
@@ -389,11 +389,11 @@ document.addEventListener('DOMContentLoaded',()=>{
         localStorage.setItem('eutTheme',t);applyTheme(t);
     });
     renderSummary();
-    @auth loadAddresses(); @endauth
+    <?php if(auth()->guard()->check()): ?> loadAddresses(); <?php endif; ?>
 });
 
 /* ── Helpers ── */
-const CSRF = '{{ csrf_token() }}';
+const CSRF = '<?php echo e(csrf_token()); ?>';
 const FREE_MIN = 500;
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function modChips(mods){
@@ -418,7 +418,7 @@ function renderSummary(){
     cart.forEach(item=>{
         const row=document.createElement('div');
         row.className='sum-item';
-        row.innerHTML=`<img src="${esc(item.image||'')}" class="sum-img" alt="${esc(item.name)}" onerror="this.src='{{ asset('images/hero-burger.jpg') }}'">
+        row.innerHTML=`<img src="${esc(item.image||'')}" class="sum-img" alt="${esc(item.name)}" onerror="this.src='<?php echo e(asset('images/hero-burger.jpg')); ?>'">
             <div style="flex:1;min-width:0;"><p class="sum-name">${esc(item.name)}</p><p class="sum-meta">× ${item.quantity} · ₱${Number(item.price).toLocaleString()} each</p>${modChips(item.modifiers)}</div>
             <span class="sum-price">₱${(item.price*item.quantity).toLocaleString()}</span>`;
         el.appendChild(row);sub+=item.price*item.quantity;
@@ -546,7 +546,7 @@ function openAddForm(){
     editingAddressId=null;
     document.getElementById('formTitle').textContent='Add Address';
     document.getElementById('editAddrId').value='';
-    document.getElementById('fName').value='{{ auth()->user()?->name ?? "" }}';
+    document.getElementById('fName').value='<?php echo e(auth()->user()?->name ?? ""); ?>';
     document.getElementById('fPhone').value='';
     document.getElementById('fAddress').value='';
     document.getElementById('fBarangay').value='';
@@ -621,7 +621,7 @@ async function saveAddress(){
 /* ── Place Order ── */
 document.getElementById('checkoutForm').addEventListener('submit',async function(e){
     e.preventDefault();
-    @guest alert('Please log in to place an order.');return; @endguest
+    <?php if(auth()->guard()->guest()): ?> alert('Please log in to place an order.');return; <?php endif; ?>
 
     const cart=JSON.parse(localStorage.getItem('eutCart')||'[]');
     if(!cart.length){alert('Your cart is empty.');return;}
@@ -643,16 +643,17 @@ document.getElementById('checkoutForm').addEventListener('submit',async function
     }));
 
     try{
-        const r=await fetch('{{ route("orders.store") }}',{
+        const r=await fetch('<?php echo e(route("orders.store")); ?>',{
             method:'POST',
             headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF,'Accept':'application/json'},
             body:JSON.stringify({items,delivery_address:deliveryAddress,delivery_barangay:addr.barangay||addr.city||'',payment_method:payment,notes}),
         });
         const d=await r.json();
-        if(d.success){localStorage.setItem('eutCart',JSON.stringify([]));window.location.href='{{ route("shop.tracking") }}';}
+        if(d.success){localStorage.setItem('eutCart',JSON.stringify([]));window.location.href='<?php echo e(route("shop.tracking")); ?>';}
         else{alert(d.message||'Order failed.');btn.disabled=false;btn.textContent='🛒 Place Order';}
     }catch(err){console.error(err);alert('Network error.');btn.disabled=false;btn.textContent='🛒 Place Order';}
 });
 </script>
 </body>
 </html>
+<?php /**PATH C:\Users\patri\Desktop\EUT_WEB\resources\views/shop/checkout.blade.php ENDPATH**/ ?>

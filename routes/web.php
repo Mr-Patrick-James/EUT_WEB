@@ -65,6 +65,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders',                   [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}',           [\App\Http\Controllers\OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel',   [\App\Http\Controllers\OrderController::class, 'cancel'])->name('orders.cancel');
+
+    // Saved addresses
+    Route::get   ('/addresses',                      [\App\Http\Controllers\AddressController::class, 'index'])->name('addresses.index');
+    Route::post  ('/addresses',                      [\App\Http\Controllers\AddressController::class, 'store'])->name('addresses.store');
+    Route::put   ('/addresses/{address}',            [\App\Http\Controllers\AddressController::class, 'update'])->name('addresses.update');
+    Route::patch ('/addresses/{address}/default',    [\App\Http\Controllers\AddressController::class, 'setDefault'])->name('addresses.default');
+    Route::delete('/addresses/{address}',            [\App\Http\Controllers\AddressController::class, 'destroy'])->name('addresses.destroy');
 });
 
 Route::post('/auth/login',  [AuthController::class, 'login'])->name('auth.login');

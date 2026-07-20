@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Rider::class);
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(\App\Models\UserAddress::class)->orderByDesc('is_default')->orderBy('created_at');
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(\App\Models\UserAddress::class)->where('is_default', true);
+    }
 }

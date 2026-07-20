@@ -71,10 +71,10 @@ body{background:#080810;color:#fff;min-height:100vh;}
 .pcard-id{font-size:13px;font-weight:700;color:#fff;}
 .pcard-date{font-size:11px;color:#4b5563;margin-top:3px;}
 .pcard-items{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);}
-.pcard-item-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.pcard-item-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
 .pcard-item-row:last-child{margin-bottom:0;}
-.pcard-item-img{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;}
-.pcard-item-name{font-size:12px;color:#d1d5db;font-weight:500;flex:1;}
+.pcard-item-img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;margin-top:1px;}
+.pcard-item-name{font-size:12px;color:#d1d5db;font-weight:500;flex:1;line-height:1.4;}
 .pcard-item-price{font-size:12px;font-weight:700;color:#9ca3af;}
 .pcard-footer{padding:12px 18px;display:flex;justify-content:space-between;align-items:center;}
 .pcard-total{font-size:16px;font-weight:800;color:#facc15;}
@@ -426,17 +426,22 @@ function modifierTagsHtml(modifiers) {
         addon:    { bg:'rgba(245,158,11,.12)',  color:'#d97706', icon:'➕' },
     };
     const tags = modifiers
-        .filter(m => !/^no\s/i.test(m.name))
+        .filter(m => m && m.name && !/^no\s/i.test(m.name))
         .map(m => {
             const tc  = typeColors[m.type] || typeColors.modifier;
             const adj = parseFloat(m.price_adjustment || 0);
             const extra = (m.price_type === 'add' && adj > 0)
                 ? ` <span style="color:#4ade80;font-size:.6rem;">+₱${adj.toLocaleString()}</span>`
                 : '';
-            return `<span style="display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .55rem;border-radius:99px;font-size:.68rem;font-weight:600;background:${tc.bg};color:${tc.color};border:1px solid ${tc.color}30;">${tc.icon} ${m.name}${extra}</span>`;
+            return `<span style="display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .55rem;border-radius:99px;font-size:.68rem;font-weight:600;background:${tc.bg};color:${tc.color};border:1px solid ${tc.color}30;white-space:nowrap;">${tc.icon} ${escHtml(m.name)}${extra}</span>`;
         });
     if (!tags.length) return '';
     return `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${tags.join('')}</div>`;
+}
+
+/* Safe HTML escape for user-supplied strings */
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ── Render Active Orders ── */
@@ -493,9 +498,10 @@ function buildActiveCard(o) {
 
     const itemsHtml = o.items.map(item => `
         <div class="item-row">
-            <img src="${item.image}" class="item-img" alt="${item.name}">
+            <img src="${item.image}" class="item-img" alt="${escHtml(item.name)}"
+                 onerror="this.src='<?php echo e(asset('images/hero-burger.jpg')); ?>'">
             <div style="flex:1;min-width:0;">
-                <p class="item-name">${item.name}</p>
+                <p class="item-name">${escHtml(item.name)}</p>
                 <p class="item-qty">Qty: ${item.qty}</p>
                 ${modifierTagsHtml(item.modifiers)}
             </div>
@@ -616,15 +622,22 @@ function renderPastOrders(orders) {
             </div>
             <div class="pcard-items">
                 ${o.items.map(i => `
-                <div class="pcard-item-row">
-                    <img src="${i.image}" class="pcard-item-img" alt="${i.name}">
-                    <span class="pcard-item-name">${i.name} × ${i.qty}</span>
-                    <span class="pcard-item-price">₱${Number(i.subtotal).toLocaleString()}</span>
+                <div class="pcard-item-row" style="align-items:flex-start;">
+                    <img src="${i.image}" class="pcard-item-img" alt="${escHtml(i.name)}"
+                         onerror="this.src='<?php echo e(asset('images/hero-burger.jpg')); ?>'">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                            <span class="pcard-item-name">${escHtml(i.name)} × ${i.qty}</span>
+                            <span class="pcard-item-price" style="flex-shrink:0;">₱${Number(i.subtotal).toLocaleString()}</span>
+                        </div>
+                        ${modifierTagsHtml(i.modifiers)}
+                    </div>
                 </div>`).join('')}
             </div>
             <div class="pcard-footer">
                 <div>
-                    <p class="pcard-total-label">Total paid</p>
+                    <p class="pcard-total-label">Subtotal</p>
+                    <p style="font-size:12px;color:#9ca3af;margin-bottom:2px;">+₱${Number(o.delivery_fee).toLocaleString()} delivery</p>
                     <p class="pcard-total">₱${Number(o.total).toLocaleString()}</p>
                 </div>
                 <a href="<?php echo e(route('shop.home')); ?>" class="btn-reorder">🔁 Reorder</a>
@@ -647,12 +660,19 @@ function renderCancelledOrders(orders) {
                 </div>
                 <p class="pcard-date">${o.placed_at}</p>
             </div>
-            <div class="pcard-items" style="opacity:.5;">
+            <div class="pcard-items" style="opacity:.6;">
                 ${o.items.map(i => `
-                <div class="pcard-item-row">
-                    <img src="${i.image}" class="pcard-item-img" alt="${i.name}" style="filter:grayscale(1);">
-                    <span class="pcard-item-name" style="text-decoration:line-through;color:#4b5563;">${i.name} × ${i.qty}</span>
-                    <span class="pcard-item-price" style="color:#4b5563;text-decoration:line-through;">₱${Number(i.subtotal).toLocaleString()}</span>
+                <div class="pcard-item-row" style="align-items:flex-start;">
+                    <img src="${i.image}" class="pcard-item-img" alt="${escHtml(i.name)}"
+                         style="filter:grayscale(1);"
+                         onerror="this.src='<?php echo e(asset('images/hero-burger.jpg')); ?>'">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                            <span class="pcard-item-name" style="text-decoration:line-through;color:#4b5563;">${escHtml(i.name)} × ${i.qty}</span>
+                            <span class="pcard-item-price" style="flex-shrink:0;color:#4b5563;text-decoration:line-through;">₱${Number(i.subtotal).toLocaleString()}</span>
+                        </div>
+                        ${modifierTagsHtml(i.modifiers)}
+                    </div>
                 </div>`).join('')}
             </div>
             ${o.cancel_reason ? `
@@ -660,7 +680,7 @@ function renderCancelledOrders(orders) {
                 <span class="cancel-reason-icon">⚠️</span>
                 <div>
                     <p class="cancel-reason-title">Cancellation Reason</p>
-                    <p class="cancel-reason-text">${o.cancel_reason}</p>
+                    <p class="cancel-reason-text">${escHtml(o.cancel_reason)}</p>
                 </div>
             </div>` : ''}
             <div class="pcard-footer">
