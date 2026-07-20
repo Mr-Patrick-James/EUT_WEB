@@ -402,7 +402,7 @@ function switchTab(id) {
     document.getElementById('btnPrevTab').style.display = id==='tabBasic' ? 'none':'inline-flex';
     syncGroupVisibility();
     syncAddonVisibility();
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 // ─────────────────────────────────────────────────────────
@@ -554,7 +554,7 @@ function loadGroup(g) {
 
     (g.options || []).forEach(function(opt){ addOption(gid, opt); });
     syncGroupVisibility();
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function removeGroup(gid) {
@@ -575,7 +575,7 @@ function toggleGroupActive(gid) {
         btn.querySelector('span').textContent = 'Active';
         btn.querySelector('i').setAttribute('data-lucide','check');
     }
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 </script>
@@ -644,7 +644,7 @@ function addAddon(addon) {
 
     container.appendChild(row);
     syncAddonVisibility();
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function toggleAddonAffects(aid) {
@@ -663,7 +663,7 @@ function toggleAddonAffects(aid) {
     adj.style.opacity      = nowYes ? '1'   : '.35';
     adj.style.pointerEvents= nowYes ? 'auto': 'none';
     if(!nowYes) adj.value  = 0;
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function removeAddon(aid) {
@@ -739,7 +739,7 @@ function addOption(gid, opt) {
         '</button>';
 
     container.appendChild(row);
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 /**
@@ -773,7 +773,7 @@ function cyclePriceType(oid) {
 
     adj.disabled      = !map[next].show;
     if(!map[next].show) adj.value = 0;
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function onPriceTypeChange(oid) {

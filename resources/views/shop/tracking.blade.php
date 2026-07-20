@@ -152,7 +152,6 @@ body{background:#080810;color:#fff;min-height:100vh;}
         </div>
         <div class="tabs-bar">
             <button class="tab active" id="tab-all"       onclick="switchTab('all')">All <span id="allDot" class="tab-dot" style="display:none;"></span></button>
-            <button class="tab"        id="tab-active"    onclick="switchTab('active')">Active <span id="activeDot" class="tab-dot" style="display:none;"></span></button>
             <button class="tab"        id="tab-past"      onclick="switchTab('past')">Past</button>
             <button class="tab"        id="tab-cancelled" onclick="switchTab('cancelled')">Cancelled</button>
         </div>
@@ -164,7 +163,6 @@ body{background:#080810;color:#fff;min-height:100vh;}
     <div id="view-all">
         <div class="empty-state"><div class="empty-icon">⏳</div><p class="empty-title">Loading…</p></div>
     </div>
-    <div id="view-active"    style="display:none;"></div>
     <div id="view-past"      style="display:none;"></div>
     <div id="view-cancelled" style="display:none;"></div>
 </div>
@@ -219,7 +217,7 @@ function applyTheme(t){document.documentElement.classList.toggle('light-mode',t=
 let currentTab = 'all';
 function switchTab(tab) {
     currentTab = tab;
-    ['all','active','past','cancelled'].forEach(id => {
+    ['all','past','cancelled'].forEach(id => {
         document.getElementById('view-'+id).style.display = id===tab ? 'block' : 'none';
         document.getElementById('tab-'+id).classList.toggle('active', id===tab);
     });
@@ -298,17 +296,11 @@ function renderAll() {
     const past      = allOrders.filter(o=>o.status==='delivered');
     const cancelled = allOrders.filter(o=>o.status==='cancelled');
 
-    // Tab dots
-    document.getElementById('activeDot').style.display = active.length ? 'inline-block' : 'none';
-    document.getElementById('allDot').style.display    = active.length ? 'inline-block' : 'none';
+    // Tab dot on All tab — blink when there are active orders
+    document.getElementById('allDot').style.display = active.length ? 'inline-block' : 'none';
 
-    // All tab — all orders as cards
-    document.getElementById('view-all').innerHTML = allOrders.length
-        ? allOrders.map(o=>buildOrderCard(o)).join('')
-        : emptyState('📦','No orders yet','Your order history will appear here.',true);
-
-    // Active tab
-    document.getElementById('view-active').innerHTML = active.length
+    // All tab — shows active/in-progress orders only
+    document.getElementById('view-all').innerHTML = active.length
         ? active.map(o=>buildOrderCard(o)).join('')
         : emptyState('⏳','No active orders','Place an order and track it here.',true);
 
@@ -348,6 +340,11 @@ function closeDetail() {
     document.getElementById('detailBackdrop').classList.remove('open');
     document.getElementById('detailSheet').classList.remove('open');
     document.body.style.overflow = '';
+    // Destroy the Leaflet map so it re-initialises fresh on next open
+    if(detailOrderId && activeMaps[detailOrderId]) {
+        try { activeMaps[detailOrderId].map.remove(); } catch(e) {}
+        delete activeMaps[detailOrderId];
+    }
 }
 
 function buildDetailBody(o) {
@@ -508,12 +505,19 @@ async function loadAllOrders() {
         if(detailOrderId) {
             const updated = allOrders.find(x=>x.id===detailOrderId);
             if(updated) {
+                // Destroy old map before wiping innerHTML so initOrderMap can re-init cleanly
+                if(activeMaps[detailOrderId]) {
+                    try { activeMaps[detailOrderId].map.remove(); } catch(e) {}
+                    delete activeMaps[detailOrderId];
+                }
                 document.getElementById('detailBody').innerHTML = buildDetailBody(updated);
                 if(!['delivered','cancelled'].includes(updated.status)) setTimeout(()=>initOrderMap(updated), 200);
             }
         }
-        // Update live rider positions on existing maps
-        (data.active||[]).forEach(o=>{if(o.rider&&o.rider.lat&&o.rider.lng&&activeMaps[o.id])updateMapRiderPos(o.id,o.rider.lat,o.rider.lng);});
+        // Update live rider positions on existing maps (only when sheet is NOT being refreshed above)
+        else {
+            (data.active||[]).forEach(o=>{if(o.rider&&o.rider.lat&&o.rider.lng&&activeMaps[o.id])updateMapRiderPos(o.id,o.rider.lat,o.rider.lng);});
+        }
     } catch(e) {
         console.error(e);
         document.getElementById('view-all').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p class="empty-title">Network error</p><p class="empty-sub">Check your connection and try refreshing.</p></div>`;

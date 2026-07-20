@@ -576,9 +576,27 @@ class AdminController extends Controller
 
     public function updateOrderStatus(Request $request, \App\Models\Order $order)
     {
-        $request->validate(['status' => 'required|in:accepted,preparing,rider_assigned,out_for_delivery,delivered,cancelled']);
-        $order->update(['status' => $request->status]);
-        return back()->with('success', "Order #{$order->order_number} updated.");
+        // Admin can only transition up to out_for_delivery — "delivered" is rider-only
+        $request->validate(['status' => 'required|in:preparing,rider_assigned,out_for_delivery,cancelled']);
+
+        // Prevent downgrading a delivered order
+        if ($order->status === 'delivered') {
+            return back()->with('error', 'Delivered orders cannot be changed. Only the rider can mark an order as delivered.');
+        }
+
+        $data = ['status' => $request->status];
+
+        // Stamp the appropriate timestamp
+        match($request->status) {
+            'accepted'         => $data['accepted_at']  = now(),
+            'out_for_delivery' => $data['picked_up_at'] = now(),
+            'delivered'        => $data['delivered_at'] = now(),
+            'cancelled'        => $data['cancelled_at'] = now(),
+            default            => null,
+        };
+
+        $order->update($data);
+        return back()->with('success', "Order #{$order->order_number} updated to \"{$request->status}\".");
     }
 
     public function riderLocations()

@@ -1,9 +1,9 @@
-@extends('admin.layout')
-@section('title', 'Orders')
 
-@section('content')
+<?php $__env->startSection('title', 'Orders'); ?>
 
-{{-- â”€â”€ PAGE HEADER â”€â”€ --}}
+<?php $__env->startSection('content'); ?>
+
+
 <div class="page-header" style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;">
     <div style="display:flex;align-items:center;gap:.75rem;">
         <div style="width:2.5rem;height:2.5rem;border-radius:.75rem;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;">
@@ -19,8 +19,8 @@
     </button>
 </div>
 
-{{-- â”€â”€ STATUS STAT CARDS â”€â”€ --}}
-@php
+
+<?php
 $statusConfig = [
     'pending'          => ['label'=>'Pending',         'sub'=>'Awaiting confirmation',  'icon'=>'clock',         'color'=>'#f59e0b','bg'=>'rgba(245,158,11,.10)'],
     'preparing'        => ['label'=>'Preparing',       'sub'=>'Being cooked',           'icon'=>'chef-hat',      'color'=>'#3b82f6','bg'=>'rgba(59,130,246,.10)'],
@@ -28,51 +28,51 @@ $statusConfig = [
     'delivered'        => ['label'=>'Delivered',       'sub'=>'Completed orders',       'icon'=>'circle-check',  'color'=>'#10b981','bg'=>'rgba(16,185,129,.10)'],
     'cancelled'        => ['label'=>'Cancelled',       'sub'=>'Cancelled orders',       'icon'=>'circle-x',      'color'=>'#ef4444','bg'=>'rgba(239,68,68,.10)'],
 ];
-@endphp
+?>
 
 <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;">
-    @foreach($statusCounts as $status => $count)
-    @php $sc = $statusConfig[$status]; @endphp
-    <a href="{{ route('admin.orders',['status'=>$status]) }}"
+    <?php $__currentLoopData = $statusCounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status => $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php $sc = $statusConfig[$status]; ?>
+    <a href="<?php echo e(route('admin.orders',['status'=>$status])); ?>"
        class="stat-card"
        style="text-decoration:none;position:relative;overflow:hidden;cursor:pointer;
-              border-color:{{ $sc['color'] }}22;
-              {{ request('status')===$status ? 'border-color:'.$sc['color'].'66;box-shadow:0 0 0 3px '.$sc['color'].'18;' : '' }}">
+              border-color:<?php echo e($sc['color']); ?>22;
+              <?php echo e(request('status')===$status ? 'border-color:'.$sc['color'].'66;box-shadow:0 0 0 3px '.$sc['color'].'18;' : ''); ?>">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;">
-            <div style="width:2.75rem;height:2.75rem;border-radius:.75rem;background:{{ $sc['bg'] }};display:flex;align-items:center;justify-content:center;">
-                <i data-lucide="{{ $sc['icon'] }}" style="width:1.3rem;height:1.3rem;color:{{ $sc['color'] }};stroke-width:2;"></i>
+            <div style="width:2.75rem;height:2.75rem;border-radius:.75rem;background:<?php echo e($sc['bg']); ?>;display:flex;align-items:center;justify-content:center;">
+                <i data-lucide="<?php echo e($sc['icon']); ?>" style="width:1.3rem;height:1.3rem;color:<?php echo e($sc['color']); ?>;stroke-width:2;"></i>
             </div>
-            <span style="font-size:2.25rem;font-weight:900;color:{{ $sc['color'] }};line-height:1;">{{ $count }}</span>
+            <span style="font-size:2.25rem;font-weight:900;color:<?php echo e($sc['color']); ?>;line-height:1;"><?php echo e($count); ?></span>
         </div>
-        <h3 style="font-size:.875rem;font-weight:700;color:var(--text-strong);margin:0 0 .15rem;">{{ $sc['label'] }}</h3>
-        <p style="font-size:.7rem;color:var(--text-muted);margin:0;">{{ $sc['sub'] }}</p>
-        <div style="position:absolute;bottom:-1.5rem;right:-1.5rem;width:5rem;height:5rem;border-radius:50%;background:{{ $sc['bg'] }};filter:blur(18px);pointer-events:none;"></div>
+        <h3 style="font-size:.875rem;font-weight:700;color:var(--text-strong);margin:0 0 .15rem;"><?php echo e($sc['label']); ?></h3>
+        <p style="font-size:.7rem;color:var(--text-muted);margin:0;"><?php echo e($sc['sub']); ?></p>
+        <div style="position:absolute;bottom:-1.5rem;right:-1.5rem;width:5rem;height:5rem;border-radius:50%;background:<?php echo e($sc['bg']); ?>;filter:blur(18px);pointer-events:none;"></div>
     </a>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
 
-{{-- â”€â”€ TABLE CARD â”€â”€ --}}
+
 <div class="section-card">
     <div class="filter-bar" style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:.5rem;">
             <i data-lucide="filter" style="width:.875rem;height:.875rem;color:var(--text-muted);stroke-width:2;"></i>
-            <select onchange="location='{{ route('admin.orders') }}?status='+this.value" class="admin-input" style="max-width:180px;">
-                <option value="" {{ !request('status') ? 'selected':'' }}>All Statuses</option>
-                <option value="pending"          {{ request('status')==='pending'          ? 'selected':'' }}>Pending</option>
-                <option value="accepted"         {{ request('status')==='accepted'         ? 'selected':'' }}>Accepted</option>
-                <option value="preparing"        {{ request('status')==='preparing'        ? 'selected':'' }}>Preparing</option>
-                <option value="rider_assigned"   {{ request('status')==='rider_assigned'   ? 'selected':'' }}>Rider Assigned</option>
-                <option value="out_for_delivery" {{ request('status')==='out_for_delivery' ? 'selected':'' }}>Out for Delivery</option>
-                <option value="delivered"        {{ request('status')==='delivered'        ? 'selected':'' }}>Delivered</option>
-                <option value="cancelled"        {{ request('status')==='cancelled'        ? 'selected':'' }}>Cancelled</option>
+            <select onchange="location='<?php echo e(route('admin.orders')); ?>?status='+this.value" class="admin-input" style="max-width:180px;">
+                <option value="" <?php echo e(!request('status') ? 'selected':''); ?>>All Statuses</option>
+                <option value="pending"          <?php echo e(request('status')==='pending'          ? 'selected':''); ?>>Pending</option>
+                <option value="accepted"         <?php echo e(request('status')==='accepted'         ? 'selected':''); ?>>Accepted</option>
+                <option value="preparing"        <?php echo e(request('status')==='preparing'        ? 'selected':''); ?>>Preparing</option>
+                <option value="rider_assigned"   <?php echo e(request('status')==='rider_assigned'   ? 'selected':''); ?>>Rider Assigned</option>
+                <option value="out_for_delivery" <?php echo e(request('status')==='out_for_delivery' ? 'selected':''); ?>>Out for Delivery</option>
+                <option value="delivered"        <?php echo e(request('status')==='delivered'        ? 'selected':''); ?>>Delivered</option>
+                <option value="cancelled"        <?php echo e(request('status')==='cancelled'        ? 'selected':''); ?>>Cancelled</option>
             </select>
         </div>
-        @if(request('status'))
-            <a href="{{ route('admin.orders') }}" class="btn-ghost" style="display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;">
+        <?php if(request('status')): ?>
+            <a href="<?php echo e(route('admin.orders')); ?>" class="btn-ghost" style="display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;">
                 <i data-lucide="x" style="width:.75rem;height:.75rem;stroke-width:2.5;"></i> Show All
             </a>
-        @endif
-        <span style="margin-left:auto;font-size:.72rem;color:var(--text-muted);">{{ $orders->count() }} order(s)</span>
+        <?php endif; ?>
+        <span style="margin-left:auto;font-size:.72rem;color:var(--text-muted);"><?php echo e($orders->count()); ?> order(s)</span>
     </div>
 
     <table class="admin-table">
@@ -83,8 +83,8 @@ $statusConfig = [
             </tr>
         </thead>
         <tbody>
-            @forelse($orders as $order)
-            @php
+            <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php
                 $s = $order->status;
                 $statusColorMap = [
                     'pending'          => ['bg'=>'rgba(245,158,11,.12)', 'color'=>'#d97706',  'label'=>'Pending'],
@@ -97,67 +97,69 @@ $statusConfig = [
                 ];
                 $sc = $statusColorMap[$s] ?? $statusColorMap['pending'];
                 $customerName = $order->user?->name ?? 'Guest';
-            @endphp
+            ?>
             <tr>
                 <td>
-                    <span style="font-family:monospace;font-weight:700;color:var(--accent);font-size:.875rem;">{{ $order->order_number }}</span>
+                    <span style="font-family:monospace;font-weight:700;color:var(--accent);font-size:.875rem;"><?php echo e($order->order_number); ?></span>
                 </td>
                 <td>
                     <div style="display:flex;align-items:center;gap:.5rem;">
                         <div style="width:1.875rem;height:1.875rem;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:.7rem;flex-shrink:0;">
-                            {{ strtoupper(substr($customerName,0,1)) }}
+                            <?php echo e(strtoupper(substr($customerName,0,1))); ?>
+
                         </div>
                         <div>
-                            <p style="font-weight:600;color:var(--text-strong);font-size:.8rem;margin:0;">{{ $customerName }}</p>
-                            <p style="font-size:.68rem;color:var(--text-muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">{{ $order->delivery_address }}</p>
+                            <p style="font-weight:600;color:var(--text-strong);font-size:.8rem;margin:0;"><?php echo e($customerName); ?></p>
+                            <p style="font-size:.68rem;color:var(--text-muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;"><?php echo e($order->delivery_address); ?></p>
                         </div>
                     </div>
                 </td>
                 <td style="max-width:180px;">
-                    @foreach($order->items->take(2) as $item)
+                    <?php $__currentLoopData = $order->items->take(2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
-                            <span style="font-size:.72rem;font-weight:700;color:var(--accent);background:rgba(250,204,21,.1);border-radius:4px;padding:1px 5px;flex-shrink:0;">x{{ $item->quantity }}</span>
-                            <span style="font-size:.75rem;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;" title="{{ $item->item_name }}">{{ $item->item_name }}</span>
+                            <span style="font-size:.72rem;font-weight:700;color:var(--accent);background:rgba(250,204,21,.1);border-radius:4px;padding:1px 5px;flex-shrink:0;">x<?php echo e($item->quantity); ?></span>
+                            <span style="font-size:.75rem;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;" title="<?php echo e($item->item_name); ?>"><?php echo e($item->item_name); ?></span>
                         </div>
-                    @endforeach
-                    @if($order->items->count() > 2)
-                        <span style="font-size:.68rem;color:var(--text-muted);">+{{ $order->items->count() - 2 }} more</span>
-                    @endif
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php if($order->items->count() > 2): ?>
+                        <span style="font-size:.68rem;color:var(--text-muted);">+<?php echo e($order->items->count() - 2); ?> more</span>
+                    <?php endif; ?>
                 </td>
-                <td style="font-weight:700;color:var(--accent);">&#x20B1;{{ number_format($order->total) }}</td>
+                <td style="font-weight:700;color:var(--accent);">&#x20B1;<?php echo e(number_format($order->total)); ?></td>
                 <td>
-                    <span style="display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .65rem;border-radius:9999px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:{{ $sc['bg'] }};color:{{ $sc['color'] }};">
-                        {{ $sc['label'] }}
+                    <span style="display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .65rem;border-radius:9999px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:<?php echo e($sc['bg']); ?>;color:<?php echo e($sc['color']); ?>;">
+                        <?php echo e($sc['label']); ?>
+
                     </span>
                 </td>
-                <td style="color:var(--text-muted);font-size:.72rem;white-space:nowrap;">{{ $order->created_at->format('M d g:i A') }}</td>
+                <td style="color:var(--text-muted);font-size:.72rem;white-space:nowrap;"><?php echo e($order->created_at->format('M d g:i A')); ?></td>
                 <td>
                     <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
                         <button class="btn-ghost" style="font-size:.72rem;display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .65rem;"
-                                onclick="openManageModal({{ $order->id }})">
+                                onclick="openManageModal(<?php echo e($order->id); ?>)">
                             <i data-lucide="settings-2" style="width:.75rem;height:.75rem;stroke-width:2;"></i> Manage
                         </button>
 
-                        {{-- Quick Accept for pending --}}
-                        @if($s === 'pending')
-                            <form method="POST" action="{{ route('admin.orders.accept', $order) }}" style="display:inline;">
-                                @csrf
+                        
+                        <?php if($s === 'pending'): ?>
+                            <form method="POST" action="<?php echo e(route('admin.orders.accept', $order)); ?>" style="display:inline;">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" class="btn-success" style="font-size:.72rem;display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .65rem;">
                                     <i data-lucide="check" style="width:.75rem;height:.75rem;stroke-width:2.5;"></i> Accept
                                 </button>
                             </form>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:3rem;">No orders found.</td></tr>
-            @endforelse
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
 
-{{-- â•â•â•â•â•â•â•â•â•â• MANAGE ORDER MODAL â•â•â•â•â•â•â•â•â•â• --}}
+
 <div id="manageModal" class="modal-backdrop" onclick="closeModalBackdrop(event,'manageModal')">
     <div class="modal-box modal-lg">
         <div class="modal-header">
@@ -175,8 +177,8 @@ $statusConfig = [
     </div>
 </div>
 
-{{-- â•â•â•â•â•â•â•â•â•â• ORDER DATA MAP â•â•â•â•â•â•â•â•â•â• --}}
-@php
+
+<?php
 $ordersMap = [];
 foreach($orders as $o) {
     $ordersMap[$o->id] = [
@@ -207,12 +209,12 @@ foreach($orders as $o) {
     ];
 }
 $ridersMap = $availableRiders->map(fn($r) => ['id'=>$r->id,'name'=>$r->user->name,'phone'=>$r->phone])->values();
-@endphp
+?>
 
 <script>
-var ORDERS_MAP   = @json($ordersMap);
-var RIDERS       = @json($ridersMap);
-var CSRF_TOKEN   = '{{ csrf_token() }}';
+var ORDERS_MAP   = <?php echo json_encode($ordersMap, 15, 512) ?>;
+var RIDERS       = <?php echo json_encode($ridersMap, 15, 512) ?>;
+var CSRF_TOKEN   = '<?php echo e(csrf_token()); ?>';
 
 // -- Status pipeline
 var STATUS_PIPELINE = {
@@ -297,8 +299,8 @@ function openManageModal(id) {
     var actionsHtml = '';
     if (sp.next && o.status !== 'delivered' && o.status !== 'cancelled') {
         var actionRoute = o.status === 'pending'
-            ? '{{ route("admin.orders.accept", ":id") }}'.replace(':id', o.id)
-            : '{{ route("admin.orders.status", ":id") }}'.replace(':id', o.id);
+            ? '<?php echo e(route("admin.orders.accept", ":id")); ?>'.replace(':id', o.id)
+            : '<?php echo e(route("admin.orders.status", ":id")); ?>'.replace(':id', o.id);
         actionsHtml +=
             '<form method="POST" action="' + actionRoute + '" style="display:inline;" id="nextStepForm_' + o.id + '">' +
                 '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
@@ -313,7 +315,7 @@ function openManageModal(id) {
         var riderOptions = '<option value="">-- Select a rider --</option>';
         RIDERS.forEach(function(r) { riderOptions += '<option value="' + r.id + '">' + r.name + (r.phone ? ' · ' + r.phone : '') + '</option>'; });
         actionsHtml +=
-            '<form method="POST" action="{{ route("admin.orders.assign-rider", ":id") }}'.replace(':id', o.id) + '" style="display:flex;gap:.5rem;margin-top:.5rem;" id="assignForm_' + o.id + '">' +
+            '<form method="POST" action="<?php echo e(route("admin.orders.assign-rider", ":id")); ?>'.replace(':id', o.id) + '" style="display:flex;gap:.5rem;margin-top:.5rem;" id="assignForm_' + o.id + '">' +
                 '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
                 '<select name="rider_id" class="admin-input" style="flex:1;">' + riderOptions + '</select>' +
                 '<button type="submit" class="btn-primary" style="white-space:nowrap;font-size:.8rem;display:inline-flex;align-items:center;gap:.3rem;">' +
@@ -324,7 +326,7 @@ function openManageModal(id) {
 
     if (['pending','accepted','preparing'].includes(o.status)) {
         actionsHtml +=
-            '<form method="POST" action="{{ route("admin.orders.status", ":id") }}'.replace(':id', o.id) + '" style="margin-top:.25rem;" onsubmit="return confirm(\'Cancel this order?\')">' +
+            '<form method="POST" action="<?php echo e(route("admin.orders.status", ":id")); ?>'.replace(':id', o.id) + '" style="margin-top:.25rem;" onsubmit="return confirm(\'Cancel this order?\')">' +
                 '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
                 '<input type="hidden" name="_method" value="PATCH">' +
                 '<input type="hidden" name="status" value="cancelled">' +
@@ -379,4 +381,6 @@ function openManageModal(id) {
 }
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\patri\Desktop\EUT_WEB\resources\views/admin/orders.blade.php ENDPATH**/ ?>

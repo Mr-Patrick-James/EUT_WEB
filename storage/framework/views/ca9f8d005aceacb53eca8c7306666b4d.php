@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rider Dashboard €” EUT</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -330,10 +330,11 @@
                 <span class="brand-tag">Rider</span>
             </div>
             <div class="online-toggle-wrap">
-                <span class="online-label" id="onlineLabel" style="color:{{ $rider->is_available ? '#10b981' : '#4b5563' }};">
-                    {{ $rider->is_available ? 'Online' : 'Offline' }}
+                <span class="online-label" id="onlineLabel" style="color:<?php echo e($rider->is_available ? '#10b981' : '#4b5563'); ?>;">
+                    <?php echo e($rider->is_available ? 'Online' : 'Offline'); ?>
+
                 </span>
-                <button class="toggle-pill {{ $rider->is_available ? 'is-online' : '' }}" id="onlineToggle" onclick="toggleOnline()">
+                <button class="toggle-pill <?php echo e($rider->is_available ? 'is-online' : ''); ?>" id="onlineToggle" onclick="toggleOnline()">
                     <span class="toggle-pill-thumb"></span>
                 </button>
             </div>
@@ -347,17 +348,17 @@
     <!-- -->
     <div class="profile-card">
         <div class="profile-row">
-            <div class="profile-avatar">{{ $rider->initials }}</div>
+            <div class="profile-avatar"><?php echo e($rider->initials); ?></div>
             <div>
-                <p class="profile-name">{{ $rider->user->name }}</p>
-                <p class="profile-sub">&#x1F3CD;&#xFE0F; {{ ucfirst($rider->vehicle_type) }} &middot; ID: RIDER-{{ str_pad($rider->id, 3, '0', STR_PAD_LEFT) }}</p>
+                <p class="profile-name"><?php echo e($rider->user->name); ?></p>
+                <p class="profile-sub">&#x1F3CD;&#xFE0F; <?php echo e(ucfirst($rider->vehicle_type)); ?> &middot; ID: RIDER-<?php echo e(str_pad($rider->id, 3, '0', STR_PAD_LEFT)); ?></p>
             </div>
         </div>
         <div class="profile-stats">
-            <div class="pstat"><p class="pstat-val">{{ $todayDeliveries }}</p><p class="pstat-label">Today</p></div>
-            <div class="pstat"><p class="pstat-val" style="color:#10b981;">{{ $rider->total_deliveries }}</p><p class="pstat-label">All Time</p></div>
-            <div class="pstat"><p class="pstat-val">&#11088; {{ number_format($rider->rating, 1) }}</p><p class="pstat-label">Rating</p></div>
-            <div class="pstat"><p class="pstat-val" style="color:#10b981;">&#8369;{{ number_format($todayEarnings) }}</p><p class="pstat-label">Today's Pay</p></div>
+            <div class="pstat"><p class="pstat-val"><?php echo e($todayDeliveries); ?></p><p class="pstat-label">Today</p></div>
+            <div class="pstat"><p class="pstat-val" style="color:#10b981;"><?php echo e($rider->total_deliveries); ?></p><p class="pstat-label">All Time</p></div>
+            <div class="pstat"><p class="pstat-val">&#11088; <?php echo e(number_format($rider->rating, 1)); ?></p><p class="pstat-label">Rating</p></div>
+            <div class="pstat"><p class="pstat-val" style="color:#10b981;">&#8369;<?php echo e(number_format($todayEarnings)); ?></p><p class="pstat-label">Today's Pay</p></div>
         </div>
     </div>
 
@@ -378,14 +379,15 @@
                 <div style="display:flex;align-items:center;gap:8px;">
                     <span style="font-size:12px;font-weight:700;color:#a78bfa;">📍 Live Map</span>
                     <span style="font-size:10px;color:#4b5563;">
-                        @php
+                        <?php
                             $activeOrder = $active->firstWhere('status', 'out_for_delivery') ?? $active->first();
-                        @endphp
-                        @if($activeOrder)
-                            #{{ $activeOrder->order_number }}
-                        @else
+                        ?>
+                        <?php if($activeOrder): ?>
+                            #<?php echo e($activeOrder->order_number); ?>
+
+                        <?php else: ?>
                             Your Location
-                        @endif
+                        <?php endif; ?>
                     </span>
                 </div>
                 <span id="gpsStatusLabel" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#10b981;">
@@ -395,43 +397,45 @@
             <div id="riderMap" style="width:100%;height:220px;"></div>
             <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:11px;color:#6b7280;">
-                    @if($activeOrder && $activeOrder->status === 'out_for_delivery')
+                    <?php if($activeOrder && $activeOrder->status === 'out_for_delivery'): ?>
                         🟡 Restaurant → 🏠 Customer
-                    @elseif($activeOrder && $activeOrder->status === 'rider_assigned')
+                    <?php elseif($activeOrder && $activeOrder->status === 'rider_assigned'): ?>
                         🟡 Restaurant
-                    @else
+                    <?php else: ?>
                         📍 Your Location
-                    @endif
+                    <?php endif; ?>
                 </span>
                 <span id="riderDistText" style="font-size:11px;font-weight:700;color:#a78bfa;"></span>
             </div>
         </div>
 
-        @foreach($active as $order)
-            @if($loop->first && $order->status === 'rider_assigned')
+        <?php $__currentLoopData = $active; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if($loop->first && $order->status === 'rider_assigned'): ?>
                 <p class="section-label" style="margin-top:0;">🟡 Assigned — Head to Restaurant</p>
-            @elseif($order->status === 'rider_assigned')
+            <?php elseif($order->status === 'rider_assigned'): ?>
                 <p class="section-label" style="margin-top:20px;">🟡 Assigned — Head to Restaurant</p>
-            @elseif($loop->first && $order->status === 'out_for_delivery')
+            <?php elseif($loop->first && $order->status === 'out_for_delivery'): ?>
                 <!-- no label, map already has it -->
-            @endif
+            <?php endif; ?>
 
-            <div class="order-card {{ $order->status === 'out_for_delivery' ? 'active-order' : '' }}">
+            <div class="order-card <?php echo e($order->status === 'out_for_delivery' ? 'active-order' : ''); ?>">
                 <div class="oc-header">
                     <div class="oc-id-row">
-                        <span class="oc-id">#{{ $order->order_number }}</span>
-                        <span class="badge {{ $order->status === 'out_for_delivery' ? 'badge-delivering' : 'badge-assigned' }}">
-                            <span class="{{ $order->status === 'out_for_delivery' ? 'pulse-dot' : '' }}"></span>
-                            {{ $order->status === 'out_for_delivery' ? 'On the Way' : 'Assigned' }}
+                        <span class="oc-id">#<?php echo e($order->order_number); ?></span>
+                        <span class="badge <?php echo e($order->status === 'out_for_delivery' ? 'badge-delivering' : 'badge-assigned'); ?>">
+                            <span class="<?php echo e($order->status === 'out_for_delivery' ? 'pulse-dot' : ''); ?>"></span>
+                            <?php echo e($order->status === 'out_for_delivery' ? 'On the Way' : 'Assigned'); ?>
+
                         </span>
                     </div>
                     <div class="oc-customer">
-                        <div class="oc-avatar" style="background:rgba({{ $order->status === 'out_for_delivery' ? '139,92,246' : '245,158,11' }},.15);color:#{{ $order->status === 'out_for_delivery' ? 'a78bfa' : 'f59e0b' }};">
-                            {{ strtoupper(substr($order->user->name, 0, 1)) }}
+                        <div class="oc-avatar" style="background:rgba(<?php echo e($order->status === 'out_for_delivery' ? '139,92,246' : '245,158,11'); ?>,.15);color:#<?php echo e($order->status === 'out_for_delivery' ? 'a78bfa' : 'f59e0b'); ?>;">
+                            <?php echo e(strtoupper(substr($order->user->name, 0, 1))); ?>
+
                         </div>
                         <div>
-                            <p class="oc-cname">{{ $order->user->name }}</p>
-                            <p class="oc-csub">{{ $order->user->phone ?? 'No phone' }}</p>
+                            <p class="oc-cname"><?php echo e($order->user->name); ?></p>
+                            <p class="oc-csub"><?php echo e($order->user->phone ?? 'No phone'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -443,7 +447,8 @@
                         <div>
                             <p class="oc-addr-label">Pick Up (Restaurant)</p>
                             <p class="oc-addr-val">
-                                {{ $order->status === 'out_for_delivery' ? '✅ Picked up at ' . $order->picked_up_at->format('g:i A') : 'EUT Restaurant — Metro Naujan' }}
+                                <?php echo e($order->status === 'out_for_delivery' ? '✅ Picked up at ' . $order->picked_up_at->format('g:i A') : 'EUT Restaurant — Metro Naujan'); ?>
+
                             </p>
                         </div>
                     </div>
@@ -453,70 +458,71 @@
                         </div>
                         <div>
                             <p class="oc-addr-label">Deliver To</p>
-                            <p class="oc-addr-val">{{ $order->delivery_address }}</p>
+                            <p class="oc-addr-val"><?php echo e($order->delivery_address); ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="oc-items">
-                    {{ $order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ') }}
+                    <?php echo e($order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ')); ?>
+
                 </div>
                 <div class="oc-footer">
                     <div>
                         <p class="oc-total-label">Order Total</p>
-                        <p class="oc-total">&#8369;{{ number_format($order->total, 2) }}</p>
+                        <p class="oc-total">&#8369;<?php echo e(number_format($order->total, 2)); ?></p>
                     </div>
                     <div style="display:flex;gap:8px;align-items:center;">
-                        @if($order->user->phone)
-                            <button class="btn-call" onclick="window.location='tel:{{ $order->user->phone }}'" title="Call Customer">
+                        <?php if($order->user->phone): ?>
+                            <button class="btn-call" onclick="window.location='tel:<?php echo e($order->user->phone); ?>'" title="Call Customer">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             </button>
-                        @endif
-                        @if($order->status === 'rider_assigned')
-                            <form method="POST" action="{{ route('rider.orders.picked-up', $order) }}" style="display:inline;">
-                                @csrf
+                        <?php endif; ?>
+                        <?php if($order->status === 'rider_assigned'): ?>
+                            <form method="POST" action="<?php echo e(route('rider.orders.picked-up', $order)); ?>" style="display:inline;">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" class="btn-pickup">
                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                                     Picked Up
                                 </button>
                             </form>
-                        @elseif($order->status === 'out_for_delivery')
-                            <button class="btn-delivered" onclick="openDeliverySheet(this)" data-order-id="{{ $order->id }}">
+                        <?php elseif($order->status === 'out_for_delivery'): ?>
+                            <button class="btn-delivered" onclick="openDeliverySheet(this)" data-order-id="<?php echo e($order->id); ?>">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 Mark as Delivered
                             </button>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-        @if($active->isEmpty())
+        <?php if($active->isEmpty()): ?>
             <p class="section-label" style="text-align:center;color:#6b7280;">No active orders right now</p>
-        @endif
+        <?php endif; ?>
     </div><!-- /view-active -->
 
     <!-- -->
     <div id="view-history" style="display:none;">
         <p class="section-label">Completed Today</p>
-        @foreach($history as $order)
+        <?php $__currentLoopData = $history; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
             <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                    <span style="font-size:13px;font-weight:800;color:#fff;font-family:monospace;">#{{ $order->order_number }}</span>
-                    <span style="font-size:11px;color:#4b5563;">{{ $order->delivered_at->format('g:i A') }}</span>
+                    <span style="font-size:13px;font-weight:800;color:#fff;font-family:monospace;">#<?php echo e($order->order_number); ?></span>
+                    <span style="font-size:11px;color:#4b5563;"><?php echo e($order->delivered_at->format('g:i A')); ?></span>
                 </div>
-                <p style="font-size:12px;font-weight:600;color:#d1d5db;margin:0 0 2px;">{{ $order->user->name }}</p>
-                <p style="font-size:11px;color:#4b5563;margin:0;">{{ $order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ') }}</p>
+                <p style="font-size:12px;font-weight:600;color:#d1d5db;margin:0 0 2px;"><?php echo e($order->user->name); ?></p>
+                <p style="font-size:11px;color:#4b5563;margin:0;"><?php echo e($order->items->map(fn($i) => $i->item_name . ' × ' . $i->quantity)->implode(' · ')); ?></p>
             </div>
             <div style="text-align:right;flex-shrink:0;">
-                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">&#8369;{{ number_format($order->total, 2) }}</p>
+                <p style="font-size:16px;font-weight:900;color:#facc15;margin:0 0 3px;">&#8369;<?php echo e(number_format($order->total, 2)); ?></p>
                 <p style="font-size:12px;color:#facc15;">⭐</p>
             </div>
         </div>
-        @endforeach
-        @if($history->isEmpty())
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        <?php if($history->isEmpty()): ?>
             <p class="section-label" style="text-align:center;color:#6b7280;">No completed orders today</p>
-        @endif
+        <?php endif; ?>
     </div>
 
     <!-- -->
@@ -541,7 +547,7 @@
             </div>
         </div>
         <p class="section-label">Daily Breakdown</p>
-        @php
+        <?php
         $earningDays = [
             ['day'=>'Fri Jul 18','deliveries'=>7,'earn'=>840],
             ['day'=>'Thu Jul 17','deliveries'=>9,'earn'=>1080],
@@ -549,16 +555,16 @@
             ['day'=>'Tue Jul 15','deliveries'=>8,'earn'=>960],
             ['day'=>'Mon Jul 14','deliveries'=>5,'earn'=>600],
         ];
-        @endphp
-        @foreach($earningDays as $e)
+        ?>
+        <?php $__currentLoopData = $earningDays; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $e): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:14px;margin-bottom:8px;">
             <div>
-                <p style="font-size:13px;font-weight:600;color:#e5e7eb;margin:0 0 2px;">{{ $e['day'] }}</p>
-                <p style="font-size:11px;color:#4b5563;margin:0;">{{ $e['deliveries'] }} deliveries</p>
+                <p style="font-size:13px;font-weight:600;color:#e5e7eb;margin:0 0 2px;"><?php echo e($e['day']); ?></p>
+                <p style="font-size:11px;color:#4b5563;margin:0;"><?php echo e($e['deliveries']); ?> deliveries</p>
             </div>
-            <p style="font-size:18px;font-weight:900;color:#10b981;">&#8369;{{ number_format($e['earn']) }}</p>
+            <p style="font-size:18px;font-weight:900;color:#10b981;">&#8369;<?php echo e(number_format($e['earn'])); ?></p>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
 </div><!-- /page-body -->
@@ -570,28 +576,28 @@
     <div style="background:linear-gradient(135deg,#1a0e00,#100f1a);border:1px solid rgba(245,158,11,.2);border-radius:20px;padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(245,158,11,.08) 0%,transparent 70%);pointer-events:none;"></div>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-            <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem;color:#f59e0b;border:3px solid rgba(245,158,11,.3);flex-shrink:0;">{{ $rider->initials }}</div>
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem;color:#f59e0b;border:3px solid rgba(245,158,11,.3);flex-shrink:0;"><?php echo e($rider->initials); ?></div>
             <div>
-                <p style="font-size:19px;font-weight:800;color:#fff;margin:0 0 4px;">{{ $rider->user->name }}</p>
-                <p style="font-size:12px;color:#6b7280;margin:0;">{{ $rider->user->email }}</p>
+                <p style="font-size:19px;font-weight:800;color:#fff;margin:0 0 4px;"><?php echo e($rider->user->name); ?></p>
+                <p style="font-size:12px;color:#6b7280;margin:0;"><?php echo e($rider->user->email); ?></p>
             </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
                 <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Vehicle</p>
-                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">&#x1F3CD; {{ ucfirst($rider->vehicle_type) }}</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">&#x1F3CD; <?php echo e(ucfirst($rider->vehicle_type)); ?></p>
             </div>
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
                 <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Plate / ID</p>
-                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">{{ $rider->plate_number ?? 'RIDER-' . str_pad($rider->id, 3, '0', STR_PAD_LEFT) }}</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;"><?php echo e($rider->plate_number ?? 'RIDER-' . str_pad($rider->id, 3, '0', STR_PAD_LEFT)); ?></p>
             </div>
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
                 <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Phone</p>
-                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;">{{ $rider->phone ?? '—' }}</p>
+                <p style="font-size:14px;font-weight:700;color:#fff;margin:0;"><?php echo e($rider->phone ?? '—'); ?></p>
             </div>
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;">
                 <p style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;">Rating</p>
-                <p style="font-size:14px;font-weight:700;color:#facc15;margin:0;">&#11088; {{ number_format($rider->rating, 1) }}</p>
+                <p style="font-size:14px;font-weight:700;color:#facc15;margin:0;">&#11088; <?php echo e(number_format($rider->rating, 1)); ?></p>
             </div>
         </div>
     </div>
@@ -601,15 +607,15 @@
         <p style="font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin:0 0 12px;">Career Stats</p>
         <div style="display:flex;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);">
             <div style="flex:1;text-align:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,.07);">
-                <p style="font-size:22px;font-weight:900;color:#facc15;margin:0 0 3px;">{{ $rider->total_deliveries }}</p>
+                <p style="font-size:22px;font-weight:900;color:#facc15;margin:0 0 3px;"><?php echo e($rider->total_deliveries); ?></p>
                 <p style="font-size:10px;color:#4b5563;margin:0;">Deliveries</p>
             </div>
             <div style="flex:1;text-align:center;padding:14px 8px;border-right:1px solid rgba(255,255,255,.07);">
-                <p style="font-size:22px;font-weight:900;color:#10b981;margin:0 0 3px;">&#8369;{{ number_format($rider->total_deliveries * 120) }}</p>
+                <p style="font-size:22px;font-weight:900;color:#10b981;margin:0 0 3px;">&#8369;<?php echo e(number_format($rider->total_deliveries * 120)); ?></p>
                 <p style="font-size:10px;color:#4b5563;margin:0;">Total Earned</p>
             </div>
             <div style="flex:1;text-align:center;padding:14px 8px;">
-                <p style="font-size:22px;font-weight:900;color:#f59e0b;margin:0 0 3px;">&#11088; {{ number_format($rider->rating,1) }}</p>
+                <p style="font-size:22px;font-weight:900;color:#f59e0b;margin:0 0 3px;">&#11088; <?php echo e(number_format($rider->rating,1)); ?></p>
                 <p style="font-size:10px;color:#4b5563;margin:0;">Rating</p>
             </div>
         </div>
@@ -621,11 +627,12 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
             <div>
                 <p style="font-size:14px;font-weight:700;color:#fff;margin:0 0 3px;" id="profileStatusLabel">
-                    {{ $rider->is_available ? 'Online — Ready for orders' : 'Offline — Not accepting orders' }}
+                    <?php echo e($rider->is_available ? 'Online — Ready for orders' : 'Offline — Not accepting orders'); ?>
+
                 </p>
                 <p style="font-size:11px;color:#6b7280;margin:0;">Toggle to start or stop receiving deliveries</p>
             </div>
-            <button class="toggle-pill {{ $rider->is_available ? 'is-online' : '' }}" id="profileOnlineToggle" onclick="toggleOnlineSync()" style="flex-shrink:0;">
+            <button class="toggle-pill <?php echo e($rider->is_available ? 'is-online' : ''); ?>" id="profileOnlineToggle" onclick="toggleOnlineSync()" style="flex-shrink:0;">
                 <span class="toggle-pill-thumb"></span>
             </button>
         </div>
@@ -633,15 +640,15 @@
 
     <!-- Account Actions -->
     <div style="background:linear-gradient(145deg,#12131f,#0e0f1a);border:1px solid rgba(255,255,255,.07);border-radius:18px;overflow:hidden;margin-bottom:24px;">
-        <a href="{{ route('shop.home') }}" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);text-decoration:none;" onmouseenter="this.style.background='rgba(255,255,255,.04)'" onmouseleave="this.style.background='transparent'">
+        <a href="<?php echo e(route('shop.home')); ?>" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);text-decoration:none;" onmouseenter="this.style.background='rgba(255,255,255,.04)'" onmouseleave="this.style.background='transparent'">
             <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;">
                 <svg width="16" height="16" fill="none" stroke="#818cf8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             </div>
             <span style="font-size:14px;font-weight:600;color:#e5e7eb;">Browse Menu</span>
             <svg width="16" height="16" fill="none" stroke="#4b5563" viewBox="0 0 24 24" style="margin-left:auto;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
-        <form method="POST" action="{{ route('auth.logout') }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('auth.logout')); ?>">
+            <?php echo csrf_field(); ?>
             <button type="submit" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 18px;background:transparent;border:none;cursor:pointer;text-align:left;" onmouseenter="this.style.background='rgba(239,68,68,.06)'" onmouseleave="this.style.background='transparent'">
                 <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;">
                     <svg width="16" height="16" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -1067,9 +1074,9 @@ document.addEventListener('DOMContentLoaded', initRiderMap);
 
 /* -- GPS Location Ping every 10 seconds -- */
 function pingLocation(lat, lng) {
-    fetch('{{ route("rider.location") }}', {
+    fetch('<?php echo e(route("rider.location")); ?>', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
         body: JSON.stringify({ lat, lng }),
     }).catch(() => {});
 }
@@ -1120,3 +1127,4 @@ if (navigator.geolocation) {
 
 
 
+<?php /**PATH C:\Users\patri\Desktop\EUT_WEB\resources\views/rider/dashboard.blade.php ENDPATH**/ ?>

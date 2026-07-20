@@ -458,7 +458,7 @@
 <!-- ══════════ FIXED BUY BAR ══════════ -->
 <div class="buy-bar">
     <div class="buy-bar-inner">
-        <button class="btn-add-cart" onclick="openSheet('cart')">+ Add to Cart</button>
+        <button class="btn-add-cart" onclick="quickAddToCart()">+ Add to Cart</button>
         <button class="btn-buy-now" onclick="openSheet('buy')">Buy Now →</button>
     </div>
 </div>
@@ -906,6 +906,11 @@ function updateTotal() {
 }
 
 
+/* ── QUICK ADD TO CART — always open sheet to pick flavors/addons ── */
+function quickAddToCart() {
+    openSheet('cart');
+}
+
 /* ── SHEET OPEN / CLOSE ── */
 function openSheet(mode) {
     sheetMode = mode;
@@ -916,8 +921,19 @@ function openSheet(mode) {
         const chk = c.querySelector('.addon-check');
         if(chk) chk.style.opacity = '0.4';
     });
-    document.getElementById('sheetAddBtn').textContent = mode === 'buy' ? 'Add to Cart' : '+ Add to Cart';
-    document.getElementById('sheetBuyBtn').textContent = 'Buy Now →';
+    // In 'cart' mode: only show Add to Cart button (full width), hide Buy Now
+    const addBtn = document.getElementById('sheetAddBtn');
+    const buyBtn = document.getElementById('sheetBuyBtn');
+    if (mode === 'cart') {
+        addBtn.textContent = '+ Add to Cart';
+        addBtn.style.flex  = '1';
+        buyBtn.style.display = 'none';
+    } else {
+        addBtn.textContent   = 'Add to Cart';
+        addBtn.style.flex    = '1';
+        buyBtn.style.display = '';
+        buyBtn.textContent   = 'Buy Now →';
+    }
     document.getElementById('sheetBackdrop').classList.add('open');
     document.getElementById('buySheet').classList.add('open');
     document.body.style.overflow = 'hidden';
