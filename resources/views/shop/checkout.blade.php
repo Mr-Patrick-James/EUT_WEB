@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - EUT Restaurant</title>
+    <title>Checkout - E.U.T Snack House</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -716,12 +716,12 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         })),
     }));
 
-    /* If GPS not yet captured, do one last blocking attempt (3s max) */
+    /* If GPS not yet captured, do one last blocking attempt (5s max) */
     if (!_gpsLat && navigator.geolocation) {
         await new Promise(res => navigator.geolocation.getCurrentPosition(
             p => { _gpsLat = p.coords.latitude; _gpsLng = p.coords.longitude; res(); },
             () => res(),
-            { enableHighAccuracy: true, timeout: 3000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         ));
     }
 
@@ -729,10 +729,10 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         items, delivery_address: deliveryAddress,
         delivery_barangay: addr.barangay || addr.city || '',
         payment_method: payment, notes,
-        // Use the geocoded coords stored on the address record (accurate to the delivery location)
-        // Fall back to device GPS only if address has no saved coords
-        delivery_lat: addr.lat || _gpsLat || null,
-        delivery_lng: addr.lng || _gpsLng || null,
+        // Prefer live device GPS (most accurate for current location),
+        // fall back to saved address coords, then null
+        delivery_lat: _gpsLat || addr.lat || null,
+        delivery_lng: _gpsLng || addr.lng || null,
     };
 
     try {

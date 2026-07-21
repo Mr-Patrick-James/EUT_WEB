@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUT Restaurant - Complete Menu</title>
+    <title>E.U.T Snack House - Complete Menu</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -141,7 +141,7 @@
 </head>
 <body>
     <div class="menu-header">
-        <h1>EUT Restaurant</h1>
+        <h1>E.U.T Snack House</h1>
         <p>Eat • Unwind • Tea</p>
         <p>Complete Menu & Price List</p>
     </div>
@@ -330,7 +330,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <h3>Visit EUT Restaurant Today!</h3>
+        <h3>Visit E.U.T Snack House Today!</h3>
         <p>Experience the perfect blend of taste, ambiance, and service</p>
         
         <div class="contact-info">
@@ -353,7 +353,7 @@
         </div>
         
         <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">
-            © 2026 EUT Restaurant. All rights reserved. | Eat • Unwind • Tea
+            © 2026 E.U.T Snack House. All rights reserved. | Eat • Unwind • Tea
         </p>
     </div>
 </body>

@@ -1,4 +1,4 @@
-@extends('admin.layout')
+﻿@extends('admin.layout')
 @section('title', 'Riders')
 
 @section('content')
@@ -74,7 +74,7 @@ $riderStats = [
             <span style="width:10px;height:10px;background:#10b981;border-radius:50%;display:inline-block;"></span> Online / Available
         </span>
         <span style="font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;gap:.4rem;">
-            <span style="width:10px;height:10px;background:#facc15;border-radius:50%;display:inline-block;"></span> EUT Restaurant
+            <span style="width:10px;height:10px;background:#facc15;border-radius:50%;display:inline-block;"></span> E.U.T Snack House
         </span>
     </div>
 </div>
@@ -552,7 +552,7 @@ async function initAdminMap() {
     L.marker(RESTAURANT_ADMIN, { icon: L.divIcon({
         html: `<div style="background:#facc15;width:42px;height:42px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:18px;line-height:1;">&#x1F354;</span></div>`,
         className: '', iconSize: [42, 42], iconAnchor: [21, 42],
-    }) }).addTo(adminMapInst).bindPopup('<b>EUT Restaurant</b><br>Metro Naujan, Oriental Mindoro');
+    }) }).addTo(adminMapInst).bindPopup('<b>E.U.T Snack House</b><br>Metro Naujan, Oriental Mindoro');
 
     const allPoints = [RESTAURANT_ADMIN];
 

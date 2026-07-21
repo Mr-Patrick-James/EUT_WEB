@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - EUT Restaurant</title>
+    <title>Profile - E.U.T Snack House</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -377,7 +377,7 @@
         @endauth
     </div>
 
-    <p style="text-align:center; font-size:11px; color:#1f2937; padding-bottom:8px;">EUT Restaurant v1.0.0 · Made with ❤️</p>
+    <p style="text-align:center; font-size:11px; color:#1f2937; padding-bottom:8px;">E.U.T Snack House v1.0.0 · Made with ❤️</p>
 
 </div><!-- /page-body -->
 

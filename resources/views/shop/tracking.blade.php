@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders - EUT Restaurant</title>
+    <title>My Orders - E.U.T Snack House</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -332,7 +332,7 @@ function openDetail(orderId) {
     document.body.style.overflow = 'hidden';
     // Init map inside sheet for active orders
     if(!['delivered','cancelled'].includes(o.status)) {
-        setTimeout(()=>initOrderMap(o), 200);
+        setTimeout(()=>{ if(typeof initOrderMap==='function') initOrderMap(o); }, 300);
     }
 }
 
@@ -516,7 +516,7 @@ async function loadAllOrders() {
                     }
                     document.getElementById('detailBody').innerHTML = buildDetailBody(updated);
                     if (!['delivered','cancelled'].includes(updated.status)) {
-                        setTimeout(() => initOrderMap(updated), 200);
+                        setTimeout(() => { if(typeof initOrderMap==='function') initOrderMap(updated); }, 300);
                     }
                 } else {
                     // Status unchanged — only move the rider marker, no rebuild
@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <script>
 /* ── Map (Leaflet + OSRM) — only initialised inside the detail sheet ── */
-const RESTAURANT_POS = [13.3213129, 121.3027265];
+const RESTAURANT_POS = [13.3213129, 121.3027265]; // EUT Snack House — verified Google Maps coordinates
 
 async function fetchOSRMRoute(from, to) {
     const url = 'https://router.project-osrm.org/route/v1/driving/'
@@ -642,7 +642,7 @@ async function geocodeDeliveryAddr(rawAddr) {
         } catch(e) { /* try next */ }
         await new Promise(r => setTimeout(r, 400));
     }
-    return [13.3100, 121.2950]; // Naujan area fallback
+    return [13.3213129, 121.3027265]; // EUT Snack House fallback
 }
 
 async function initOrderMap(order) {
@@ -672,7 +672,7 @@ async function initOrderMap(order) {
     L.marker(RESTAURANT_POS, { icon: L.divIcon({
         html: '<div style="background:#facc15;width:36px;height:36px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.5);"><span style="transform:rotate(45deg);font-size:15px;">🍔</span></div>',
         className: '', iconSize: [36, 36], iconAnchor: [18, 36],
-    }) }).addTo(map).bindPopup('<b>EUT Restaurant</b>');
+    }) }).addTo(map).bindPopup('<b>E.U.T Snack House</b>');
 
     // Geocode fallback if coords missing
     if (!customerPos && order.delivery_address) {

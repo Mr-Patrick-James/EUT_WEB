@@ -1,4 +1,4 @@
-@extends('admin.layout')
+﻿@extends('admin.layout')
 @section('title', 'Settings')
 
 @section('content')
@@ -29,7 +29,7 @@
                 <label class="field-label" style="display:flex;align-items:center;gap:.3rem;">
                     <i data-lucide="building-2" style="width:.75rem;height:.75rem;stroke-width:2;"></i> Restaurant Name
                 </label>
-                <input type="text" name="restaurant_name" value="EUT Restaurant" class="admin-input" placeholder="e.g. EUT Restaurant">
+                <input type="text" name="restaurant_name" value="E.U.T Snack House" class="admin-input" placeholder="e.g. E.U.T Snack House">
             </div>
             <div>
                 <label class="field-label" style="display:flex;align-items:center;gap:.3rem;">

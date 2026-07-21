@@ -456,7 +456,7 @@
                         <div>
                             <p class="oc-addr-label">Pick Up (Restaurant)</p>
                             <p class="oc-addr-val">
-                                {{ $order->status === 'out_for_delivery' ? '✅ Picked up at ' . $order->picked_up_at?->format('g:i A') : 'EUT Restaurant — Metro Naujan' }}
+                                {{ $order->status === 'out_for_delivery' ? '✅ Picked up at ' . $order->picked_up_at?->format('g:i A') : 'E.U.T Snack House — Metro Naujan' }}
                             </p>
                         </div>
                     </div>
@@ -1159,7 +1159,7 @@ async function initRiderMap() {
     L.marker(RESTAURANT_R, { icon: L.divIcon({
         html: `<div style="background:#facc15;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F354;</span></div>`,
         className: '', iconSize: [38, 38], iconAnchor: [19, 38],
-    }) }).addTo(riderMapL).bindPopup('<b>EUT Restaurant</b>');
+    }) }).addTo(riderMapL).bindPopup('<b>E.U.T Snack House</b>');
 
     // Rider marker
     myMarker = L.marker(myPos, { icon: L.divIcon({

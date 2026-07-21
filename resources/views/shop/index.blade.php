@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUT Restaurant - Menu</title>
+    <title>E.U.T Snack House - Menu</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
@@ -345,7 +345,7 @@
     <div class="hero-card">
         <div class="hero-text">
             <div class="hero-badge"><span class="hero-badge-dot"></span> Open Now</div>
-            <h1 class="hero-title">EUT Restaurant</h1>
+            <h1 class="hero-title">E.U.T Snack House</h1>
             <p class="hero-sub">Eat • Unwind • Tea — Delivered Fast</p>
             <div class="hero-pills">
                 <span class="hero-pill">🚀 30–45 min</span>

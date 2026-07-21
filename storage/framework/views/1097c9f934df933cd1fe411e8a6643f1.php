@@ -1,4 +1,4 @@
-
+﻿
 <?php $__env->startSection('title', 'Orders'); ?>
 
 
@@ -447,7 +447,7 @@ async function initAdminRiderMap(o) {
     L.marker(ADMIN_RESTAURANT, { icon: L.divIcon({
         html: '<div style="background:#facc15;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:14px;">&#x1F354;</span></div>',
         className: '', iconSize: [34,34], iconAnchor: [17,34]
-    })}).addTo(adminMapInstance).bindPopup('<b>EUT Restaurant</b>');
+    })}).addTo(adminMapInstance).bindPopup('<b>E.U.T Snack House</b>');
 
     // Rider marker
     L.marker(riderPos, { icon: L.divIcon({
