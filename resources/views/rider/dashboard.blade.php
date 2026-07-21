@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -392,7 +392,20 @@
                     <span style="width:6px;height:6px;background:#10b981;border-radius:50%;animation:blink 1.2s infinite;"></span>GPS Live
                 </span>
             </div>
-            <div id="riderMap" style="width:100%;height:220px;"></div>
+            <div style="position:relative;">
+                <div id="riderMap" style="width:100%;height:220px;"></div>
+                <!-- Re-center button — appears after rider pans away -->
+                <button id="recenterBtn" onclick="recenterMap()"
+                    style="display:none;position:absolute;bottom:10px;right:10px;z-index:1000;
+                           background:rgba(8,8,16,.88);border:1px solid rgba(139,92,246,.5);
+                           color:#a78bfa;padding:6px 12px;border-radius:99px;font-size:11px;
+                           font-weight:700;cursor:pointer;backdrop-filter:blur(6px);
+                           display:none;align-items:center;gap:5px;transition:all .2s;"
+                    onmouseenter="this.style.background='rgba(139,92,246,.2)'"
+                    onmouseleave="this.style.background='rgba(8,8,16,.88)'">
+                    📍 Re-center
+                </button>
+            </div>
             <div style="padding:8px 16px 12px;display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:11px;color:#6b7280;">
                     @if($activeOrder && $activeOrder->status === 'out_for_delivery')
@@ -768,15 +781,35 @@
 
 <script>
 /* ”€”€ Online/Offline Toggle ”€”€ */
-let isOnline = false;
-function toggleOnline() {
-    isOnline = !isOnline;
+let isOnline = {{ $rider->is_available ? 'true' : 'false' }};
+
+function applyOnlineUI(online) {
     const pill  = document.getElementById('onlineToggle');
     const label = document.getElementById('onlineLabel');
-    pill.classList.toggle('is-online', isOnline);
-    label.textContent = isOnline ? 'Online' : 'Offline';
-    label.style.color  = isOnline ? '#10b981' : '#4b5563';
+    if (pill)  pill.classList.toggle('is-online', online);
+    if (label) { label.textContent = online ? 'Online' : 'Offline'; label.style.color = online ? '#10b981' : '#4b5563'; }
+    const pill2  = document.getElementById('profileOnlineToggle');
+    const label2 = document.getElementById('profileStatusLabel');
+    if (pill2)  pill2.classList.toggle('is-online', online);
+    if (label2) label2.textContent = online ? 'Online — Ready for orders' : 'Offline — Not accepting orders';
 }
+
+async function toggleOnline() {
+    const next = !isOnline;
+    applyOnlineUI(next);
+    try {
+        const res = await fetch('{{ route("rider.status") }}', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: JSON.stringify({ is_available: next }),
+        });
+        const data = await res.json();
+        if (data.success) { isOnline = data.is_available; }
+        else { applyOnlineUI(isOnline); }
+    } catch (e) { applyOnlineUI(isOnline); }
+}
+
+const toggleOnlineSync = toggleOnline;
 
 /* ”€”€ Tabs ”€”€ */
 function switchTab(tab) {
@@ -1112,6 +1145,16 @@ async function initRiderMap() {
     L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { attribution: '&copy; Google Maps', maxZoom: 20 }).addTo(riderMapL);
     L.tileLayer('https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', { attribution: '', maxZoom: 20, opacity: 0.85 }).addTo(riderMapL);
 
+    // Track manual panning/zooming so auto-recenter pauses while rider is exploring the map
+    riderMapL.on('movestart', function(e) {
+        if (!riderMapL._eutAutoPan) {
+            _lastUserMove = Date.now();
+            // Show re-center button when rider pans away
+            const btn = document.getElementById('recenterBtn');
+            if (btn) btn.style.display = 'flex';
+        }
+    });
+
     // Restaurant pin
     L.marker(RESTAURANT_R, { icon: L.divIcon({
         html: `<div style="background:#facc15;width:38px;height:38px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #d97706;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">&#x1F354;</span></div>`,
@@ -1159,6 +1202,17 @@ function updateRiderDist() {
     }
 }
 
+/* ── Re-center map to rider's current position ── */
+function recenterMap() {
+    if (!riderMapL || !myPos) return;
+    _lastUserMove = 0; // reset idle so auto-recenter also resumes
+    riderMapL._eutAutoPan = true;
+    riderMapL.flyTo(myPos, riderMapL.getZoom(), { animate: true, duration: 0.6 });
+    setTimeout(() => { if (riderMapL) riderMapL._eutAutoPan = false; }, 800);
+    const btn = document.getElementById('recenterBtn');
+    if (btn) btn.style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', initRiderMap);
 
 /* ═══════════════════════════════════════════
@@ -1190,6 +1244,8 @@ function retryGps() {
 let _gpsWatchId    = null;
 let _lastPing      = 0;
 let _lastRoute     = 0;
+let _lastUserMove  = 0;   // timestamp of last manual map interaction
+
 
 function startGpsWatch() {
     if (!navigator.geolocation) {
@@ -1213,7 +1269,19 @@ function startGpsWatch() {
             // Move rider marker
             myPos = [lat, lng];
             if (myMarker) myMarker.setLatLng(myPos);
-            if (riderMapL) riderMapL.panTo(myPos);
+
+            // Auto-recenter — only if rider hasn't manually panned in the last 8 seconds
+            if (riderMapL) {
+                const idleMs = Date.now() - _lastUserMove;
+                if (idleMs > 8000) {
+                    riderMapL._eutAutoPan = true;
+                    riderMapL.panTo(myPos, { animate: true, duration: 0.8 });
+                    setTimeout(() => { if (riderMapL) riderMapL._eutAutoPan = false; }, 1000);
+                    // Hide re-center button once map has snapped back automatically
+                    const btn = document.getElementById('recenterBtn');
+                    if (btn) btn.style.display = 'none';
+                }
+            }
             updateRiderDist();
 
             // Refresh OSRM route — throttled to once per 20 seconds
