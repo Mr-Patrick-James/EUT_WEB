@@ -15,7 +15,7 @@ class Order extends Model
         'delivery_address', 'delivery_barangay', 'delivery_lat', 'delivery_lng',
         'notes', 'proof_photo', 'delivery_type',
         'cancel_reason',
-        'accepted_at', 'assigned_at', 'picked_up_at', 'delivered_at', 'cancelled_at',
+        'accepted_at', 'prepared_at', 'assigned_at', 'picked_up_at', 'delivered_at', 'cancelled_at',
     ];
 
     protected $casts = [
@@ -25,6 +25,7 @@ class Order extends Model
         'delivery_lat'  => 'float',
         'delivery_lng'  => 'float',
         'accepted_at'   => 'datetime',
+        'prepared_at'   => 'datetime',
         'assigned_at'   => 'datetime',
         'picked_up_at'  => 'datetime',
         'delivered_at'  => 'datetime',
@@ -77,6 +78,16 @@ class Order extends Model
     public function isCancellable(): bool
     {
         return in_array($this->status, ['pending', 'accepted', 'preparing']);
+    }
+
+    public function isPrepared(): bool
+    {
+        return $this->prepared_at !== null;
+    }
+
+    public function scopeKitchenActive($query)
+    {
+        return $query->whereIn('status', ['pending', 'accepted', 'preparing']);
     }
 
     public function getStatusColorAttribute(): string

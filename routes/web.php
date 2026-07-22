@@ -131,6 +131,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::patch('/orders/{order}/status',          [AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::get('/riders/locations',                 [AdminController::class, 'riderLocations'])->name('riders.locations');
 
+    // ── Kitchen ────────────────────────────────────────────
+    Route::get('/kitchen',                          [AdminController::class, 'kitchen'])->name('kitchen');
+    Route::get('/kitchen/orders',                   [AdminController::class, 'kitchenOrders'])->name('kitchen.orders');
+    Route::post('/kitchen/orders/{order}/start',    [AdminController::class, 'kitchenStartCooking'])->name('kitchen.start');
+    Route::post('/kitchen/orders/{order}/ready',    [AdminController::class, 'kitchenMarkReady'])->name('kitchen.ready');
+
     // ── Riders ─────────────────────────────────────────────
     Route::get('/riders',                           [AdminController::class, 'riders'])->name('riders');
     Route::post('/riders',                          [AdminController::class, 'storeRider'])->name('riders.store');

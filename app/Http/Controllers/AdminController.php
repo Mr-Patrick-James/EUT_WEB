@@ -551,10 +551,10 @@ class AdminController extends Controller
     public function acceptOrder(\App\Models\Order $order)
     {
         if ($order->status !== 'pending') {
-            return back()->with('error', 'Order cannot be accepted.');
+            return $this->kitchenActionResponse(false, 'Order cannot be accepted.');
         }
         $order->update(['status' => 'accepted', 'accepted_at' => now()]);
-        return back()->with('success', "Order #{$order->order_number} accepted.");
+        return $this->kitchenActionResponse(true, "Order #{$order->order_number} accepted.");
     }
 
     public function assignRider(Request $request, \App\Models\Order $order)
@@ -569,6 +569,7 @@ class AdminController extends Controller
             'rider_id'    => $request->rider_id,
             'status'      => 'rider_assigned',
             'assigned_at' => now(),
+            'prepared_at' => $order->prepared_at ?? now(),
         ]);
 
         return back()->with('success', "Rider assigned to order #{$order->order_number}.");
@@ -621,6 +622,178 @@ class AdminController extends Controller
             });
 
         return response()->json($riders);
+    }
+
+    // ════════════════════════════════════════════════════════
+    // KITCHEN
+    // ════════════════════════════════════════════════════════
+
+    public function kitchen()
+    {
+        $orders = $this->getKitchenOrders();
+
+        return view('admin.kitchen', [
+            'newOrders'      => $orders['new'],
+            'queuedOrders'   => $orders['queued'],
+            'cookingOrders'  => $orders['cooking'],
+            'readyOrders'    => $orders['ready'],
+        ]);
+    }
+
+    public function kitchenOrders()
+    {
+        $orders = $this->getKitchenOrders();
+
+        return response()->json([
+            'new'     => $this->formatKitchenOrders($orders['new']),
+            'queued'  => $this->formatKitchenOrders($orders['queued']),
+            'cooking' => $this->formatKitchenOrders($orders['cooking']),
+            'ready'   => $this->formatKitchenOrders($orders['ready']),
+        ]);
+    }
+
+    public function kitchenStartCooking(\App\Models\Order $order)
+    {
+        if ($order->status !== 'accepted') {
+            return $this->kitchenActionResponse(false, 'Only accepted orders can start cooking.');
+        }
+
+        $order->update([
+            'status'      => 'preparing',
+            'prepared_at' => null,
+        ]);
+
+        return $this->kitchenActionResponse(true, "Order #{$order->order_number} is now cooking.");
+    }
+
+    public function kitchenMarkReady(\App\Models\Order $order)
+    {
+        if ($order->status !== 'preparing') {
+            return $this->kitchenActionResponse(false, 'Only orders being cooked can be marked ready.');
+        }
+
+        if ($order->prepared_at) {
+            return $this->kitchenActionResponse(false, 'Order is already marked ready.');
+        }
+
+        $order->update(['prepared_at' => now()]);
+
+        return $this->kitchenActionResponse(true, "Order #{$order->order_number} is ready for pickup.");
+    }
+
+    private function getKitchenOrders(): array
+    {
+        $active = \App\Models\Order::with(['user', 'items'])
+            ->whereIn('status', ['pending', 'accepted', 'preparing'])
+            ->oldest()
+            ->get();
+
+        $readyForDelivery = \App\Models\Order::with(['user', 'items', 'rider.user'])
+            ->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->where('status', 'preparing')->whereNotNull('prepared_at');
+                })->orWhereIn('status', ['rider_assigned', 'out_for_delivery']);
+            })
+            ->orderByRaw("CASE
+                WHEN status = 'preparing' THEN 1
+                WHEN status = 'rider_assigned' THEN 2
+                WHEN status = 'out_for_delivery' THEN 3
+                ELSE 4 END")
+            ->oldest('prepared_at')
+            ->get();
+
+        return [
+            'new'     => $active->where('status', 'pending')->values(),
+            'queued'  => $active->where('status', 'accepted')->values(),
+            'cooking' => $active->where('status', 'preparing')->whereNull('prepared_at')->values(),
+            'ready'   => $readyForDelivery->values(),
+        ];
+    }
+
+    private function formatKitchenOrders($orders): array
+    {
+        return collect($orders)->map(fn ($o) => $this->formatKitchenOrder($o))->values()->all();
+    }
+
+    private function formatKitchenOrder(\App\Models\Order $order): array
+    {
+        $delivery = $this->kitchenDeliveryMeta($order);
+
+        return [
+            'id'              => $order->id,
+            'order_number'    => $order->order_number,
+            'status'          => $order->status,
+            'customer'        => $order->user?->name ?? 'Guest',
+            'notes'           => $order->notes,
+            'placed_at'       => $order->created_at->format('g:i A'),
+            'elapsed_mins'    => (int) $order->created_at->diffInMinutes(now()),
+            'accepted_at'     => $order->accepted_at?->format('g:i A'),
+            'prepared_at'     => $order->prepared_at?->format('g:i A'),
+            'assigned_at'     => $order->assigned_at?->format('g:i A'),
+            'picked_up_at'    => $order->picked_up_at?->format('g:i A'),
+            'rider_name'      => $order->rider?->user?->name,
+            'delivery_status' => $delivery['status'],
+            'delivery_label'  => $delivery['label'],
+            'delivery_detail' => $delivery['detail'],
+            'delivery_color'  => $delivery['color'],
+            'delivery_bg'     => $delivery['bg'],
+            'items'           => $order->items->map(fn ($i) => [
+                'name'      => $i->item_name,
+                'qty'       => $i->quantity,
+                'image'     => $i->image ? asset($i->image) : asset('images/hero-burger.jpg'),
+                'modifiers' => collect($i->modifiers ?? [])->pluck('name')->filter()->values()->all(),
+            ])->all(),
+        ];
+    }
+
+    private function kitchenDeliveryMeta(\App\Models\Order $order): array
+    {
+        if ($order->status === 'out_for_delivery') {
+            return [
+                'status' => 'picked_up',
+                'label'  => 'Picked Up — On the Way',
+                'detail' => $order->picked_up_at
+                    ? 'Left kitchen at ' . $order->picked_up_at->format('g:i A')
+                    : 'Out for delivery',
+                'color'  => '#8b5cf6',
+                'bg'     => 'rgba(139,92,246,.14)',
+            ];
+        }
+
+        if ($order->status === 'rider_assigned') {
+            $rider = $order->rider?->user?->name ?? 'Rider';
+
+            return [
+                'status' => 'rider_assigned',
+                'label'  => "Hand to Rider: {$rider}",
+                'detail' => $order->assigned_at
+                    ? 'Rider assigned at ' . $order->assigned_at->format('g:i A')
+                    : 'Waiting for rider pickup',
+                'color'  => '#2563eb',
+                'bg'     => 'rgba(37,99,235,.14)',
+            ];
+        }
+
+        return [
+            'status' => 'waiting_rider',
+            'label'  => 'Ready — Waiting for Rider',
+            'detail' => $order->prepared_at
+                ? 'Food ready at ' . $order->prepared_at->format('g:i A')
+                : 'Ready for delivery',
+            'color'  => '#10b981',
+            'bg'     => 'rgba(16,185,129,.14)',
+        ];
+    }
+
+    private function kitchenActionResponse(bool $success, string $message)
+    {
+        if (request()->expectsJson()) {
+            return response()->json(['success' => $success, 'message' => $message]);
+        }
+
+        return $success
+            ? back()->with('success', $message)
+            : back()->with('error', $message);
     }
 
     // ════════════════════════════════════════════════════════
